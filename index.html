@@ -9,7 +9,7 @@
     --bg:#0f1115;--panel:#171a21;--line:#2a3140;
     --text:#e9ecf1;--muted:#8a90a2;
     --primary:#2563eb;--danger:#7f1d1d;
-    --ok:#86efac;--warn:#fde68a;--err:#fca5a5;
+    --err:#fca5a5;
     --chip:#111827;
   }
   body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;background:var(--bg);color:var(--text)}
@@ -33,8 +33,6 @@
   td.num{text-align:right;white-space:nowrap}
   a{color:#93c5fd;text-decoration:none}
   a:hover{text-decoration:underline}
-  .pill{display:inline-block;padding:4px 8px;border:1px solid var(--line);border-radius:999px;background:var(--chip);font-size:12px}
-  .ok{color:var(--ok)} .warn{color:var(--warn)}
   .grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
   @media (max-width:900px){ .grid{grid-template-columns:1fr} }
   input,select,textarea{background:#0f1115;color:var(--text);border:1px solid var(--line);border-radius:10px;padding:10px;width:100%}
@@ -63,7 +61,7 @@
       <button class="btn" id="btnPrintPlan">Imprimir Acuerdo + Anexo (A4)</button>
       <button class="btn" id="btnExport">Exportar JSON</button>
       <button class="btn" id="btnImport">Importar JSON</button>
-      <button class="btn danger" id="btnReset">Reset</button>
+      <button class="btn danger" id="btnReset">Reset TOTAL</button>
     </div>
   </div>
 
@@ -201,7 +199,6 @@
   </div>
 </div>
 
-<!-- ✅ IMPORTANTE: type="module" bien puesto -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-app.js";
 import { getFirestore, doc, getDoc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-firestore.js";
@@ -221,18 +218,20 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
 
+// Documento compartido
 const CC_REF = doc(db, "cuentas", "bertinelli-lin");
 
+// Identidad simple del dispositivo
 const CLIENT_ID_KEY = "cc_client_id";
 const clientId = localStorage.getItem(CLIENT_ID_KEY) || crypto.randomUUID();
 localStorage.setItem(CLIENT_ID_KEY, clientId);
 
 let applyingRemote = false;
 let lastLocalRev = 0;
-let canWrite = false; // se habilita solo si estás logueado
+let canWrite = false; // editor solo si logueado
 
 async function pushRemote(state) {
-  if (!canWrite) return;          // ✅ vendedor nunca escribe
+  if (!canWrite) return;
   if (applyingRemote) return;
 
   state._meta = state._meta || {};
@@ -290,6 +289,24 @@ document.addEventListener("DOMContentLoaded", async () => {
     };
   }
 
+  // ✅ Reset total (local + Firebase) — dentro del scope correcto
+  async function hardReset(){
+    if(!confirm("Reset TOTAL: borra local y Firebase. ¿Seguro?")) return;
+
+    localStorage.removeItem(KEY);
+
+    const fresh = makeInitialState();
+    fresh._meta = { rev: 1, updatedAt: Date.now(), updatedBy: clientId };
+
+    applyingRemote = true;
+    state = fresh;
+    await setDoc(CC_REF, { state: fresh }, { merge: true });
+    applyingRemote = false;
+
+    render();
+    alert("Listo: reseteado local + Firebase.");
+  }
+
   function calcSaldos(state){
     let saldo = 0;
     return state.movs.map(m=>{
@@ -301,7 +318,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     return state.movs.reduce((acc,m)=> acc + Number(m.credito||0), 0);
   }
 
-  // ===== números a letras =====
+  // ===== números a letras (ES) =====
   function unidades(n){ return ["CERO","UNO","DOS","TRES","CUATRO","CINCO","SEIS","SIETE","OCHO","NUEVE"][n] || ""; }
   function decenas(n){
     const esp = {
@@ -349,12 +366,13 @@ document.addEventListener("DOMContentLoaded", async () => {
   function montoEnFormatoReciboUSD(monto){
     const m = Math.floor(Number(monto||0));
     const letras = numeroEnLetras(m);
-    return `DOLARES BILLETES<br>ESTADOUNIDENSES ${letras} (U$S ${m})`;
+    // ✅ texto plano (sin <br>) porque lo metemos en una oración
+    return `DOLARES ESTADOUNIDENSES BILLETE ${letras} (USD ${m})`;
   }
 
-  function nextReciboNum2(state){
+  function nextReciboNum4(state){
     state.recibo_seq = (state.recibo_seq || 0) + 1;
-    return String(state.recibo_seq).padStart(2,"0");
+    return String(state.recibo_seq).padStart(4,"0");
   }
 
   function fileToDataUrl(file){
@@ -369,6 +387,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   // ===== plan =====
   function generarPlanBase(state){
     const plan = [];
+
     plan.push({
       periodo: "12/2025",
       concepto: state.meta.entrega_inicial_label || "Entrega inicial ya efectuada",
@@ -397,6 +416,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   function aplicarPagosAlPlan(plan, state){
     let pagado = totalPagado(state);
+
     for(const fila of plan){
       if(fila.tipo === "antecedente") continue;
       if(pagado <= 0) break;
@@ -420,83 +440,106 @@ document.addEventListener("DOMContentLoaded", async () => {
     return { fin: lastNotCumplida ? lastNotCumplida.periodo : "(—)", cuotasRestantes: cuotas.slice(firstPendingIdx).length };
   }
 
+  // ===== recibo (A4) con el formato “tipo tu captura” =====
   function openReciboPrint(state, rec, modo, saldoLuego){
+    const isImputado = (modo === "imputado");
     const [mm,yyyy] = String(rec.periodo).split("/");
     const mes = MESES[mm] || mm;
+
     const monto = Math.floor(Number(rec.monto||0));
     const montoLinea = montoEnFormatoReciboUSD(monto);
 
-    const saldoBlock = (modo==="imputado" && typeof saldoLuego==="number")
-      ? `<div class="k">Saldo pendiente luego del presente pago: <b>U$S ${fmt(saldoLuego)}</b></div>`
+    const saldoBlock = (isImputado && typeof saldoLuego==="number")
+      ? `<div class="kv"><span class="k">Saldo pendiente luego del presente pago:</span> <b>USD ${fmt(saldoLuego)}</b></div>`
       : ``;
-
-    const notaEstado = (modo==="imputado")
-      ? `<div class="m" style="margin-top:10px">Este recibo fue imputado al libro de movimientos.</div>`
-      : ``;
-
-    const aclV = `${state.meta.vendedor} – DNI ${state.meta.dni_vendedor}`;
-    const aclC = `${state.meta.comprador} – DNI ${state.meta.dni_comprador}`;
 
     const html = `
-<!doctype html><html lang="es"><head><meta charset="utf-8"/>
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>Recibo R${rec.numero}</title>
+<title>Recibo N° ${rec.numero}</title>
 <style>
-  @page{ size:A4; margin:2.5cm; }
-  body{font-family:system-ui,Segoe UI,Arial;color:#111}
+  @page{ size:A4; margin:2.2cm; }
+  body{font-family:system-ui,Segoe UI,Arial;color:#111;background:#fff}
   .noprint{margin-bottom:12px}
   .btn{border:1px solid #111;background:#f2f2f2;padding:8px 12px;border-radius:10px;font-weight:700;cursor:pointer}
   @media print{ .noprint{display:none} }
-  .box{border:1px solid #222;padding:18px;border-radius:10px}
-  h1{font-size:18px;margin:0 0 10px 0}
-  .m{color:#444;font-size:12px}
-  .k{margin-top:10px;line-height:1.55}
-  .row{display:flex;gap:18px;margin-top:18px}
-  .sig{flex:1;border-top:1px solid #111;padding-top:8px;font-size:12px}
-  .monto{margin-top:10px;font-weight:700;text-transform:uppercase}
-</style></head><body>
+
+  .sheet{
+    border:1px solid #111;
+    border-radius:10px;
+    padding:14px 16px 12px 16px;
+  }
+
+  .h1{font-size:16px;font-weight:800;margin:0 0 4px 0}
+  .sub{font-size:12px;color:#333;margin:0 0 10px 0}
+
+  .txt{font-size:13px;line-height:1.55;margin:0 0 10px 0}
+  .b{font-weight:800}
+  .upper{font-weight:800;text-transform:uppercase}
+
+  .kv{margin:6px 0;font-size:13px}
+  .k{color:#222}
+
+  .sigGrid{display:grid;grid-template-columns:1fr 1fr;gap:22px;margin-top:16px}
+  .lineLabel{font-size:11px;color:#333;margin-top:6px}
+  .line{border-top:1px solid #111;margin-top:18px}
+  .foot{font-size:11px;color:#333;margin-top:10px}
+</style>
+</head>
+<body>
+
 <div class="noprint">
   <button class="btn" onclick="window.print()">Imprimir (A4)</button>
 </div>
 
-<div class="box">
-  <h1>RECIBO Nº R${rec.numero}</h1>
-  <div class="m">Cuenta Corriente – Bertinelli / Lin Racioppi</div>
+<div class="sheet">
+  <div class="h1">RECIBO N° ${rec.numero}</div>
+  <div class="sub">Cuenta Corriente – Bertinelli / Lin Racioppi</div>
 
-  <div class="k">
-    En la ciudad de Buenos Aires, en el mes de <b>${mes} de ${yyyy}</b>, recibí de <b>${state.meta.comprador}</b>
-    la suma de
-  
+  <p class="txt">
+    En la ciudad de ________________________, en el mes de <span class="b">${mes} de ${yyyy}</span>,
+    recibí de <span class="b">${state.meta.comprador}</span> la suma de
+    <span class="upper">${montoLinea}</span>,
+    en concepto de pago a cuenta del saldo pendiente de la operación de compraventa instrumentada mediante
+    <span class="b">Escritura N° ${state.meta.escritura_num}</span> (Registro Notarial N° ${state.meta.registro}).
+  </p>
 
-  <div class="monto">${montoLinea}
-
-  <div class="k">
-    en concepto de pago a cuenta del saldo pendiente de la operación de compraventa instrumentada mediante <b>Escritura Nº ${state.meta.escritura_num}</b>
-    (Registro Notarial Nº ${state.meta.registro}), referida al mes de <b>${state.meta.ref_mes}</b>.
-  </div>
-
-  <div class="k">
-    Inmueble: <b>${state.meta.inmueble}</b><br/>
-    Concepto: <b>${rec.concepto}</b><br/>
-    Período imputado: <b>${rec.periodo}</b>
-  </div>
+  <div class="kv"><span class="k">Concepto:</span> <span class="b">${rec.concepto}</span></div>
+  <div class="kv"><span class="k">Período imputado:</span> <span class="b">${rec.periodo}</span></div>
 
   ${saldoBlock}
-  ${notaEstado}
 
-  <div class="row">
-    <div class="sig">Firma comprador</div>
-    <div class="sig">Firma vendedor</div>
+  <div class="sigGrid">
+    <div>
+      <div class="line"></div>
+      <div class="lineLabel">Firma comprador</div>
+
+      <div class="line"></div>
+      <div class="lineLabel">Aclaración / DNI comprador</div>
+    </div>
+
+    <div>
+      <div class="line"></div>
+      <div class="lineLabel">Firma vendedor</div>
+
+      <div class="line"></div>
+      <div class="lineLabel">Aclaración / DNI vendedor</div>
+    </div>
   </div>
-  <div class="row" style="margin-top:10px">
-    <div class="sig">${aclC}</div>
-    <div class="sig">${aclV}</div>
-  </div>
+
+  <div class="foot">Pago en efectivo (USD billete).</div>
 </div>
-</body></html>`;
+
+</body>
+</html>`;
 
     const w = window.open("", "_blank");
-    w.document.open(); w.document.write(html); w.document.close();
+    w.document.open();
+    w.document.write(html);
+    w.document.close();
   }
 
   function abrirAdjunto(adjunto){
@@ -515,6 +558,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     w.document.close();
   }
 
+  // ===== impresión Acuerdo + Anexo (A4) =====
   function printPlanYAcuerdo(state){
     const plan = aplicarPagosAlPlan(generarPlanBase(state), state);
 
@@ -610,7 +654,7 @@ Escritura Nº <b>${state.meta.escritura_num}</b> – Registro Notarial Nº <b>${
     w.document.open(); w.document.write(html); w.document.close();
   }
 
-  // ==== Auth UI simple ====
+  // ===== Auth UI simple =====
   const authBar = $("authBar");
   authBar.innerHTML = `
     <span id="authStatus">Modo visualizador</span>
@@ -639,7 +683,6 @@ Escritura Nº <b>${state.meta.escritura_num}</b> – Registro Notarial Nº <b>${
   btnLogout.onclick = async ()=> { await signOut(auth); };
 
   function setViewerUI(){
-    // vendedor: solo lectura
     $("btnEmitir").style.display = "none";
     $("btnImputar").style.display = "none";
     $("btnExport").style.display = "none";
@@ -697,12 +740,10 @@ Escritura Nº <b>${state.meta.escritura_num}</b> – Registro Notarial Nº <b>${
 
   function saveState(){
     localStorage.setItem(KEY, JSON.stringify(state));
-    // push remoto si editor
     pushRemote(state).catch(err => console.error("pushRemote error", err));
   }
 
   function render(){
-    // protecciones básicas
     if(!state || !state.meta || !Array.isArray(state.movs) || !Array.isArray(state.recibos)){
       $("saldoBadge").textContent = "Saldo: —";
       $("planResumen").textContent = "Estado inválido (no se pudo cargar).";
@@ -718,70 +759,57 @@ Escritura Nº <b>${state.meta.escritura_num}</b> – Registro Notarial Nº <b>${
     const saldoRestante = Math.max(0, Number(state.meta.saldo_inicial||0) - totalPagado(state));
     $("planResumen").textContent = `Saldo restante: U$S ${fmt(saldoRestante)} · Fin estimado: ${fin} · Cuotas restantes: ${cuotasRestantes}`;
 
-    // plan
+    // Plan
     const tbPlan = $("tbodyPlan");
     tbPlan.innerHTML = "";
     plan.forEach(p=>{
-      let estadoHtml;
-      if(p.estado === "Pagado"){
-        estadoHtml = `<span class="pill ok">Pagado</span>`;
-      } else if(p.estado === "Cumplida"){
-        estadoHtml = `<span class="pill ok">Cumplida</span>`;
-      } else if(p.estado === "Parcial"){
-        estadoHtml = `<span class="pill warn">Parcial</span>`;
-      } else {
-        estadoHtml = `<span class="pill">Pendiente</span>`;
-      }
-
       const tr = document.createElement("tr");
       tr.innerHTML = `
         <td>${p.periodo}</td>
         <td>${p.concepto}${p.tipo==="antecedente" ? `<div class="small">Antecedente</div>` : ""}</td>
         <td class="num">${fmt(p.cuota)}</td>
-        <td>${estadoHtml}</td>
+        <td>${p.estado}</td>
         <td class="num">${fmt(p.saldo_proyectado)}</td>
       `;
       tbPlan.appendChild(tr);
     });
 
-    // recibos
+    // Recibos
     const tbRec = $("tbodyRec");
     tbRec.innerHTML = "";
     if(state.recibos.length === 0){
       tbRec.innerHTML = `<tr><td colspan="5" class="muted">Todavía no hay recibos emitidos.</td></tr>`;
     } else {
       state.recibos.slice().sort((a,b)=>a.numero.localeCompare(b.numero)).forEach(r=>{
-        const est = r.estado==="pendiente"
-          ? `<span class="pill warn">Pendiente</span>`
-          : `<span class="pill ok">Imputado</span>`;
+        const est = (r.estado==="pendiente" ? "Pendiente" : "Imputado");
         const ver = `<a href="#" class="lnkRec" data-id="${r.id}">Ver / Imprimir (A4)</a>`;
         const tr = document.createElement("tr");
         tr.innerHTML = `
           <td>${r.periodo}</td>
           <td>${r.concepto}<div class="small">${(MESES[r.periodo.split("/")[0]]||r.periodo.split("/")[0])} ${r.periodo.split("/")[1]}</div></td>
           <td class="num">${fmt(r.monto)}</td>
-          <td>R${r.numero} · ${ver}</td>
+          <td>${r.numero} · ${ver}</td>
           <td>${est}</td>
         `;
         tbRec.appendChild(tr);
       });
     }
 
-    // movimientos
+    // Movimientos
     const tbMov = $("tbodyMov");
     tbMov.innerHTML = "";
     movs.forEach(m=>{
       const adj =
         m.recibo_num
           ? (m.adjunto
-              ? `<span class="pill ok">Adjunto cargado</span> · <a href="#" class="lnkAdj" data-id="${m.id}">Ver</a>`
-              : `<span class="pill warn">Falta adjunto</span>`)
+              ? `Adjunto cargado · <a href="#" class="lnkAdj" data-id="${m.id}">Ver</a>`
+              : `Falta adjunto`)
           : "—";
 
       const tr = document.createElement("tr");
       tr.innerHTML = `
         <td>${m.periodo}</td>
-        <td>${m.concepto}${m.recibo_num ? ` <span class="small">(R${m.recibo_num})</span>` : ""}${m.obs ? `<div class="small">Obs.: ${m.obs}</div>`:""}</td>
+        <td>${m.concepto}${m.recibo_num ? ` <span class="small">(${m.recibo_num})</span>` : ""}${m.obs ? `<div class="small">Obs.: ${m.obs}</div>`:""}</td>
         <td class="num">${m.credito ? fmt(m.credito) : "—"}</td>
         <td class="num"><b>${fmt(m.saldo)}</b></td>
         <td>${adj}</td>
@@ -789,7 +817,7 @@ Escritura Nº <b>${state.meta.escritura_num}</b> – Registro Notarial Nº <b>${
       tbMov.appendChild(tr);
     });
 
-    // bind ver recibo
+    // Ver recibo
     document.querySelectorAll(".lnkRec").forEach(a=>{
       a.onclick = (e)=>{
         e.preventDefault();
@@ -807,7 +835,7 @@ Escritura Nº <b>${state.meta.escritura_num}</b> – Registro Notarial Nº <b>${
       };
     });
 
-    // bind ver adjunto
+    // Ver adjunto
     document.querySelectorAll(".lnkAdj").forEach(a=>{
       a.onclick = (e)=>{
         e.preventDefault();
@@ -817,15 +845,16 @@ Escritura Nº <b>${state.meta.escritura_num}</b> – Registro Notarial Nº <b>${
       };
     });
 
-    // imputar select
+    // Imputar select
     const pendientes = state.recibos.filter(r=>r.estado==="pendiente");
     $("btnImputar").disabled = pendientes.length===0;
+
     const sel = $("i_recibo");
     sel.innerHTML = "";
     pendientes.sort((a,b)=>a.numero.localeCompare(b.numero)).forEach(r=>{
       const opt = document.createElement("option");
       opt.value = r.id;
-      opt.textContent = `R${r.numero} · ${r.periodo} · U$S ${fmt(r.monto)} · ${r.concepto}`;
+      opt.textContent = `${r.numero} · ${r.periodo} · U$S ${fmt(r.monto)} · ${r.concepto}`;
       sel.appendChild(opt);
     });
   }
@@ -849,7 +878,7 @@ Escritura Nº <b>${state.meta.escritura_num}</b> – Registro Notarial Nº <b>${
     if(!monto || monto<=0) return alert("Monto inválido.");
     if(!concepto) return alert("Concepto requerido.");
 
-    const numero = nextReciboNum2(state);
+    const numero = nextReciboNum4(state); // ✅ 0001, 0002...
     const rec = { id: crypto.randomUUID(), numero, periodo, monto, concepto, estado:"pendiente" };
     state.recibos.push(rec);
 
@@ -896,7 +925,7 @@ Escritura Nº <b>${state.meta.escritura_num}</b> – Registro Notarial Nº <b>${
       };
       reader.readAsDataURL(f);
     } else {
-      $("i_preview").innerHTML = `<div class="pill">PDF seleccionado</div>`;
+      $("i_preview").innerHTML = `<div class="small">PDF seleccionado</div>`;
     }
   };
 
@@ -973,12 +1002,7 @@ Escritura Nº <b>${state.meta.escritura_num}</b> – Registro Notarial Nº <b>${
     inp.click();
   };
 
-  $("btnReset").onclick = ()=>{
-    if(confirm("¿Resetear en ESTE navegador? (borra todo lo local)")){
-      localStorage.removeItem(KEY);
-      location.reload();
-    }
-  };
+  $("btnReset").onclick = ()=> hardReset();
 
   // primer render
   render();
