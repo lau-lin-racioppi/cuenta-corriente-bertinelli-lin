@@ -464,9 +464,13 @@ document.addEventListener("DOMContentLoaded", async () => {
   <div class="m">Cuenta Corriente – Bertinelli / Lin Racioppi</div>
 
   <div class="k">
-    En la ciudad de ______________________, en el mes de <b>${mes} de ${yyyy}</b>, recibí de <b>${state.meta.comprador}</b>
+    En la ciudad de Buenos Aires, en el mes de <b>${mes} de ${yyyy}</b>, recibí de <b>${state.meta.comprador}</b>
     la suma de
-  <div class="monto">${montoLinea}</div> <div class="k">
+  
+
+  <div class="monto">${montoLinea}
+
+  <div class="k">
     en concepto de pago a cuenta del saldo pendiente de la operación de compraventa instrumentada mediante <b>Escritura Nº ${state.meta.escritura_num}</b>
     (Registro Notarial Nº ${state.meta.registro}), referida al mes de <b>${state.meta.ref_mes}</b>.
   </div>
