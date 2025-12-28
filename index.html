@@ -123,6 +123,7 @@
         <tr>
           <th style="width:110px">Período</th>
           <th>Concepto</th>
+          <th class="num" style="width:110px">Débito</th>
           <th class="num" style="width:110px">Crédito</th>
           <th class="num" style="width:110px">Saldo</th>
           <th style="width:190px">Adjunto</th>
@@ -289,7 +290,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     };
   }
 
-  // ✅ Reset total (local + Firebase) — dentro del scope correcto
+  // Reset total (local + Firebase)
   async function hardReset(){
     if(!confirm("Reset TOTAL: borra local y Firebase. ¿Seguro?")) return;
 
@@ -318,7 +319,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     return state.movs.reduce((acc,m)=> acc + Number(m.credito||0), 0);
   }
 
-  // ===== números a letras (ES) =====
+  // números a letras (ES)
   function unidades(n){ return ["CERO","UNO","DOS","TRES","CUATRO","CINCO","SEIS","SIETE","OCHO","NUEVE"][n] || ""; }
   function decenas(n){
     const esp = {
@@ -366,7 +367,6 @@ document.addEventListener("DOMContentLoaded", async () => {
   function montoEnFormatoReciboUSD(monto){
     const m = Math.floor(Number(monto||0));
     const letras = numeroEnLetras(m);
-    // ✅ texto plano (sin <br>) porque lo metemos en una oración
     return `DOLARES ESTADOUNIDENSES BILLETE ${letras} (USD ${m})`;
   }
 
@@ -384,7 +384,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
   }
 
-  // ===== plan =====
+  // plan
   function generarPlanBase(state){
     const plan = [];
 
@@ -440,7 +440,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     return { fin: lastNotCumplida ? lastNotCumplida.periodo : "(—)", cuotasRestantes: cuotas.slice(firstPendingIdx).length };
   }
 
-  // ===== recibo (A4) con el formato “tipo tu captura” =====
+  // Recibo (A4)
   function openReciboPrint(state, rec, modo, saldoLuego){
     const isImputado = (modo === "imputado");
     const [mm,yyyy] = String(rec.periodo).split("/");
@@ -558,7 +558,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     w.document.close();
   }
 
-  // ===== impresión Acuerdo + Anexo (A4) =====
+  // Impresión Acuerdo + Anexo (A4) — vista A4 + justificado + título de ventana
   function printPlanYAcuerdo(state){
     const plan = aplicarPagosAlPlan(generarPlanBase(state), state);
 
@@ -566,95 +566,163 @@ document.addEventListener("DOMContentLoaded", async () => {
       <tr>
         <td>${p.periodo}</td>
         <td>${p.concepto}</td>
-        <td style="text-align:right">${fmt(p.cuota)}</td>
+        <td class="num">${fmt(p.cuota)}</td>
         <td>${p.estado}</td>
-        <td style="text-align:right">${fmt(p.saldo_proyectado)}</td>
+        <td class="num">${fmt(p.saldo_proyectado)}</td>
       </tr>
     `).join("");
 
+    const docTitle = "Acuerdo y Anexo – Cuenta Corriente";
+
     const acuerdo = `
-<h3>ACUERDO DE CANCELACIÓN DE SALDO DE PRECIO</h3>
-<p>
-Entre el Sr. <b>${state.meta.vendedor}</b>, DNI ${state.meta.dni_vendedor}, en adelante <b>EL VENDEDOR</b>, y el Sr. <b>${state.meta.comprador}</b>, DNI ${state.meta.dni_comprador}, en adelante <b>EL COMPRADOR</b>, se celebra el presente acuerdo, sujeto a las siguientes cláusulas:
-</p>
+      <h1>ACUERDO PRIVADO DE CANCELACIÓN DE SALDO DE PRECIO</h1>
 
-<p><b>PRIMERA – Antecedentes.</b> Las partes manifiestan que celebraron la compraventa del inmueble sito en <b>${state.meta.inmueble}</b>,
-instrumentada mediante <b>Escritura Pública Nº ${state.meta.escritura_num}</b>, pasada ante el <b>Registro Notarial Nº ${state.meta.registro}</b>,
-referida al mes de <b>${state.meta.ref_mes}</b>.</p>
+      <p>
+        Entre el Sr. <b>${state.meta.vendedor}</b>, DNI ${state.meta.dni_vendedor}, en adelante <b>EL VENDEDOR</b>,
+        y el Sr. <b>${state.meta.comprador}</b>, DNI ${state.meta.dni_comprador}, en adelante <b>EL COMPRADOR</b>,
+        se celebra el presente acuerdo, sujeto a las siguientes cláusulas:
+      </p>
 
-<p><b>ANTECEDENTE – Entrega inicial ya efectuada.</b> Las partes dejan constancia de que el COMPRADOR entregó en concepto de entrega inicial la suma de <b>U$S ${fmt(state.meta.entrega_inicial)}</b>,
-quedando el saldo convenido en cuenta corriente determinado en función de dicha entrega.</p>
+      <p><b>PRIMERA – Antecedentes.</b> Las partes manifiestan que celebraron la compraventa del inmueble sito en
+        <b>${state.meta.inmueble}</b>, instrumentada mediante <b>Escritura Pública Nº ${state.meta.escritura_num}</b>,
+        pasada ante el <b>Registro Notarial Nº ${state.meta.registro}</b>, referida al mes de <b>${state.meta.ref_mes}</b>.
+      </p>
 
-<p><b>SEGUNDA – Saldo pendiente.</b> Las partes reconocen un saldo pendiente a cargo del COMPRADOR por <b>U$S ${fmt(state.meta.saldo_inicial)}</b>.</p>
+      <p><b>ANTECEDENTE – Entrega inicial ya efectuada.</b> Las partes dejan constancia de que el COMPRADOR entregó
+        en concepto de entrega inicial la suma de <b>U$S ${fmt(state.meta.entrega_inicial)}</b>, quedando el saldo
+        convenido en cuenta corriente determinado en función de dicha entrega.
+      </p>
 
-<p><b>TERCERA – Forma de pago.</b> El saldo será cancelado conforme esquema:
-a) <b>enero 2026</b>: U$S 150; b) desde el período siguiente: pagos mensuales de referencia de U$S 500 hasta cancelar el saldo.</p>
+      <p><b>SEGUNDA – Saldo pendiente.</b> Las partes reconocen un saldo pendiente a cargo del COMPRADOR por
+        <b>U$S ${fmt(state.meta.saldo_inicial)}</b>.
+      </p>
 
-<p><b>CUARTA – Adelantos.</b> El COMPRADOR podrá efectuar pagos adelantados o superiores sin penalidad. Dichos adelantos se imputarán al saldo y
-acortarán la duración total del plan.</p>
+      <p><b>TERCERA – Forma de pago.</b> El saldo será cancelado conforme esquema: a) <b>enero 2026</b>: U$S 150;
+        b) desde el período siguiente: pagos mensuales de referencia de U$S 500 hasta cancelar el saldo.
+      </p>
 
-<p><b>QUINTA – Carácter.</b> El plan se recalcula por adelantos, manteniéndose la obligación de cancelar el saldo hasta cero.</p>
+      <p><b>CUARTA – Adelantos.</b> El COMPRADOR podrá efectuar pagos adelantados o superiores sin penalidad.
+        Dichos adelantos se imputarán al saldo y acortarán la duración total del plan.
+      </p>
 
-<p><b>SEXTA – Recibos.</b> Cada pago se documentará mediante recibo firmado por ambas partes.</p>
+      <p><b>QUINTA – Carácter.</b> El plan se recalcula por adelantos, manteniéndose la obligación de cancelar el saldo
+        hasta cero.
+      </p>
 
-<p><b>SÉPTIMA – Naturaleza.</b> El presente acuerdo es complementario de la escritura referida y regula exclusivamente la modalidad de cancelación del saldo pendiente.</p>
+      <p><b>SEXTA – Recibos.</b> Cada pago se documentará mediante recibo firmado por ambas partes.</p>
 
-<p>En prueba de conformidad, se firman dos ejemplares de un mismo tenor, en la ciudad de ______________________, en el mes de ______________________ del año ____________.</p>
+      <p><b>SÉPTIMA – Naturaleza.</b> El presente acuerdo es complementario de la escritura referida y regula exclusivamente
+        la modalidad de cancelación del saldo pendiente.
+      </p>
 
-<div style="display:flex;gap:40px;margin-top:40px">
-  <div style="flex:1;border-top:1px solid #000;padding-top:6px">Firma EL VENDEDOR</div>
-  <div style="flex:1;border-top:1px solid #000;padding-top:6px">Firma EL COMPRADOR</div>
-</div>
-`;
+      <p>
+        En prueba de conformidad, se firman dos ejemplares de un mismo tenor, en la ciudad de ______________________,
+        en el mes de ______________________ del año ____________.
+      </p>
+
+      <div class="signRow">
+        <div class="sign">
+          <div class="line"></div>
+          <div class="lbl">Firma EL VENDEDOR</div>
+        </div>
+        <div class="sign">
+          <div class="line"></div>
+          <div class="lbl">Firma EL COMPRADOR</div>
+        </div>
+      </div>
+    `;
 
     const html = `
-<!doctype html><html lang="es"><head><meta charset="utf-8"/>
-<title>Acuerdo + Anexo (A4)</title>
-<style>
-  @page{ size:A4; margin:2.5cm; }
-  body{font-family:Arial;color:#111}
-  .noprint{margin-bottom:12px}
-  .btn{border:1px solid #111;background:#f2f2f2;padding:8px 12px;border-radius:10px;font-weight:700;cursor:pointer}
-  @media print{ .noprint{display:none} }
-  h2{margin:0 0 10px 0}
-  p{line-height:1.45}
-  table{width:100%;border-collapse:collapse;margin:14px 0}
-  th,td{border:1px solid #000;padding:6px;font-size:12px}
-  th{background:#eee}
-  .small{font-size:12px;color:#333}
-  .pb{page-break-before:always}
-</style></head><body>
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8"/>
+  <title>${docTitle}</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <style>
+    @page{ size:A4; margin:2.5cm; }
 
-<div class="noprint">
-  <button class="btn" onclick="window.print()">Imprimir (A4)</button>
-</div>
+    body{ margin:0; background:#e5e7eb; font-family: Arial, sans-serif; color:#111; }
+    .noprint{ padding:12px; }
+    .btn{border:1px solid #111;background:#f2f2f2;padding:8px 12px;border-radius:10px;font-weight:700;cursor:pointer}
+    .sheet{
+      width:210mm;
+      min-height:297mm;
+      background:#fff;
+      margin:16px auto;
+      padding:2.5cm;
+      box-shadow:0 10px 30px rgba(0,0,0,.15);
+      box-sizing:border-box;
+    }
 
-${acuerdo}
+    p{ text-align: justify; line-height:1.55; margin:0 0 10px 0; }
+    h1{ font-size:16px; margin:0 0 12px 0; text-align:center; letter-spacing:.2px; }
+    h2{ font-size:14px; margin:0 0 10px 0; }
+    .small{ font-size:12px; color:#333; }
 
-<div class="pb"></div>
+    table{ width:100%; border-collapse: collapse; margin:14px 0; font-size:12px; }
+    th,td{ border:1px solid #000; padding:6px; vertical-align:top; }
+    th{ background:#eee; text-align:left; }
+    td.num{ text-align:right; white-space:nowrap; }
 
-<h2>ANEXO I – PLAN DE PAGOS</h2>
-<p class="small">
-Inmueble: <b>${state.meta.inmueble}</b><br/>
-Escritura Nº <b>${state.meta.escritura_num}</b> – Registro Notarial Nº <b>${state.meta.registro}</b>.
-</p>
+    .pb{ page-break-before: always; }
+    .signRow{ display:flex; gap:40px; margin-top:30px; }
+    .sign{ flex:1; }
+    .line{ border-top:1px solid #000; margin-top:26px; }
+    .lbl{ font-size:12px; padding-top:6px; }
 
-<table>
-<thead>
-<tr>
-  <th>Período</th><th>Concepto</th><th>Cuota (U$S)</th><th>Estado</th><th>Saldo proyectado</th>
-</tr>
-</thead>
-<tbody>${filas}</tbody>
-</table>
+    /* Intento de suprimir encabezado/pie del navegador (depende del usuario/config del navegador) */
+    @media print{
+      body{ background:#fff; }
+      .noprint{ display:none; }
+      .sheet{ width:auto; min-height:auto; margin:0; padding:0; box-shadow:none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="noprint">
+    <button class="btn" onclick="window.print()">Imprimir (A4)</button>
+  </div>
 
-</body></html>`;
+  <div class="sheet">
+    ${acuerdo}
 
-    const w = window.open("", "_blank");
-    w.document.open(); w.document.write(html); w.document.close();
+    <div class="pb"></div>
+
+    <h2>ANEXO I – PLAN DE PAGOS</h2>
+    <p class="small">
+      Inmueble: <b>${state.meta.inmueble}</b><br/>
+      Escritura Nº <b>${state.meta.escritura_num}</b> – Registro Notarial Nº <b>${state.meta.registro}</b>.
+    </p>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Período</th>
+          <th>Concepto</th>
+          <th class="num">Cuota (U$S)</th>
+          <th>Estado</th>
+          <th class="num">Saldo proyectado</th>
+        </tr>
+      </thead>
+      <tbody>${filas}</tbody>
+    </table>
+  </div>
+
+  <script>
+    document.title = ${JSON.stringify(docTitle)};
+  </script>
+</body>
+</html>`;
+
+    // nombre de ventana (la URL puede seguir siendo about:blank, depende del navegador)
+    const w = window.open("", "acuerdo_anexo");
+    w.document.open();
+    w.document.write(html);
+    w.document.close();
   }
 
-  // ===== Auth UI simple =====
+  // Auth UI simple
   const authBar = $("authBar");
   authBar.innerHTML = `
     <span id="authStatus">Modo visualizador</span>
@@ -711,7 +779,7 @@ Escritura Nº <b>${state.meta.escritura_num}</b> – Registro Notarial Nº <b>${
     }
   });
 
-  // ===== estado =====
+  // Estado
   let state = await pullRemoteOrInit(makeInitialState);
   localStorage.setItem(KEY, JSON.stringify(state)); // backup local
 
@@ -788,14 +856,14 @@ Escritura Nº <b>${state.meta.escritura_num}</b> – Registro Notarial Nº <b>${
           <td>${r.periodo}</td>
           <td>${r.concepto}<div class="small">${(MESES[r.periodo.split("/")[0]]||r.periodo.split("/")[0])} ${r.periodo.split("/")[1]}</div></td>
           <td class="num">${fmt(r.monto)}</td>
-          <td>${r.numero} · ${ver}</td>
+          <td>R${r.numero} · ${ver}</td>
           <td>${est}</td>
         `;
         tbRec.appendChild(tr);
       });
     }
 
-    // Movimientos
+    // Movimientos (✅ incluye débito + crédito)
     const tbMov = $("tbodyMov");
     tbMov.innerHTML = "";
     movs.forEach(m=>{
@@ -810,6 +878,7 @@ Escritura Nº <b>${state.meta.escritura_num}</b> – Registro Notarial Nº <b>${
       tr.innerHTML = `
         <td>${m.periodo}</td>
         <td>${m.concepto}${m.recibo_num ? ` <span class="small">(${m.recibo_num})</span>` : ""}${m.obs ? `<div class="small">Obs.: ${m.obs}</div>`:""}</td>
+        <td class="num">${m.debito ? fmt(m.debito) : "—"}</td>
         <td class="num">${m.credito ? fmt(m.credito) : "—"}</td>
         <td class="num"><b>${fmt(m.saldo)}</b></td>
         <td>${adj}</td>
@@ -854,12 +923,12 @@ Escritura Nº <b>${state.meta.escritura_num}</b> – Registro Notarial Nº <b>${
     pendientes.sort((a,b)=>a.numero.localeCompare(b.numero)).forEach(r=>{
       const opt = document.createElement("option");
       opt.value = r.id;
-      opt.textContent = `${r.numero} · ${r.periodo} · U$S ${fmt(r.monto)} · ${r.concepto}`;
+      opt.textContent = `R${r.numero} · ${r.periodo} · U$S ${fmt(r.monto)} · ${r.concepto}`;
       sel.appendChild(opt);
     });
   }
 
-  // ===== handlers UI =====
+  // handlers UI
   $("btnEmitir").onclick = ()=>{
     $("e_periodo").value = "01/2026";
     $("e_monto").value = "";
@@ -878,7 +947,7 @@ Escritura Nº <b>${state.meta.escritura_num}</b> – Registro Notarial Nº <b>${
     if(!monto || monto<=0) return alert("Monto inválido.");
     if(!concepto) return alert("Concepto requerido.");
 
-    const numero = nextReciboNum4(state); // ✅ 0001, 0002...
+    const numero = nextReciboNum4(state);
     const rec = { id: crypto.randomUUID(), numero, periodo, monto, concepto, estado:"pendiente" };
     state.recibos.push(rec);
 
