@@ -495,7 +495,7 @@
 </head>
 <body>
 <div class="noprint">
-  <button class="btn" onclick="window.print()">Imprimir (A4)</button>
+  <button class="btn" onclick="window.print()">Imprimir</button>
 </div>
 
 <div class="sheet">
@@ -724,7 +724,7 @@ body{
 </head>
 <body>
   <div class="noprint">
-    <button class="btn" onclick="window.print()">Imprimir (A4)</button>
+    <button class="btn" onclick="window.print()">Imprimir</button>
   </div>
 
   <div class="sheet">
@@ -889,7 +889,7 @@ body{
       } else {
         state.recibos.slice().sort((a,b)=>a.numero.localeCompare(b.numero)).forEach(r=>{
           const est = (r.estado==="pendiente" ? "Pendiente" : "Imputado");
-          const ver = `<a href="#" class="lnkRec" data-id="${r.id}">Ver / Imprimir (A4)</a>`;
+          const ver = `<a href="#" class="lnkRec" data-id="${r.id}">Ver / Imprimir</a>`;
           const tr = document.createElement("tr");
           tr.innerHTML = `
             <td>${r.periodo}</td>
