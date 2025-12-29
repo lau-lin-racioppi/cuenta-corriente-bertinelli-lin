@@ -39,7 +39,6 @@
   textarea{min-height:70px;resize:vertical}
   hr{border:none;border-top:1px solid var(--line);margin:10px 0}
 
-  /* MODAL: en mobile permite scrollear el contenido y no te tapa el botón "Imputar" */
   .modal{
     position:fixed; inset:0;
     display:none;
@@ -51,18 +50,9 @@
     justify-content:center;
   }
   .modal.show{display:flex}
-  .modal .card{
-    max-width:920px;
-    width:100%;
-    margin:auto;
-  }
+  .modal .card{ max-width:920px; width:100%; margin:auto; }
 
-  /* El preview no debe “expandir” infinito y bloquear el scroll */
-  #i_preview img{
-    max-height:40vh;
-    width:auto;
-    display:block;
-  }
+  #i_preview img{ max-height:40vh; width:auto; display:block; }
 
   .ck{display:flex;gap:8px;align-items:flex-start}
   .ck input{width:auto;margin-top:3px}
@@ -187,9 +177,7 @@
 <div class="modal" id="modalImputar">
   <div class="card">
     <h2>Imputar pago (obligatorio adjuntar recibo firmado)</h2>
-    <div class="muted">
-      El archivo adjunto debe ser una imagen o PDF del recibo firmado por ambas partes.
-    </div>
+    <div class="muted">El archivo adjunto debe ser una imagen o PDF del recibo firmado por ambas partes.</div>
     <hr>
     <div class="grid">
       <div>
@@ -211,9 +199,7 @@
 
     <div class="ck" style="margin-top:10px">
       <input type="checkbox" id="i_declaro" />
-      <div class="small">
-        Declaro que el adjunto corresponde al recibo seleccionado y que se encuentra firmado por ambas partes.
-      </div>
+      <div class="small">Declaro que el adjunto corresponde al recibo seleccionado y que se encuentra firmado por ambas partes.</div>
     </div>
 
     <div class="row" style="justify-content:flex-end;margin-top:10px">
@@ -468,7 +454,20 @@
     }
 
     // ======================
-    // RECIBO (A5 apaisado) + RESPONSIVE + COMPARTIR
+    // Helpers: CTA adaptativa (desktop=Imprimir, móvil=Compartir)
+    // ======================
+    function wantsShareCTA(){
+      // Si hay Web Share + touch/móvil, priorizamos compartir. Si no, imprimir.
+      const canShare = !!(navigator.share && navigator.canShare);
+      const isTouch = (navigator.maxTouchPoints || 0) > 0;
+      const isSmall = window.matchMedia && window.matchMedia("(max-width: 900px)").matches;
+      return canShare && (isTouch || isSmall);
+    }
+
+    // ======================
+    // RECIBO (A5 apaisado) + RESPONSIVE
+    // Desktop: IMPRIMIR
+    // Mobile: COMPARTIR
     // ======================
     function openReciboPrint(state, rec, modo, saldoLuego){
       const isImputado = (modo === "imputado");
@@ -494,9 +493,7 @@
 <title>${docTitle}</title>
 <style>
   @page{ size:A5 landscape; margin:10mm; }
-
   :root{ --barH:56px; }
-
   html,body{ height:100%; }
   body{ margin:0; font-family:system-ui,Segoe UI,Arial; color:#111; background:#fff; }
 
@@ -595,7 +592,7 @@
 
 <div class="topbar">
   <div class="ttl">${docTitle}</div>
-  <button class="btn" id="btnShare">Compartir</button>
+  <button class="btn" id="btnCta">...</button>
 </div>
 
 <div class="sheet">
@@ -664,19 +661,33 @@
         text: ${JSON.stringify(docTitle)},
         files: [file]
       });
-      return;
+      return true;
     }
-
+    // fallback desktop: descarga
     downloadAsFile(file.name, html, "text/html");
     alert("Tu navegador no soporta compartir. Se descargó el HTML para que lo envíes.");
+    return false;
   }
 
-  document.getElementById("btnShare").onclick = ()=>{
-    shareHtml().catch(err=>{
-      console.error(err);
-      alert("No se pudo compartir.");
-    });
-  };
+  function isShareMode(){
+    const canShare = !!(navigator.share && navigator.canShare);
+    const isTouch = (navigator.maxTouchPoints || 0) > 0;
+    const isSmall = window.matchMedia && window.matchMedia("(max-width: 900px)").matches;
+    return canShare && (isTouch || isSmall);
+  }
+
+  const btn = document.getElementById("btnCta");
+  function syncCTA(){
+    if(isShareMode()){
+      btn.textContent = "Compartir";
+      btn.onclick = ()=> shareHtml().catch(err=>{ console.error(err); alert("No se pudo compartir."); });
+    } else {
+      btn.textContent = "Imprimir";
+      btn.onclick = ()=> window.print();
+    }
+  }
+  syncCTA();
+  window.addEventListener("resize", syncCTA);
 <\/script>
 
 </body>
@@ -689,7 +700,9 @@
     }
 
     // ======================
-    // ADJUNTO: RESPONSIVE + COMPARTIR
+    // ADJUNTO: RESPONSIVE
+    // Desktop: IMPRIMIR
+    // Mobile: COMPARTIR
     // ======================
     function abrirAdjunto(adjunto){
       const w = window.open("", "_blank");
@@ -751,22 +764,9 @@
     background:#fff;
   }
 
-  .imgWrap{
-    display:flex;
-    justify-content:center;
-    padding: 12px;
-  }
-  img{
-    max-width: 100%;
-    height: auto;
-    border:1px solid #ddd;
-    border-radius:10px;
-  }
-  embed{
-    width:100%;
-    height:100%;
-    border:none;
-  }
+  .imgWrap{ display:flex; justify-content:center; padding: 12px; }
+  img{ max-width: 100%; height: auto; border:1px solid #ddd; border-radius:10px; }
+  embed{ width:100%; height:100%; border:none; }
 
   @media print{
     .topbar{ display:none; }
@@ -778,7 +778,7 @@
 
 <div class="topbar">
   <div class="ttl">${title}</div>
-  <button class="btn" id="btnShare">Compartir</button>
+  <button class="btn" id="btnCta">...</button>
 </div>
 
 <div class="viewer">
@@ -810,7 +810,7 @@
         text: ${JSON.stringify(title)},
         files: [file]
       });
-      return;
+      return true;
     }
 
     const url = URL.createObjectURL(blob);
@@ -822,14 +822,28 @@
     a.remove();
     setTimeout(()=>URL.revokeObjectURL(url), 1000);
     alert("Tu navegador no soporta compartir. Se descargó el archivo para que lo envíes.");
+    return false;
   }
 
-  document.getElementById("btnShare").onclick = ()=>{
-    shareAdj().catch(err=>{
-      console.error(err);
-      alert("No se pudo compartir.");
-    });
-  };
+  function isShareMode(){
+    const canShare = !!(navigator.share && navigator.canShare);
+    const isTouch = (navigator.maxTouchPoints || 0) > 0;
+    const isSmall = window.matchMedia && window.matchMedia("(max-width: 900px)").matches;
+    return canShare && (isTouch || isSmall);
+  }
+
+  const btn = document.getElementById("btnCta");
+  function syncCTA(){
+    if(isShareMode()){
+      btn.textContent = "Compartir";
+      btn.onclick = ()=> shareAdj().catch(err=>{ console.error(err); alert("No se pudo compartir."); });
+    } else {
+      btn.textContent = "Imprimir";
+      btn.onclick = ()=> window.print();
+    }
+  }
+  syncCTA();
+  window.addEventListener("resize", syncCTA);
 <\/script>
 
 </body>
@@ -841,7 +855,9 @@
     }
 
     // ==========================
-    // ACUERDO + ANEXO (A4 2 páginas + FULLSCREEN en mobile + COMPARTIR)
+    // ACUERDO + ANEXO
+    // Desktop: IMPRIMIR
+    // Mobile: COMPARTIR
     // ==========================
     function printPlanYAcuerdo(state){
       const plan = aplicarPagosAlPlan(generarPlanBase(state), state);
@@ -934,19 +950,12 @@
   <style>
     @page{ size:A4 portrait; margin:16mm; }
 
-    body{
-      margin:0;
-      background:#e5e7eb;
-      font-family: Arial, sans-serif;
-      color:#111;
-    }
-
+    body{ margin:0; background:#e5e7eb; font-family: Arial, sans-serif; color:#111; }
     .fecha{ text-align:right; }
 
     .noprint{ padding:12px; }
     .btn{border:1px solid #111;background:#f2f2f2;padding:8px 12px;border-radius:10px;font-weight:700;cursor:pointer}
 
-    /* ====== MODO PANTALLA (responsivo / full screen) ====== */
     .sheet{
       width: min(210mm, 100vw);
       min-height: 100vh;
@@ -985,7 +994,6 @@
       overflow-wrap: break-word;
     }
 
-    /* Aumentado acuerdo */
     p{ line-height:1.78; margin:0 0 12px 0; font-size:15.8px; }
     h1{ font-size:22px; margin:0; text-align:center; letter-spacing:.2px; }
     h2{ font-size:17px; margin:0 0 10px 0; }
@@ -999,33 +1007,25 @@
     th{ background:#eee; text-align:left; }
     td.num{ text-align:right; white-space:nowrap; }
 
-    .pageBreak{
-      break-before: page;
-      page-break-before: always;
-    }
+    .pageBreak{ break-before: page; page-break-before: always; }
 
     .signRow{ display:flex; gap:40px; margin-top:28px; }
     .sign{ flex:1; }
     .line{ border-top:1px solid #000; margin-top:24px; }
     .lbl{ font-size:13.2px; padding-top:6px; }
 
-    /* ====== MODO IMPRESIÓN (A4 real, 2 páginas) ====== */
     @media print{
       body{ background:#fff; }
       .noprint{ display:none; }
       .sheet{
-        width:auto;
-        min-height:auto;
-        margin:0;
-        padding:0;
-        box-shadow:none;
+        width:auto; min-height:auto; margin:0; padding:0; box-shadow:none;
       }
     }
   </style>
 </head>
 <body>
   <div class="noprint">
-    <button class="btn" id="btnShare">Compartir</button>
+    <button class="btn" id="btnCta">...</button>
   </div>
 
   <div class="sheet">
@@ -1073,24 +1073,34 @@
       const file = new File([html], "acuerdo_y_anexo.html", { type:"text/html" });
 
       if(navigator.share && navigator.canShare && navigator.canShare({ files:[file] })){
-        await navigator.share({
-          title: document.title,
-          text: document.title,
-          files: [file]
-        });
-        return;
+        await navigator.share({ title: document.title, text: document.title, files: [file] });
+        return true;
       }
 
       downloadAsFile(file.name, html, "text/html");
       alert("Tu navegador no soporta compartir. Se descargó el HTML para que lo envíes.");
+      return false;
     }
 
-    document.getElementById("btnShare").onclick = ()=>{
-      shareHtml().catch(err=>{
-        console.error(err);
-        alert("No se pudo compartir.");
-      });
-    };
+    function isShareMode(){
+      const canShare = !!(navigator.share && navigator.canShare);
+      const isTouch = (navigator.maxTouchPoints || 0) > 0;
+      const isSmall = window.matchMedia && window.matchMedia("(max-width: 900px)").matches;
+      return canShare && (isTouch || isSmall);
+    }
+
+    const btn = document.getElementById("btnCta");
+    function syncCTA(){
+      if(isShareMode()){
+        btn.textContent = "Compartir";
+        btn.onclick = ()=> shareHtml().catch(err=>{ console.error(err); alert("No se pudo compartir."); });
+      } else {
+        btn.textContent = "Imprimir";
+        btn.onclick = ()=> window.print();
+      }
+    }
+    syncCTA();
+    window.addEventListener("resize", syncCTA);
   <\/script>
 </body>
 </html>`;
@@ -1102,9 +1112,7 @@
       try { w.document.title = docTitle; } catch(e) {}
     }
 
-    // ==========
-    // AUTH UI (UNA SOLA VEZ)
-    // ==========
+    // ========== AUTH UI ==========
     const authBar = $("authBar");
     authBar.innerHTML = `
       <span id="authStatus">Modo visualizador</span>
@@ -1161,9 +1169,7 @@
       }
     });
 
-    // ==========
-    // STATE (UNA SOLA VEZ)
-    // ==========
+    // ========== STATE ==========
     let state = await pullRemoteOrInit(makeInitialState);
     localStorage.setItem(KEY, JSON.stringify(state));
 
@@ -1192,9 +1198,7 @@
       applyingRemote = false;
     });
 
-    // ==========
-    // RENDER
-    // ==========
+    // ========== RENDER ==========
     function render(){
       if(!state || !state.meta || !Array.isArray(state.movs) || !Array.isArray(state.recibos)){
         $("saldoBadge").textContent = "Saldo: —";
@@ -1306,9 +1310,7 @@
       });
     }
 
-    // ==========
-    // UI EVENTS
-    // ==========
+    // ========== UI EVENTS ==========
     $("btnEmitir").onclick = ()=>{
       $("e_periodo").value = "01/2026";
       $("e_monto").value = "";
@@ -1412,7 +1414,6 @@
       hide("modalImputar");
       render();
 
-      // ===== Envío de mail por imputación (Spark-friendly) =====
       const to = "l.linracioppi@gmail.com";
       const cc = "l.linracioppi@gmail.com";
       const subject = `Imputación de pago – Recibo R${rec.numero} – ${rec.periodo}`;
@@ -1468,7 +1469,20 @@ Cuenta: Bertinelli / Lin Racioppi`;
       inp.click();
     };
 
-    $("btnReset").onclick = ()=> hardReset();
+    $("btnReset").onclick = async ()=> {
+      if(!confirm("Reset TOTAL: borra local y Firebase. ¿Seguro?")) return;
+      await (async function(){
+        localStorage.removeItem(KEY);
+        const fresh = makeInitialState();
+        fresh._meta = { rev: 1, updatedAt: Date.now(), updatedBy: clientId };
+        applyingRemote = true;
+        state = fresh;
+        await setDoc(CC_REF, { state: fresh }, { merge: true });
+        applyingRemote = false;
+        render();
+        alert("Listo: reseteado local + Firebase.");
+      })();
+    };
 
     render();
   });
