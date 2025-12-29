@@ -389,13 +389,14 @@
     }
 
     // ===== MAILTO (Spark-friendly) =====
+    // Nota: con mailto NO podés forzar "diseño HTML" real. Solo texto.
+    // Si el cliente te mete guiones, esto minimiza (encode + \r\n) pero depende del cliente.
     function abrirMailImputacion({ to, cc, subject, body }) {
-      const params = new URLSearchParams();
-      if (cc) params.set("cc", cc);
-      params.set("subject", subject);
-      params.set("body", body);
-      const url = `mailto:${encodeURIComponent(to)}?${params.toString()}`;
-      window.open(url, "_blank");
+      const enc = encodeURIComponent;
+      const normalized = String(body || "").replace(/\n/g, "\r\n");
+      let url = `mailto:${enc(to)}?subject=${enc(subject)}&body=${enc(normalized)}`;
+      if (cc) url += `&cc=${enc(cc)}`;
+      window.location.href = url;
     }
 
     function generarPlanBase(state){
@@ -453,11 +454,12 @@
       return { fin: lastNotPagada ? lastNotPagada.periodo : "(—)", cuotasRestantes: cuotas.slice(firstPendingIdx).length };
     }
 
-    // ======================
-    // Helpers: CTA adaptativa (desktop=Imprimir, móvil=Compartir)
-    // ======================
-    function wantsShareCTA(){
-      // Si hay Web Share + touch/móvil, priorizamos compartir. Si no, imprimir.
+    // ==================================================
+    // CTA ADAPTATIVA
+    // Desktop (mouse/no touch): Imprimir
+    // Mobile/touch + WebShare: Compartir
+    // ==================================================
+    function isShareMode(){
       const canShare = !!(navigator.share && navigator.canShare);
       const isTouch = (navigator.maxTouchPoints || 0) > 0;
       const isSmall = window.matchMedia && window.matchMedia("(max-width: 900px)").matches;
@@ -638,19 +640,6 @@
 </div>
 
 <script>
-  function downloadAsFile(filename, content, type){
-    const blob = new Blob([content], {type: type || "text/html"});
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = filename;
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    setTimeout(()=>URL.revokeObjectURL(url), 1000);
-    return blob;
-  }
-
   async function shareHtml(){
     const html = document.documentElement.outerHTML;
     const file = new File([html], ${JSON.stringify(fileName)}, { type:"text/html" });
@@ -663,8 +652,17 @@
       });
       return true;
     }
-    // fallback desktop: descarga
-    downloadAsFile(file.name, html, "text/html");
+
+    // fallback: descarga
+    const blob = new Blob([html], {type:"text/html"});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = file.name;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(()=>URL.revokeObjectURL(url), 1000);
     alert("Tu navegador no soporta compartir. Se descargó el HTML para que lo envíes.");
     return false;
   }
@@ -1055,19 +1053,6 @@
   <script>
     document.title = ${JSON.stringify(docTitle)};
 
-    function downloadAsFile(filename, content, type){
-      const blob = new Blob([content], {type: type || "text/html"});
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = filename;
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      setTimeout(()=>URL.revokeObjectURL(url), 1000);
-      return blob;
-    }
-
     async function shareHtml(){
       const html = document.documentElement.outerHTML;
       const file = new File([html], "acuerdo_y_anexo.html", { type:"text/html" });
@@ -1077,7 +1062,15 @@
         return true;
       }
 
-      downloadAsFile(file.name, html, "text/html");
+      const blob = new Blob([html], {type:"text/html"});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = file.name;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(()=>URL.revokeObjectURL(url), 1000);
       alert("Tu navegador no soporta compartir. Se descargó el HTML para que lo envíes.");
       return false;
     }
@@ -1392,7 +1385,7 @@
       if(!okType) return alert("Tipo inválido. Debe ser imagen o PDF.");
 
       if(!$("i_declaro").checked){
-        return alert("Debés declarar que el adjunto corresponde al recibo seleccionado y que se encuentra firmado por ambas partes.");
+        return alert("Debés declarar que el adjunto corresponde al recibo y está firmado por ambas partes.");
       }
 
       const obs = String($("i_obs").value||"").trim();
@@ -1414,29 +1407,24 @@
       hide("modalImputar");
       render();
 
+      // ===== Envío de mail por imputación =====
       const to = "l.linracioppi@gmail.com";
       const cc = "l.linracioppi@gmail.com";
       const subject = `Imputación de pago – Recibo R${rec.numero} – ${rec.periodo}`;
       const body = [
-  "Se registró una imputación de pago.",
-  "",
-  `Recibo: R${rec.numero}`,
-  `Período: ${rec.periodo}`,
-  `Monto: U$S ${fmt(rec.monto)}`,
-  `Concepto: ${rec.concepto}`,
-  `Obs.: ${obs || ""}`,
-  "",
-  "Cuenta: Bertinelli / Lin Racioppi"
-].join("\n");
+        "Se registró una imputación de pago.",
+        "",
+        `Recibo: R${rec.numero}`,
+        `Período: ${rec.periodo}`,
+        `Monto: U$S ${fmt(rec.monto)}`,
+        `Concepto: ${rec.concepto}`,
+        `Obs.: ${obs || ""}`,
+        "",
+        "Cuenta: Bertinelli / Lin Racioppi"
+      ].join("\n");
 
-function abrirMailImputacion({ to, cc, subject, body }) {
-  const enc = encodeURIComponent;
-
-  let url = `mailto:${enc(to)}?subject=${enc(subject)}&body=${enc(body)}`;
-  if (cc) url += `&cc=${enc(cc)}`;
-
-  window.location.href = url;
-}
+      abrirMailImputacion({ to, cc, subject, body });
+    };
 
     $("btnPrintPlan").onclick = ()=> printPlanYAcuerdo(state);
 
@@ -1476,23 +1464,10 @@ function abrirMailImputacion({ to, cc, subject, body }) {
       inp.click();
     };
 
-    $("btnReset").onclick = async ()=> {
-      if(!confirm("Reset TOTAL: borra local y Firebase. ¿Seguro?")) return;
-      await (async function(){
-        localStorage.removeItem(KEY);
-        const fresh = makeInitialState();
-        fresh._meta = { rev: 1, updatedAt: Date.now(), updatedBy: clientId };
-        applyingRemote = true;
-        state = fresh;
-        await setDoc(CC_REF, { state: fresh }, { merge: true });
-        applyingRemote = false;
-        render();
-        alert("Listo: reseteado local + Firebase.");
-      })();
-    };
+    $("btnReset").onclick = ()=> hardReset();
 
     render();
-  }});
+  });
 </script>
 </body>
 </html>
