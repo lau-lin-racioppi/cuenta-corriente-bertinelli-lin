@@ -77,7 +77,7 @@
     <div>Precio solicitado: USD 44.000</div>
     <div>Precio escriturado: USD 41.000</div>
     <div>Crédito Banco Nación: USD 30.850</div>
-    <div>Entrega inicial: USD 5.000 </div>
+    <div>Entrega inicial: USD 5.000</div>
     <div>Saldo inicial convenido en cuenta corriente: USD 8.150</div>
   </div>
 
@@ -365,7 +365,6 @@
       return `DOLARES BILLETES ESTADOUNIDENSES ${letras} (U$D ${m})`;
     }
 
-    // === RECIBO: número con 2 dígitos ===
     function nextReciboNum2(state){
       state.recibo_seq = (state.recibo_seq || 0) + 1;
       return String(state.recibo_seq).padStart(2,"0");
@@ -435,7 +434,10 @@
       return { fin: lastNotCumplida ? lastNotCumplida.periodo : "(—)", cuotasRestantes: cuotas.slice(firstPendingIdx).length };
     }
 
-    // === RECIBO: A5 apaisado ===
+    // =========================================================
+    // RECIBO: A5 apaisado (sin desborde de borde)
+    // Clave: NO usar width=210mm cuando @page tiene márgenes.
+    // =========================================================
     function openReciboPrint(state, rec, modo, saldoLuego){
       const isImputado = (modo === "imputado");
       const [mm,yyyy] = String(rec.periodo).split("/");
@@ -456,8 +458,38 @@
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
 <title>Recibo N° ${rec.numero}</title>
 <style>
-  @page{ size:A5 landscape; margin:15mm; }
-  body{font-family:system-ui,Segoe UI,Arial;color:#111;background:#fff;margin:0}
+  @page{ size:A5 landscape; margin:10mm; } /* margen real de impresión */
+
+  html,body{ height:100%; }
+  body{ margin:0; font-family:system-ui,Segoe UI,Arial; color:#111; background:#fff; }
+
+  .noprint{margin:12px}
+  .btn{border:1px solid #111;background:#f2f2f2;padding:8px 12px;border-radius:10px;font-weight:700;cursor:pointer}
+  @media print{ .noprint{display:none} }
+
+  /* Vista pantalla: hoja centrada */
+  .sheet{
+    background:#fff;
+    border:1px solid #111;
+    border-radius:10px;
+    padding:8mm;
+    box-sizing:border-box;
+
+    /* pantalla */
+    max-width:210mm;
+    min-height:148mm;
+    margin:12px auto;
+  }
+
+  /* Impresión: ocupar SOLO el área imprimible (evita que el borde se corte) */
+  @media print{
+    .sheet{
+      max-width:none;
+      min-height:auto;
+      margin:0;
+      width:100%;
+    }
+  }
 
   p, li{
     text-align: justify;
@@ -468,32 +500,19 @@
     overflow-wrap: break-word;
   }
 
-  .noprint{margin:12px}
-  .btn{border:1px solid #111;background:#f2f2f2;padding:8px 12px;border-radius:10px;font-weight:700;cursor:pointer}
-  @media print{ .noprint{display:none} }
+  .h1{font-size:15px;font-weight:800;margin:0 0 4px 0}
+  .sub{font-size:11.5px;color:#333;margin:0 0 10px 0}
 
-  .sheet{
-    width:210mm;
-    min-height:148mm;
-    box-sizing:border-box;
-    border:1px solid #111;
-    border-radius:10px;
-    padding:14px 16px 12px 16px;
-  }
-
-  .h1{font-size:16px;font-weight:800;margin:0 0 4px 0}
-  .sub{font-size:12px;color:#333;margin:0 0 10px 0}
-
-  .txt{font-size:13px;line-height:1.55;margin:0 0 10px 0}
+  .txt{font-size:12.5px;line-height:1.55;margin:0 0 10px 0}
   .b{font-weight:800}
   .upper{font-weight:800;text-transform:uppercase}
 
-  .kv{margin:6px 0;font-size:13px}
+  .kv{margin:6px 0;font-size:12.5px}
   .k{color:#222}
 
-  .sigGrid{display:grid;grid-template-columns:1fr 1fr;gap:22px;margin-top:16px}
-  .lineLabel{font-size:11px;color:#333;margin-top:6px}
-  .line{border-top:1px solid #111;margin-top:18px}
+  .sigGrid{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:14px}
+  .lineLabel{font-size:10.8px;color:#333;margin-top:6px}
+  .line{border-top:1px solid #111;margin-top:16px}
 </style>
 </head>
 <body>
@@ -561,7 +580,9 @@
       w.document.close();
     }
 
-    // === ACUERDO + ANEXO: A4 ===
+    // =========================================================
+    // ACUERDO + ANEXO: A4 (sin “doble margen” -> queda grande)
+    // =========================================================
     function printPlanYAcuerdo(state){
       const plan = aplicarPagosAlPlan(generarPlanBase(state), state);
 
@@ -648,7 +669,7 @@
   <title>${docTitle}</title>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <style>
-    @page{ size:A4 portrait; margin:20mm; }
+    @page{ size:A4 portrait; margin:18mm; } /* margen único (no duplicar con padding en print) */
 
     body{
       margin:0;
@@ -662,12 +683,13 @@
     .noprint{ padding:12px; }
     .btn{border:1px solid #111;background:#f2f2f2;padding:8px 12px;border-radius:10px;font-weight:700;cursor:pointer}
 
+    /* Pantalla: hoja centrada con padding agradable */
     .sheet{
       width:210mm;
       min-height:297mm;
       background:#fff;
       margin:16px auto;
-      padding:20mm;
+      padding:18mm; /* solo para pantalla */
       box-shadow:0 10px 30px rgba(0,0,0,.15);
       box-sizing:border-box;
     }
@@ -680,12 +702,14 @@
       -ms-hyphens: auto;
       overflow-wrap: break-word;
     }
-    p{ line-height:1.55; margin:0 0 10px 0; }
-    h1{ font-size:16px; margin:0 0 12px 0; text-align:center; letter-spacing:.2px; }
-    h2{ font-size:14px; margin:0 0 10px 0; }
-    .small{ font-size:12px; color:#333; }
 
-    table{ width:100%; border-collapse: collapse; margin:14px 0; font-size:12px; }
+    /* Subo un poco el tamaño para que no “quede chico” */
+    p{ line-height:1.62; margin:0 0 10px 0; font-size:13.2px; }
+    h1{ font-size:17px; margin:0 0 12px 0; text-align:center; letter-spacing:.2px; }
+    h2{ font-size:14.5px; margin:0 0 10px 0; }
+    .small{ font-size:12.5px; color:#333; }
+
+    table{ width:100%; border-collapse: collapse; margin:14px 0; font-size:12.8px; }
     th,td{ border:1px solid #000; padding:6px; vertical-align:top; }
     th{ background:#eee; text-align:left; }
     td.num{ text-align:right; white-space:nowrap; }
@@ -699,7 +723,15 @@
     @media print{
       body{ background:#fff; }
       .noprint{ display:none; }
-      .sheet{ margin:0; box-shadow:none; }
+
+      /* IMPRESIÓN: NO duplicar margen con padding */
+      .sheet{
+        width:auto;
+        min-height:auto;
+        margin:0;
+        padding:0;         /* <- clave: evita doble margen */
+        box-shadow:none;
+      }
     }
   </style>
 </head>
@@ -962,7 +994,7 @@
       if(!monto || monto<=0) return alert("Monto inválido.");
       if(!concepto) return alert("Concepto requerido.");
 
-      const numero = nextReciboNum2(state); // <-- corregido
+      const numero = nextReciboNum2(state);
       const rec = { id: crypto.randomUUID(), numero, periodo, monto, concepto, estado:"pendiente" };
       state.recibos.push(rec);
 
