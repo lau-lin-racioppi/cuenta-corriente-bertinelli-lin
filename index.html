@@ -178,7 +178,7 @@
     </div>
     <div class="row" style="justify-content:flex-end;margin-top:10px">
       <button class="btn" id="e_cancel">Cancelar</button>
-      <button class="btn primary" id="e_save">Emitir y ver/imprimir</button>
+      <button class="btn primary" id="e_save">Emitir</button>
     </div>
   </div>
 </div>
@@ -463,12 +463,12 @@
       const cuotas = plan.filter(p=>p.tipo==="cuota");
       const firstPendingIdx = cuotas.findIndex(p => p.estado !== "Pagado");
       if(firstPendingIdx === -1) return { fin:"(cancelado)", cuotasRestantes:0 };
-      const lastNotCumplida = cuotas.slice(firstPendingIdx).pop();
-      return { fin: lastNotCumplida ? lastNotCumplida.periodo : "(—)", cuotasRestantes: cuotas.slice(firstPendingIdx).length };
+      const lastNotPagada = cuotas.slice(firstPendingIdx).pop();
+      return { fin: lastNotPagada ? lastNotPagada.periodo : "(—)", cuotasRestantes: cuotas.slice(firstPendingIdx).length };
     }
 
     // ======================
-    // RECIBO (A5 apaisado)
+    // RECIBO (A5 apaisado) + RESPONSIVE + COMPARTIR
     // ======================
     function openReciboPrint(state, rec, modo, saldoLuego){
       const isImputado = (modo === "imputado");
@@ -482,42 +482,63 @@
         ? `<div class="kv"><span class="k">Saldo pendiente luego del presente pago:</span> <b>USD ${fmt(saldoLuego)}</b></div>`
         : ``;
 
+      const docTitle = `Recibo R${rec.numero} – ${rec.periodo}`;
+      const fileName = `recibo_R${rec.numero}_${String(rec.periodo).replace("/","-")}.html`;
+
       const html = `
 <!doctype html>
 <html lang="es">
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>Recibo N° ${rec.numero}</title>
+<title>${docTitle}</title>
 <style>
   @page{ size:A5 landscape; margin:10mm; }
+
+  :root{ --barH:56px; }
 
   html,body{ height:100%; }
   body{ margin:0; font-family:system-ui,Segoe UI,Arial; color:#111; background:#fff; }
 
-  .noprint{margin:12px}
-  .btn{border:1px solid #111;background:#f2f2f2;padding:8px 12px;border-radius:10px;font-weight:700;cursor:pointer}
-  @media print{ .noprint{display:none} }
+  .topbar{
+    position: sticky;
+    top:0;
+    z-index:10;
+    height: var(--barH);
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    padding: 10px 12px;
+    background:#fff;
+    border-bottom: 1px solid #e5e7eb;
+  }
+  .topbar .ttl{
+    font-size:14px;
+    font-weight:900;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+  }
+  .btn{
+    border:1px solid #111;
+    background:#f2f2f2;
+    padding:8px 12px;
+    border-radius:10px;
+    font-weight:800;
+    cursor:pointer;
+  }
 
   .sheet{
     background:#fff;
     border:1px solid #111;
     border-radius:10px;
-    padding:10mm;
     box-sizing:border-box;
 
-    max-width:210mm;
-    min-height:148mm;
-    margin:12px auto;
-  }
-
-  @media print{
-    .sheet{
-      max-width:none;
-      min-height:auto;
-      margin:0;
-      width:100%;
-    }
+    width: min(1100px, calc(100vw - 24px));
+    margin: 12px auto;
+    padding: 14px;
+    min-height: calc(100dvh - var(--barH) - 24px);
   }
 
   p, li{
@@ -529,7 +550,6 @@
     overflow-wrap: break-word;
   }
 
-  /* Aumentado para cubrir mejor A5 */
   .h1{font-size:20px;font-weight:900;margin:0 0 4px 0}
   .sub{font-size:14px;color:#333;margin:0 0 10px 0}
   .txt{font-size:15.5px;line-height:1.65;margin:0 0 10px 0}
@@ -539,24 +559,43 @@
   .kv{margin:8px 0;font-size:15px}
   .k{color:#222}
 
-  .vbox{
-    display:flex;
-    flex-direction:column;
-    min-height:calc(148mm - 20mm);
-  }
-  @media print{
-    .vbox{ min-height:0; height:100%; }
-  }
+  .vbox{ display:flex; flex-direction:column; min-height:100%; }
   .grow{ flex:1; }
 
   .sigGrid{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:12px}
   .lineLabel{font-size:12.5px;color:#333;margin-top:6px}
   .line{border-top:1px solid #111;margin-top:18px}
+
+  @media (max-width: 900px){
+    .sheet{
+      width:100vw;
+      margin:0;
+      border-radius:0;
+      border-left:none;
+      border-right:none;
+      min-height: calc(100dvh - var(--barH));
+      padding: 16px;
+    }
+  }
+
+  @media print{
+    .topbar{ display:none; }
+    .sheet{
+      border:1px solid #111;
+      border-radius:10px;
+      width:100%;
+      margin:0;
+      padding:10mm;
+      min-height:148mm;
+    }
+  }
 </style>
 </head>
 <body>
-<div class="noprint">
-  <button class="btn" onclick="window.print()">Imprimir</button>
+
+<div class="topbar">
+  <div class="ttl">${docTitle}</div>
+  <button class="btn" id="btnShare">Compartir</button>
 </div>
 
 <div class="sheet">
@@ -600,6 +639,46 @@
     </div>
   </div>
 </div>
+
+<script>
+  function downloadAsFile(filename, content, type){
+    const blob = new Blob([content], {type: type || "text/html"});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(()=>URL.revokeObjectURL(url), 1000);
+    return blob;
+  }
+
+  async function shareHtml(){
+    const html = document.documentElement.outerHTML;
+    const file = new File([html], ${JSON.stringify(fileName)}, { type:"text/html" });
+
+    if(navigator.share && navigator.canShare && navigator.canShare({ files:[file] })){
+      await navigator.share({
+        title: ${JSON.stringify(docTitle)},
+        text: ${JSON.stringify(docTitle)},
+        files: [file]
+      });
+      return;
+    }
+
+    downloadAsFile(file.name, html, "text/html");
+    alert("Tu navegador no soporta compartir. Se descargó el HTML para que lo envíes.");
+  }
+
+  document.getElementById("btnShare").onclick = ()=>{
+    shareHtml().catch(err=>{
+      console.error(err);
+      alert("No se pudo compartir.");
+    });
+  };
+<\/script>
+
 </body>
 </html>`;
 
@@ -609,24 +688,160 @@
       w.document.close();
     }
 
+    // ======================
+    // ADJUNTO: RESPONSIVE + COMPARTIR
+    // ======================
     function abrirAdjunto(adjunto){
       const w = window.open("", "_blank");
       if(!adjunto?.dataUrl){
-        w.document.write("<p>No hay adjunto.</p>");
+        w.document.write("<p style='font-family:system-ui'>No hay adjunto.</p>");
         w.document.close();
         return;
       }
+
       const safeName = (adjunto.name || "adjunto").replaceAll("<","").replaceAll(">","");
-      if((adjunto.type||"").includes("pdf")){
-        w.document.write(`<title>${safeName}</title><div style="padding:10px"><button onclick="window.print()">Imprimir</button></div><embed src="${adjunto.dataUrl}" type="application/pdf" width="100%" height="100%"/>`);
-      } else {
-        w.document.write(`<title>${safeName}</title><div style="padding:10px"><button onclick="window.print()">Imprimir</button></div><img src="${adjunto.dataUrl}" style="max-width:100%;height:auto"/>`);
-      }
+      const isPdf = (adjunto.type||"").includes("pdf");
+      const title = `Adjunto – ${safeName}`;
+
+      const html = `
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>${title}</title>
+<style>
+  :root{ --barH:56px; }
+  html,body{ height:100%; }
+  body{ margin:0; font-family:system-ui,Segoe UI,Arial; background:#fff; color:#111; }
+
+  .topbar{
+    position: sticky;
+    top:0;
+    z-index:10;
+    height: var(--barH);
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    padding: 10px 12px;
+    background:#fff;
+    border-bottom: 1px solid #e5e7eb;
+  }
+  .ttl{
+    font-size:14px;
+    font-weight:900;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+  }
+  .btn{
+    border:1px solid #111;
+    background:#f2f2f2;
+    padding:8px 12px;
+    border-radius:10px;
+    font-weight:800;
+    cursor:pointer;
+  }
+
+  .viewer{
+    height: calc(100dvh - var(--barH));
+    width: 100vw;
+    overflow:auto;
+    background:#fff;
+  }
+
+  .imgWrap{
+    display:flex;
+    justify-content:center;
+    padding: 12px;
+  }
+  img{
+    max-width: 100%;
+    height: auto;
+    border:1px solid #ddd;
+    border-radius:10px;
+  }
+  embed{
+    width:100%;
+    height:100%;
+    border:none;
+  }
+
+  @media print{
+    .topbar{ display:none; }
+    .viewer{ height:auto; }
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="ttl">${title}</div>
+  <button class="btn" id="btnShare">Compartir</button>
+</div>
+
+<div class="viewer">
+  ${isPdf
+    ? `<embed src="${adjunto.dataUrl}" type="application/pdf" />`
+    : `<div class="imgWrap"><img src="${adjunto.dataUrl}" alt="Adjunto"/></div>`
+  }
+</div>
+
+<script>
+  function dataUrlToBlob(dataUrl){
+    const [meta, b64] = dataUrl.split(",");
+    const m = /data:(.*?);base64/.exec(meta);
+    const type = m ? m[1] : "application/octet-stream";
+    const bin = atob(b64);
+    const len = bin.length;
+    const arr = new Uint8Array(len);
+    for(let i=0;i<len;i++) arr[i] = bin.charCodeAt(i);
+    return new Blob([arr], {type});
+  }
+
+  async function shareAdj(){
+    const blob = dataUrlToBlob(${JSON.stringify(adjunto.dataUrl)});
+    const file = new File([blob], ${JSON.stringify(safeName)}, { type: ${JSON.stringify(adjunto.type || "application/octet-stream")} });
+
+    if(navigator.share && navigator.canShare && navigator.canShare({ files:[file] })){
+      await navigator.share({
+        title: ${JSON.stringify(title)},
+        text: ${JSON.stringify(title)},
+        files: [file]
+      });
+      return;
+    }
+
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = file.name;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(()=>URL.revokeObjectURL(url), 1000);
+    alert("Tu navegador no soporta compartir. Se descargó el archivo para que lo envíes.");
+  }
+
+  document.getElementById("btnShare").onclick = ()=>{
+    shareAdj().catch(err=>{
+      console.error(err);
+      alert("No se pudo compartir.");
+    });
+  };
+<\/script>
+
+</body>
+</html>`;
+
+      w.document.open();
+      w.document.write(html);
       w.document.close();
     }
 
     // ==========================
-    // ACUERDO + ANEXO (A4 2 páginas + FULLSCREEN en mobile)
+    // ACUERDO + ANEXO (A4 2 páginas + FULLSCREEN en mobile + COMPARTIR)
     // ==========================
     function printPlanYAcuerdo(state){
       const plan = aplicarPagosAlPlan(generarPlanBase(state), state);
@@ -810,7 +1025,7 @@
 </head>
 <body>
   <div class="noprint">
-    <button class="btn" onclick="window.print()">Imprimir</button>
+    <button class="btn" id="btnShare">Compartir</button>
   </div>
 
   <div class="sheet">
@@ -839,6 +1054,43 @@
 
   <script>
     document.title = ${JSON.stringify(docTitle)};
+
+    function downloadAsFile(filename, content, type){
+      const blob = new Blob([content], {type: type || "text/html"});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(()=>URL.revokeObjectURL(url), 1000);
+      return blob;
+    }
+
+    async function shareHtml(){
+      const html = document.documentElement.outerHTML;
+      const file = new File([html], "acuerdo_y_anexo.html", { type:"text/html" });
+
+      if(navigator.share && navigator.canShare && navigator.canShare({ files:[file] })){
+        await navigator.share({
+          title: document.title,
+          text: document.title,
+          files: [file]
+        });
+        return;
+      }
+
+      downloadAsFile(file.name, html, "text/html");
+      alert("Tu navegador no soporta compartir. Se descargó el HTML para que lo envíes.");
+    }
+
+    document.getElementById("btnShare").onclick = ()=>{
+      shareHtml().catch(err=>{
+        console.error(err);
+        alert("No se pudo compartir.");
+      });
+    };
   <\/script>
 </body>
 </html>`;
@@ -980,7 +1232,7 @@
       } else {
         state.recibos.slice().sort((a,b)=>a.numero.localeCompare(b.numero)).forEach(r=>{
           const est = (r.estado==="pendiente" ? "Pendiente" : "Imputado");
-          const ver = `<a href="#" class="lnkRec" data-id="${r.id}">Ver / Imprimir</a>`;
+          const ver = `<a href="#" class="lnkRec" data-id="${r.id}">Ver</a>`;
           const tr = document.createElement("tr");
           tr.innerHTML = `
             <td>${r.periodo}</td>
@@ -1138,7 +1390,7 @@
       if(!okType) return alert("Tipo inválido. Debe ser imagen o PDF.");
 
       if(!$("i_declaro").checked){
-        return alert("Debés declarar que el adjunto corresponde al recibo y está firmado por ambas partes.");
+        return alert("Debés declarar que el adjunto corresponde al recibo seleccionado y que se encuentra firmado por ambas partes.");
       }
 
       const obs = String($("i_obs").value||"").trim();
@@ -1161,8 +1413,8 @@
       render();
 
       // ===== Envío de mail por imputación (Spark-friendly) =====
-      const to = "l.linracioppi@gmail.com"; // podés agregar más separados por coma
-      const cc = "l.linracioppi@gmail.com"; // opcional
+      const to = "l.linracioppi@gmail.com";
+      const cc = "l.linracioppi@gmail.com";
       const subject = `Imputación de pago – Recibo R${rec.numero} – ${rec.periodo}`;
       const body =
 `Se registró una imputación de pago.
