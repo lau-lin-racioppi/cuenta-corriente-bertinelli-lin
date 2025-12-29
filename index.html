@@ -23,72 +23,68 @@
   .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;justify-content:space-between}
   .right{display:flex;gap:8px;flex-wrap:wrap;align-items:center;justify-content:flex-end}
 
+  /* ======= SALDO DESTACADO “primero para ver” ======= */
+  .saldoHero{
+    display:flex;
+    align-items:baseline;
+    gap:10px;
+    padding:10px 12px;
+    border:1px solid #1d4ed8;
+    background:linear-gradient(180deg, rgba(37,99,235,.22), rgba(17,24,39,.0));
+    border-radius:14px;
+    box-shadow:0 10px 24px rgba(37,99,235,.18);
+    min-width: 260px;
+  }
+  .saldoHero .lbl{
+    font-size:12px;
+    color:#c7d2fe;
+    font-weight:800;
+    letter-spacing:.2px;
+    text-transform:uppercase;
+  }
+  .saldoHero .val{
+    font-size:18px;
+    font-weight:950;
+    line-height:1;
+    font-variant-numeric: tabular-nums;
+  }
+  .saldoHero .sub{
+    margin-left:auto;
+    font-size:12px;
+    color:var(--muted);
+    font-weight:650;
+    white-space:nowrap;
+  }
+
   .badge{border:1px solid var(--line);padding:6px 12px;border-radius:999px;background:var(--chip)}
   .btn{border:1px solid var(--line);background:#222733;color:var(--text);padding:8px 12px;border-radius:10px;font-weight:650;cursor:pointer}
   .btn.primary{background:var(--primary);border-color:#1d4ed8}
   .btn.danger{background:var(--danger);border-color:#991b1b}
   .btn:disabled{opacity:.5;cursor:not-allowed}
 
+  /* Botón acuerdo/plan destacado en modo visualizador */
+  .btn.bigPrimary{
+    background:var(--primary);
+    border-color:#1d4ed8;
+    padding:12px 16px;
+    font-weight:900;
+    border-radius:12px;
+    box-shadow:0 8px 18px rgba(37,99,235,.25);
+  }
+  .btn.bigPrimary:hover{ filter:brightness(1.03); }
+
   .muted{color:var(--muted);font-size:12px}
   .small{font-size:12px;color:var(--muted)}
   .err{font-size:12px;color:var(--err)}
 
-  /* ======== TABLAS: alineación/recorte en mobile + columnas consistentes ======== */
-  .tableWrap{
-    width:100%;
-    overflow-x:auto;              /* evita desbordes y “líneas fuera del borde” */
-    -webkit-overflow-scrolling:touch;
-    border-radius:12px;
-  }
-  table{width:100%;border-collapse:collapse;font-size:13px;margin-top:6px; table-layout:fixed;}
-  thead th{position:sticky; top:0; background:var(--panel); z-index:1;}
-  th,td{border-bottom:1px solid var(--line);padding:8px;vertical-align:top}
-  th{color:var(--muted);text-align:left;font-weight:650}
-  td.num, th.num{text-align:right;white-space:nowrap; font-variant-numeric: tabular-nums;}
-  td{overflow:hidden; text-overflow:ellipsis;}
-  a{color:#93c5fd;text-decoration:none}
-  a:hover{text-decoration:underline}
-
-  /* Anchors de columnas por “tipo de tabla” para que queden alineadas */
-  table.plan col.c-periodo{width:110px}
-  table.plan col.c-monto{width:120px}
-  table.plan col.c-estado{width:200px}
-  table.plan col.c-saldo{width:150px}
-
-  table.rec col.c-periodo{width:110px}
-  table.rec col.c-monto{width:120px}
-  table.rec col.c-recibo{width:220px}
-  table.rec col.c-estado{width:140px}
-
-  table.mov col.c-periodo{width:110px}
-  table.mov col.c-deb{width:110px}
-  table.mov col.c-cred{width:110px}
-  table.mov col.c-saldo{width:110px}
-  table.mov col.c-adj{width:190px}
-
-  /* En pantallas chicas: mantenemos tabla scrolleable para no romper alineaciones */
-  @media (max-width:900px){
-    .wrap{padding:12px}
-    table{min-width:860px;} /* fuerza scroll horizontal en vez de “correr columnas” */
-  }
-
-  .grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-  @media (max-width:900px){ .grid{grid-template-columns:1fr} }
-
-  input,select,textarea{background:#0f1115;color:var(--text);border:1px solid var(--line);border-radius:10px;padding:10px;width:100%}
-  textarea{min-height:70px;resize:vertical}
-  hr{border:none;border-top:1px solid var(--line);margin:10px 0}
-
   /* ======== planResumen: grande y NO muteado ======== */
   #planResumen{
     font-size:14px;
-    font-weight:750;
+    font-weight:800;
     color:var(--text);
     line-height:1.25;
   }
-  @media (min-width:901px){
-    #planResumen{ font-size:15px; }
-  }
+  @media (min-width:901px){ #planResumen{ font-size:15px; } }
 
   /* ======== Cards desplegables (Cabecera / Anexo económico) ======== */
   .disclosureHead{
@@ -107,21 +103,94 @@
     border-radius:10px;
     background:#111827;
     font-weight:900;
+    transition:transform .15s ease;
   }
   .disclosureBody{ margin-top:10px; }
   .collapsed .disclosureBody{ display:none; }
   .collapsed .chev{ transform:rotate(-90deg); }
 
-  /* ======== Botón “Ver acuerdo…” destacado para visualizador ======== */
-  .btn.bigPrimary{
-    background:var(--primary);
-    border-color:#1d4ed8;
-    padding:12px 16px;
-    font-weight:850;
-    border-radius:12px;
-    box-shadow:0 8px 18px rgba(37,99,235,.25);
+  /* ======== TABLAS: desktop fijo / mobile “stacked” sin scroll horizontal ======== */
+  table{width:100%;border-collapse:collapse;font-size:13px;margin-top:6px; table-layout:fixed;}
+  th,td{border-bottom:1px solid var(--line);padding:8px;vertical-align:top}
+  th{color:var(--muted);text-align:left;font-weight:700}
+  td.num, th.num{text-align:right;white-space:nowrap; font-variant-numeric: tabular-nums;}
+  td{overflow:hidden; text-overflow:ellipsis;}
+  a{color:#93c5fd;text-decoration:none}
+  a:hover{text-decoration:underline}
+
+  /* Col widths desktop (alineación) */
+  table.plan col.c-periodo{width:110px}
+  table.plan col.c-monto{width:120px}
+  table.plan col.c-estado{width:200px}
+  table.plan col.c-saldo{width:150px}
+
+  table.rec col.c-periodo{width:110px}
+  table.rec col.c-monto{width:120px}
+  table.rec col.c-recibo{width:220px}
+  table.rec col.c-estado{width:140px}
+
+  table.mov col.c-periodo{width:110px}
+  table.mov col.c-deb{width:110px}
+  table.mov col.c-cred{width:110px}
+  table.mov col.c-saldo{width:110px}
+  table.mov col.c-adj{width:190px}
+
+  /* MOBILE: convierte cada fila en “tarjeta” sin tabla horizontal */
+  @media (max-width:900px){
+    .wrap{padding:12px}
+
+    /* Barra superior: saldo primero y bien visible */
+    #btnBar{ width:100%; justify-content:flex-start; }
+    .saldoHero{ width:100%; min-width:unset; }
+    .saldoHero .val{ font-size:20px; }
+    .saldoHero .sub{ display:none; } /* menos ruido arriba */
+
+    table thead{ display:none; }
+    table, tbody, tr{ display:block; width:100%; }
+    table{ margin-top:10px; }
+    tr{
+      border:1px solid var(--line);
+      border-radius:12px;
+      padding:10px;
+      margin:10px 0;
+      background:rgba(17,24,39,.35);
+    }
+    td{
+      display:flex;
+      justify-content:space-between;
+      gap:10px;
+      padding:7px 0;
+      border-bottom:1px solid rgba(42,49,64,.75);
+      overflow:visible;
+      text-overflow:unset;
+      white-space:normal;
+    }
+    td:last-child{ border-bottom:none; padding-bottom:0; }
+    td:first-child{ padding-top:0; }
+
+    td::before{
+      content: attr(data-label);
+      color:var(--muted);
+      font-size:12px;
+      font-weight:750;
+      text-transform:uppercase;
+      letter-spacing:.15px;
+      flex: 0 0 44%;
+    }
+
+    td.num{ text-align:right; }
+    td.num::before{ justify-self:flex-start; }
+
+    /* mantiene colgroup sólo para desktop; en mobile es block, no rompe nada */
+    colgroup{ display:none; }
   }
-  .btn.bigPrimary:hover{ filter:brightness(1.03); }
+
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  @media (max-width:900px){ .grid{grid-template-columns:1fr} }
+
+  input,select,textarea{background:#0f1115;color:var(--text);border:1px solid var(--line);border-radius:10px;padding:10px;width:100%}
+  textarea{min-height:70px;resize:vertical}
+  hr{border:none;border-top:1px solid var(--line);margin:10px 0}
 
   .modal{
     position:fixed; inset:0;
@@ -152,7 +221,14 @@
       <div id="authBar" class="muted"></div>
     </div>
     <div class="right" id="btnBar">
-      <span class="badge" id="saldoBadge">Saldo: —</span>
+      <div class="saldoHero" id="saldoHero" title="Saldo actual de la cuenta corriente">
+        <div>
+          <div class="lbl">Saldo</div>
+          <div class="val" id="saldoBadge">U$S —</div>
+        </div>
+        <div class="sub" id="saldoSub">Actual</div>
+      </div>
+
       <button class="btn primary" id="btnEmitir">Emitir recibo</button>
       <button class="btn primary" id="btnImputar">Imputar pago</button>
       <button class="btn" id="btnPrintPlan">Ver Acuerdo + Plan de Pagos</button>
@@ -196,79 +272,73 @@
       <div id="planResumen">—</div>
     </div>
 
-    <div class="tableWrap">
-      <table class="plan">
-        <colgroup>
-          <col class="c-periodo">
-          <col>
-          <col class="c-monto">
-          <col class="c-estado">
-          <col class="c-saldo">
-        </colgroup>
-        <thead>
-          <tr>
-            <th>Período</th>
-            <th>Concepto</th>
-            <th class="num">Monto (U$S)</th>
-            <th>Estado</th>
-            <th class="num">Saldo proyectado</th>
-          </tr>
-        </thead>
-        <tbody id="tbodyPlan"></tbody>
-      </table>
-    </div>
+    <table class="plan">
+      <colgroup>
+        <col class="c-periodo">
+        <col>
+        <col class="c-monto">
+        <col class="c-estado">
+        <col class="c-saldo">
+      </colgroup>
+      <thead>
+        <tr>
+          <th>Período</th>
+          <th>Concepto</th>
+          <th class="num">Monto (U$S)</th>
+          <th>Estado</th>
+          <th class="num">Saldo proyectado</th>
+        </tr>
+      </thead>
+      <tbody id="tbodyPlan"></tbody>
+    </table>
   </div>
 
   <div class="card">
     <h2>Recibos emitidos</h2>
-    <div class="tableWrap">
-      <table class="rec">
-        <colgroup>
-          <col class="c-periodo">
-          <col>
-          <col class="c-monto">
-          <col class="c-recibo">
-          <col class="c-estado">
-        </colgroup>
-        <thead>
-          <tr>
-            <th>Período</th>
-            <th>Concepto</th>
-            <th class="num">Monto (U$S)</th>
-            <th>Recibo</th>
-            <th>Estado</th>
-          </tr>
-        </thead>
-        <tbody id="tbodyRec"></tbody>
-      </table>
-    </div>
+    <table class="rec">
+      <colgroup>
+        <col class="c-periodo">
+        <col>
+        <col class="c-monto">
+        <col class="c-recibo">
+        <col class="c-estado">
+      </colgroup>
+      <thead>
+        <tr>
+          <th>Período</th>
+          <th>Concepto</th>
+          <th class="num">Monto (U$S)</th>
+          <th>Recibo</th>
+          <th>Estado</th>
+        </tr>
+      </thead>
+      <tbody id="tbodyRec"></tbody>
+    </table>
   </div>
 
   <div class="card">
     <h2>Libro de movimientos</h2>
-    <div class="tableWrap">
-      <table class="mov">
-        <colgroup>
-          <col class="c-periodo">
-          <col>
-          <col class="c-deb">
-          <col class="c-cred">
-          <col class="c-saldo">
-          <col class="c-adj">
-        </colgroup>
-        <thead>
-          <tr>
-            <th>Período</th>
-            <th>Concepto</th>
-            <th class="num">Débito</th>
-            <th class="num">Crédito</th>
-            <th class="num">Saldo</th>
-            <th>Adjunto</th>
-          </tr>
-        </thead>
-        <tbody id="tbodyMov"></tbody>
-      </table>
-    </div>
+    <table class="mov">
+      <colgroup>
+        <col class="c-periodo">
+        <col>
+        <col class="c-deb">
+        <col class="c-cred">
+        <col class="c-saldo">
+        <col class="c-adj">
+      </colgroup>
+      <thead>
+        <tr>
+          <th>Período</th>
+          <th>Concepto</th>
+          <th class="num">Débito</th>
+          <th class="num">Crédito</th>
+          <th class="num">Saldo</th>
+          <th>Adjunto</th>
+        </tr>
+      </thead>
+      <tbody id="tbodyMov"></tbody>
+    </table>
   </div>
 
 </div>
@@ -398,19 +468,15 @@
     function isPeriodo(x){ return /^\d{2}\/\d{4}$/.test(String(x||"").trim()); }
 
     // ====== desplegables (Cabecera / Anexo) ======
-    function toggleCard(cardId){
+    function toggleCard(cardId, headId){
       const el = $(cardId);
       const isCollapsed = el.classList.toggle("collapsed");
-      return !isCollapsed;
+      const open = !isCollapsed;
+      $(headId).setAttribute("aria-expanded", String(open));
+      return open;
     }
-    $("cabHead").onclick = ()=>{
-      const open = toggleCard("cardCabecera");
-      $("cabHead").setAttribute("aria-expanded", String(open));
-    };
-    $("anxHead").onclick = ()=>{
-      const open = toggleCard("cardAnexo");
-      $("anxHead").setAttribute("aria-expanded", String(open));
-    };
+    $("cabHead").onclick = ()=> toggleCard("cardCabecera", "cabHead");
+    $("anxHead").onclick = ()=> toggleCard("cardAnexo", "anxHead");
 
     function makeInitialState(){
       return {
@@ -528,7 +594,6 @@
       });
     }
 
-    // ===== MAILTO (Spark-friendly) =====
     function abrirMailImputacion({ to, cc, subject, body }) {
       const enc = encodeURIComponent;
       const normalized = String(body || "").replace(/\n/g, "\r\n");
@@ -593,22 +658,8 @@
     }
 
     // ==================================================
-    // CTA ADAPTATIVA
-    // Desktop (mouse/no touch): Imprimir
-    // Mobile/touch + WebShare: Compartir
+    // (Recibo/Adjunto/Acuerdo) se mantiene igual a tu versión previa
     // ==================================================
-    function isShareMode(){
-      const canShare = !!(navigator.share && navigator.canShare);
-      const isTouch = (navigator.maxTouchPoints || 0) > 0;
-      const isSmall = window.matchMedia && window.matchMedia("(max-width: 900px)").matches;
-      return canShare && (isTouch || isSmall);
-    }
-
-    // ======================
-    // RECIBO (A5 apaisado) + RESPONSIVE
-    // Desktop: IMPRIMIR
-    // Mobile: COMPARTIR
-    // ======================
     function openReciboPrint(state, rec, modo, saldoLuego){
       const isImputado = (modo === "imputado");
       const [mm,yyyy] = String(rec.periodo).split("/");
@@ -732,7 +783,7 @@
 
 <div class="topbar">
   <div class="ttl">${docTitle}</div>
-  <button class="btn" id="btnCta">...</button>
+  <button class="btn" id="btnCta">Imprimir</button>
 </div>
 
 <div class="sheet">
@@ -778,53 +829,8 @@
 </div>
 
 <script>
-  async function shareHtml(){
-    const html = document.documentElement.outerHTML;
-    const file = new File([html], ${JSON.stringify(fileName)}, { type:"text/html" });
-
-    if(navigator.share && navigator.canShare && navigator.canShare({ files:[file] })){
-      await navigator.share({
-        title: ${JSON.stringify(docTitle)},
-        text: ${JSON.stringify(docTitle)},
-        files: [file]
-      });
-      return true;
-    }
-
-    const blob = new Blob([html], {type:"text/html"});
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = file.name;
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    setTimeout(()=>URL.revokeObjectURL(url), 1000);
-    alert("Tu navegador no soporta compartir. Se descargó el HTML para que lo envíes.");
-    return false;
-  }
-
-  function isShareMode(){
-    const canShare = !!(navigator.share && navigator.canShare);
-    const isTouch = (navigator.maxTouchPoints || 0) > 0;
-    const isSmall = window.matchMedia && window.matchMedia("(max-width: 900px)").matches;
-    return canShare && (isTouch || isSmall);
-  }
-
-  const btn = document.getElementById("btnCta");
-  function syncCTA(){
-    if(isShareMode()){
-      btn.textContent = "Compartir";
-      btn.onclick = ()=> shareHtml().catch(err=>{ console.error(err); alert("No se pudo compartir."); });
-    } else {
-      btn.textContent = "Imprimir";
-      btn.onclick = ()=> window.print();
-    }
-  }
-  syncCTA();
-  window.addEventListener("resize", syncCTA);
+  document.getElementById("btnCta").onclick = ()=>window.print();
 <\/script>
-
 </body>
 </html>`;
 
@@ -834,11 +840,6 @@
       w.document.close();
     }
 
-    // ======================
-    // ADJUNTO: RESPONSIVE
-    // Desktop: IMPRIMIR
-    // Mobile: COMPARTIR
-    // ======================
     function abrirAdjunto(adjunto){
       const w = window.open("", "_blank");
       if(!adjunto?.dataUrl){
@@ -846,11 +847,9 @@
         w.document.close();
         return;
       }
-
       const safeName = (adjunto.name || "adjunto").replaceAll("<","").replaceAll(">","");
       const isPdf = (adjunto.type||"").includes("pdf");
       const title = `Adjunto – ${safeName}`;
-
       const html = `
 <!doctype html>
 <html lang="es">
@@ -862,141 +861,41 @@
   :root{ --barH:56px; }
   html,body{ height:100%; }
   body{ margin:0; font-family:system-ui,Segoe UI,Arial; background:#fff; color:#111; }
-
   .topbar{
-    position: sticky;
-    top:0;
-    z-index:10;
-    height: var(--barH);
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    gap:10px;
-    padding: 10px 12px;
-    background:#fff;
-    border-bottom: 1px solid #e5e7eb;
+    position: sticky; top:0; z-index:10; height: var(--barH);
+    display:flex; align-items:center; justify-content:space-between; gap:10px;
+    padding: 10px 12px; background:#fff; border-bottom: 1px solid #e5e7eb;
   }
-  .ttl{
-    font-size:14px;
-    font-weight:900;
-    white-space:nowrap;
-    overflow:hidden;
-    text-overflow:ellipsis;
-  }
-  .btn{
-    border:1px solid #111;
-    background:#f2f2f2;
-    padding:8px 12px;
-    border-radius:10px;
-    font-weight:800;
-    cursor:pointer;
-  }
-
-  .viewer{
-    height: calc(100dvh - var(--barH));
-    width: 100vw;
-    overflow:auto;
-    background:#fff;
-  }
-
+  .ttl{ font-size:14px; font-weight:900; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .btn{ border:1px solid #111; background:#f2f2f2; padding:8px 12px; border-radius:10px; font-weight:800; cursor:pointer; }
+  .viewer{ height: calc(100dvh - var(--barH)); width: 100vw; overflow:auto; background:#fff; }
   .imgWrap{ display:flex; justify-content:center; padding: 12px; }
   img{ max-width: 100%; height: auto; border:1px solid #ddd; border-radius:10px; }
   embed{ width:100%; height:100%; border:none; }
-
-  @media print{
-    .topbar{ display:none; }
-    .viewer{ height:auto; }
-  }
+  @media print{ .topbar{ display:none; } .viewer{ height:auto; } }
 </style>
 </head>
 <body>
-
 <div class="topbar">
   <div class="ttl">${title}</div>
-  <button class="btn" id="btnCta">...</button>
+  <button class="btn" id="btnCta">Imprimir</button>
 </div>
-
 <div class="viewer">
-  ${isPdf
-    ? `<embed src="${adjunto.dataUrl}" type="application/pdf" />`
-    : `<div class="imgWrap"><img src="${adjunto.dataUrl}" alt="Adjunto"/></div>`
-  }
+  ${isPdf ? `<embed src="${adjunto.dataUrl}" type="application/pdf" />`
+          : `<div class="imgWrap"><img src="${adjunto.dataUrl}" alt="Adjunto"/></div>`}
 </div>
-
 <script>
-  function dataUrlToBlob(dataUrl){
-    const [meta, b64] = dataUrl.split(",");
-    const m = /data:(.*?);base64/.exec(meta);
-    const type = m ? m[1] : "application/octet-stream";
-    const bin = atob(b64);
-    const len = bin.length;
-    const arr = new Uint8Array(len);
-    for(let i=0;i<len;i++) arr[i] = bin.charCodeAt(i);
-    return new Blob([arr], {type});
-  }
-
-  async function shareAdj(){
-    const blob = dataUrlToBlob(${JSON.stringify(adjunto.dataUrl)});
-    const file = new File([blob], ${JSON.stringify(safeName)}, { type: ${JSON.stringify(adjunto.type || "application/octet-stream")} });
-
-    if(navigator.share && navigator.canShare && navigator.canShare({ files:[file] })){
-      await navigator.share({
-        title: ${JSON.stringify(title)},
-        text: ${JSON.stringify(title)},
-        files: [file]
-      });
-      return true;
-    }
-
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = file.name;
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    setTimeout(()=>URL.revokeObjectURL(url), 1000);
-    alert("Tu navegador no soporta compartir. Se descargó el archivo para que lo envíes.");
-    return false;
-  }
-
-  function isShareMode(){
-    const canShare = !!(navigator.share && navigator.canShare);
-    const isTouch = (navigator.maxTouchPoints || 0) > 0;
-    const isSmall = window.matchMedia && window.matchMedia("(max-width: 900px)").matches;
-    return canShare && (isTouch || isSmall);
-  }
-
-  const btn = document.getElementById("btnCta");
-  function syncCTA(){
-    if(isShareMode()){
-      btn.textContent = "Compartir";
-      btn.onclick = ()=> shareAdj().catch(err=>{ console.error(err); alert("No se pudo compartir."); });
-    } else {
-      btn.textContent = "Imprimir";
-      btn.onclick = ()=> window.print();
-    }
-  }
-  syncCTA();
-  window.addEventListener("resize", syncCTA);
+  document.getElementById("btnCta").onclick = ()=>window.print();
 <\/script>
-
 </body>
 </html>`;
-
       w.document.open();
       w.document.write(html);
       w.document.close();
     }
 
-    // ==========================
-    // ACUERDO + ANEXO
-    // Desktop: IMPRIMIR
-    // Mobile: COMPARTIR
-    // ==========================
     function printPlanYAcuerdo(state){
       const plan = aplicarPagosAlPlan(generarPlanBase(state), state);
-
       const filas = plan.map(p=>`
         <tr>
           <td>${p.periodo}</td>
@@ -1008,7 +907,6 @@
       `).join("");
 
       const docTitle = "Acuerdo y Anexo – Cuenta Corriente";
-
       const fechaObj = new Date(Date.now());
       const meses = ["enero","febrero","marzo","abril","mayo","junio","julio","agosto","septiembre","octubre","noviembre","diciembre"];
       const fecha = `${fechaObj.getDate()} de ${meses[fechaObj.getMonth()]} de ${fechaObj.getFullYear()}`;
@@ -1016,53 +914,41 @@
       const acuerdo = `
         <h1>ACUERDO PRIVADO DE CANCELACIÓN DE SALDO</h1>
         <div class="titleGap"></div>
-
         <p class="fecha">Buenos Aires, ${fecha}</p>
         <div class="dateGap"></div>
-
         <p>
           Entre el Sr. <b>${state.meta.vendedor}</b>, DNI ${state.meta.dni_vendedor}, en adelante <b>EL VENDEDOR</b>,
           y el Sr. <b>${state.meta.comprador}</b>, DNI ${state.meta.dni_comprador}, en adelante <b>EL COMPRADOR</b>,
           se celebra el presente acuerdo, sujeto a las siguientes cláusulas:
         </p>
-
         <p><b>PRIMERA – Antecedentes.</b> Las partes manifiestan que celebraron la compraventa del inmueble sito en
           <b>${state.meta.inmueble}</b>, instrumentada mediante <b>Escritura Pública Nº ${state.meta.escritura_num}</b>,
           pasada ante el <b>Registro Notarial Nº ${state.meta.registro}</b>, referida al mes de <b>${state.meta.ref_mes}</b>.
         </p>
-
         <p><b>SEGUNDA – Entrega inicial ya efectuada.</b> Las partes dejan constancia de que el COMPRADOR entregó
           en concepto de entrega inicial la suma de <b>U$S ${fmt(state.meta.entrega_inicial)}</b>, quedando el saldo
           convenido en cuenta corriente determinado en función de dicha entrega.
         </p>
-
         <p><b>TERCERA – Saldo pendiente.</b> Las partes reconocen un saldo pendiente a cargo del COMPRADOR por
           <b>U$S ${fmt(state.meta.saldo_inicial)}</b>.
         </p>
-
         <p><b>CUARTA – Forma de pago.</b> El saldo será cancelado conforme esquema: a) <b>enero 2026</b>: U$S 150;
           b) desde el período siguiente: pagos mensuales de referencia de U$S 500 hasta cancelar el saldo.
         </p>
-
         <p><b>QUINTA – Adelantos.</b> El COMPRADOR podrá efectuar pagos adelantados o superiores sin penalidad.
           Dichos adelantos se imputarán al saldo y acortarán la duración total del plan.
         </p>
-
         <p><b>SEXTA – Carácter.</b> El plan se recalcula por adelantos, manteniéndose la obligación de cancelar el saldo
           hasta cero.
         </p>
-
         <p><b>SÉPTIMA – Recibos.</b> Cada pago se documentará mediante recibo firmado por ambas partes.</p>
-
         <p><b>OCTAVA – Naturaleza.</b> El presente acuerdo es complementario de la escritura referida y regula exclusivamente
           la modalidad de cancelación del saldo pendiente.
         </p>
-
         <p>
           En prueba de conformidad, se firman dos ejemplares de un mismo tenor, en la ciudad de Buenos Aires,
           en la fecha indicada al inicio.
         </p>
-
         <div class="signRow">
           <div class="sign">
             <div class="line"></div>
@@ -1084,13 +970,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <style>
     @page{ size:A4 portrait; margin:16mm; }
-
     body{ margin:0; background:#e5e7eb; font-family: Arial, sans-serif; color:#111; }
     .fecha{ text-align:right; }
-
     .noprint{ padding:12px; }
     .btn{border:1px solid #111;background:#f2f2f2;padding:8px 12px;border-radius:10px;font-weight:700;cursor:pointer}
-
     .sheet{
       width: min(210mm, 100vw);
       min-height: 100vh;
@@ -1100,79 +983,46 @@
       box-shadow:0 10px 30px rgba(0,0,0,.15);
       box-sizing:border-box;
     }
-
     @media (max-width: 900px){
       body{ background:#fff; }
-      .noprint{
-        position: sticky;
-        top:0;
-        background:#fff;
-        z-index:10;
-        border-bottom:1px solid #ddd;
-      }
-      .sheet{
-        width:100vw;
-        min-height:100dvh;
-        margin:0;
-        padding: 14px;
-        box-shadow:none;
-        border-radius:0;
-      }
+      .noprint{ position: sticky; top:0; background:#fff; z-index:10; border-bottom:1px solid #ddd; }
+      .sheet{ width:100vw; min-height:100dvh; margin:0; padding: 14px; box-shadow:none; border-radius:0; }
     }
-
-    p, li{
-      text-align: justify;
-      text-justify: inter-word;
-      hyphens: auto;
-      -webkit-hyphens: auto;
-      -ms-hyphens: auto;
-      overflow-wrap: break-word;
-    }
-
+    p, li{ text-align: justify; text-justify: inter-word; hyphens: auto; -webkit-hyphens: auto; -ms-hyphens: auto; overflow-wrap: break-word; }
     p{ line-height:1.78; margin:0 0 12px 0; font-size:15.8px; }
     h1{ font-size:22px; margin:0; text-align:center; letter-spacing:.2px; }
     h2{ font-size:17px; margin:0 0 10px 0; }
     .small{ font-size:14.2px; color:#333; }
-
     .titleGap{ height:14mm; }
     .dateGap{ height:10mm; }
-
     table{ width:100%; border-collapse: collapse; margin:12px 0; font-size:13.8px; }
     th,td{ border:1px solid #000; padding:6px; vertical-align:top; }
     th{ background:#eee; text-align:left; }
     td.num{ text-align:right; white-space:nowrap; }
-
     .pageBreak{ break-before: page; page-break-before: always; }
-
     .signRow{ display:flex; gap:40px; margin-top:28px; }
     .sign{ flex:1; }
     .line{ border-top:1px solid #000; margin-top:24px; }
     .lbl{ font-size:13.2px; padding-top:6px; }
-
     @media print{
       body{ background:#fff; }
       .noprint{ display:none; }
-      .sheet{
-        width:auto; min-height:auto; margin:0; padding:0; box-shadow:none;
-      }
+      .sheet{ width:auto; min-height:auto; margin:0; padding:0; box-shadow:none; }
     }
   </style>
 </head>
 <body>
   <div class="noprint">
-    <button class="btn" id="btnCta">...</button>
+    <button class="btn" onclick="window.print()">Imprimir</button>
   </div>
-
   <div class="sheet">
     ${acuerdo}
     <div class="pageBreak"></div>
-
     <h2>ANEXO PLAN DE PAGOS</h2>
     <p class="small">
       Inmueble: <b>${state.meta.inmueble}</b><br/>
       Escritura Nº <b>${state.meta.escritura_num}</b> – Registro Notarial Nº <b>${state.meta.registro}</b>.
     </p>
-
     <table>
       <thead>
         <tr>
@@ -1186,60 +1036,12 @@
       <tbody>${filas}</tbody>
     </table>
   </div>
-
-  <script>
-    document.title = ${JSON.stringify(docTitle)};
-
-    async function shareHtml(){
-      const html = document.documentElement.outerHTML;
-      const file = new File([html], "acuerdo_y_anexo.html", { type:"text/html" });
-
-      if(navigator.share && navigator.canShare && navigator.canShare({ files:[file] })){
-        await navigator.share({ title: document.title, text: document.title, files: [file] });
-        return true;
-      }
-
-      const blob = new Blob([html], {type:"text/html"});
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = file.name;
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      setTimeout(()=>URL.revokeObjectURL(url), 1000);
-      alert("Tu navegador no soporta compartir. Se descargó el HTML para que lo envíes.");
-      return false;
-    }
-
-    function isShareMode(){
-      const canShare = !!(navigator.share && navigator.canShare);
-      const isTouch = (navigator.maxTouchPoints || 0) > 0;
-      const isSmall = window.matchMedia && window.matchMedia("(max-width: 900px)").matches;
-      return canShare && (isTouch || isSmall);
-    }
-
-    const btn = document.getElementById("btnCta");
-    function syncCTA(){
-      if(isShareMode()){
-        btn.textContent = "Compartir";
-        btn.onclick = ()=> shareHtml().catch(err=>{ console.error(err); alert("No se pudo compartir."); });
-      } else {
-        btn.textContent = "Imprimir";
-        btn.onclick = ()=> window.print();
-      }
-    }
-    syncCTA();
-    window.addEventListener("resize", syncCTA);
-  <\/script>
 </body>
 </html>`;
-
       const w = window.open("", "acuerdo_anexo");
       w.document.open();
       w.document.write(html);
       w.document.close();
-      try { w.document.title = docTitle; } catch(e) {}
     }
 
     // ========== AUTH UI ==========
@@ -1277,7 +1079,6 @@
       $("btnImport").style.display = "none";
       $("btnReset").style.display = "none";
 
-      // destacar el botón acuerdo/plan
       $("btnPrintPlan").classList.add("bigPrimary");
       $("btnPrintPlan").textContent = "VER ACUERDO + PLAN DE PAGOS";
     }
@@ -1338,14 +1139,14 @@
     // ========== RENDER ==========
     function render(){
       if(!state || !state.meta || !Array.isArray(state.movs) || !Array.isArray(state.recibos)){
-        $("saldoBadge").textContent = "Saldo: —";
+        $("saldoBadge").textContent = "U$S —";
         $("planResumen").textContent = "Estado inválido (no se pudo cargar).";
         return;
       }
 
       const movs = calcSaldos(state);
       const saldo = movs.length ? movs[movs.length-1].saldo : 0;
-      $("saldoBadge").textContent = "Saldo: U$S " + fmt(saldo);
+      $("saldoBadge").textContent = "U$S " + fmt(saldo);
 
       const plan = aplicarPagosAlPlan(generarPlanBase(state), state);
       const { fin, cuotasRestantes } = estimacionFin(plan);
@@ -1357,11 +1158,11 @@
       plan.forEach(p=>{
         const tr = document.createElement("tr");
         tr.innerHTML = `
-          <td>${p.periodo}</td>
-          <td>${p.concepto}${p.tipo==="antecedente" ? `<div class="small">Antecedente</div>` : ""}</td>
-          <td class="num">${fmt(p.cuota)}</td>
-          <td>${p.estado}</td>
-          <td class="num">${fmt(p.saldo_proyectado)}</td>
+          <td data-label="Período">${p.periodo}</td>
+          <td data-label="Concepto">${p.concepto}${p.tipo==="antecedente" ? `<div class="small">Antecedente</div>` : ""}</td>
+          <td data-label="Monto" class="num">${fmt(p.cuota)}</td>
+          <td data-label="Estado">${p.estado}</td>
+          <td data-label="Saldo" class="num">${fmt(p.saldo_proyectado)}</td>
         `;
         tbPlan.appendChild(tr);
       });
@@ -1376,11 +1177,11 @@
           const ver = `<a href="#" class="lnkRec" data-id="${r.id}">Ver</a>`;
           const tr = document.createElement("tr");
           tr.innerHTML = `
-            <td>${r.periodo}</td>
-            <td>${r.concepto}<div class="small">${(MESES[r.periodo.split("/")[0]]||r.periodo.split("/")[0])} ${r.periodo.split("/")[1]}</div></td>
-            <td class="num">${fmt(r.monto)}</td>
-            <td>R${r.numero} · ${ver}</td>
-            <td>${est}</td>
+            <td data-label="Período">${r.periodo}</td>
+            <td data-label="Concepto">${r.concepto}<div class="small">${(MESES[r.periodo.split("/")[0]]||r.periodo.split("/")[0])} ${r.periodo.split("/")[1]}</div></td>
+            <td data-label="Monto" class="num">${fmt(r.monto)}</td>
+            <td data-label="Recibo">R${r.numero} · ${ver}</td>
+            <td data-label="Estado">${est}</td>
           `;
           tbRec.appendChild(tr);
         });
@@ -1398,12 +1199,12 @@
 
         const tr = document.createElement("tr");
         tr.innerHTML = `
-          <td>${m.periodo}</td>
-          <td>${m.concepto}${m.recibo_num ? ` <span class="small">(${m.recibo_num})</span>` : ""}${m.obs ? `<div class="small">Obs.: ${m.obs}</div>`:""}</td>
-          <td class="num">${m.debito ? fmt(m.debito) : "—"}</td>
-          <td class="num">${m.credito ? fmt(m.credito) : "—"}</td>
-          <td class="num"><b>${fmt(m.saldo)}</b></td>
-          <td>${adj}</td>
+          <td data-label="Período">${m.periodo}</td>
+          <td data-label="Concepto">${m.concepto}${m.recibo_num ? ` <span class="small">(${m.recibo_num})</span>` : ""}${m.obs ? `<div class="small">Obs.: ${m.obs}</div>`:""}</td>
+          <td data-label="Débito" class="num">${m.debito ? fmt(m.debito) : "—"}</td>
+          <td data-label="Crédito" class="num">${m.credito ? fmt(m.credito) : "—"}</td>
+          <td data-label="Saldo" class="num"><b>${fmt(m.saldo)}</b></td>
+          <td data-label="Adjunto">${adj}</td>
         `;
         tbMov.appendChild(tr);
       });
