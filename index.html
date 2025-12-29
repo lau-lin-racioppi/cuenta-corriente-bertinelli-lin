@@ -655,20 +655,41 @@ const fecha = `${fechaObj.getDate()} de ${meses[fechaObj.getMonth()]} de ${fecha
     .fecha {
   text-align: right;
 }
-    @page{ size:A4; margin:2.5cm; }
+@page{
+  size: A5 landscape;
+  margin: 15mm;
+}
 
-    body{ margin:0; background:#e5e7eb; font-family: Arial, sans-serif; color:#111; }
-    .noprint{ padding:12px; }
-    .btn{border:1px solid #111;background:#f2f2f2;padding:8px 12px;border-radius:10px;font-weight:700;cursor:pointer}
-    .sheet{
-      width:210mm;
-      min-height:297mm;
-      background:#fff;
-      margin:16px auto;
-      padding:2.5cm;
-      box-shadow:0 10px 30px rgba(0,0,0,.15);
-      box-sizing:border-box;
-    }
+body{
+  margin:0;
+  background:#e5e7eb;
+  font-family: Arial, sans-serif;
+  color:#111;
+}
+
+.noprint{
+  padding:12px;
+}
+
+.btn{
+  border:1px solid #111;
+  background:#f2f2f2;
+  padding:8px 12px;
+  border-radius:10px;
+  font-weight:700;
+  cursor:pointer;
+}
+
+.sheet{
+  width:210mm;
+  min-height:148mm;   /* A5 apaisado */
+  background:#fff;
+  margin:16px auto;
+  padding:15mm;       /* mejor que cm para consistencia */
+  box-shadow:0 10px 30px rgba(0,0,0,.15);
+  box-sizing:border-box;
+}
+
 
     p, li{
       text-align: justify;
