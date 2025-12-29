@@ -81,7 +81,7 @@
       <span class="badge" id="saldoBadge">Saldo: —</span>
       <button class="btn primary" id="btnEmitir">Emitir recibo</button>
       <button class="btn primary" id="btnImputar">Imputar pago</button>
-      <button class="btn" id="btnPrintPlan">Imprimir Acuerdo + Anexo (A4)</button>
+      <button class="btn" id="btnPrintPlan"> Ver Acuerdo + Plan de Pagos </button>
       <button class="btn" id="btnExport">Exportar JSON</button>
       <button class="btn" id="btnImport">Importar JSON</button>
       <button class="btn danger" id="btnReset">Reset TOTAL</button>
@@ -449,7 +449,7 @@
         if(pagado <= 0) break;
 
         if(pagado >= fila.cuota){
-          fila.estado = "Cumplida";
+          fila.estado = "Pagado";
           pagado -= fila.cuota;
         } else {
           fila.estado = "Parcial";
@@ -461,7 +461,7 @@
 
     function estimacionFin(plan){
       const cuotas = plan.filter(p=>p.tipo==="cuota");
-      const firstPendingIdx = cuotas.findIndex(p => p.estado !== "Cumplida");
+      const firstPendingIdx = cuotas.findIndex(p => p.estado !== "Pagado");
       if(firstPendingIdx === -1) return { fin:"(cancelado)", cuotasRestantes:0 };
       const lastNotCumplida = cuotas.slice(firstPendingIdx).pop();
       return { fin: lastNotCumplida ? lastNotCumplida.periodo : "(—)", cuotasRestantes: cuotas.slice(firstPendingIdx).length };
