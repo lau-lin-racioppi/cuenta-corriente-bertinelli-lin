@@ -12,124 +12,30 @@
     --err:#fca5a5;
     --chip:#111827;
   }
-  *{box-sizing:border-box}
   body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;background:var(--bg);color:var(--text)}
   .wrap{max-width:1200px;margin:auto;padding:16px}
-
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px;margin:14px 0}
   h1{margin:0 0 6px 0;font-size:20px}
-  h2{margin:0;font-size:15px;color:var(--muted)}
+  h2{margin:0 0 8px 0;font-size:15px;color:var(--muted)}
   .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;justify-content:space-between}
   .right{display:flex;gap:8px;flex-wrap:wrap;align-items:center;justify-content:flex-end}
-
-  .btn{
-    border:1px solid var(--line);
-    background:#222733;color:var(--text);
-    padding:9px 12px;border-radius:12px;font-weight:750;cursor:pointer;
-    line-height:1;
-  }
+  .badge{border:1px solid var(--line);padding:6px 12px;border-radius:999px;background:var(--chip)}
+  .btn{border:1px solid var(--line);background:#222733;color:var(--text);padding:8px 12px;border-radius:10px;font-weight:650;cursor:pointer}
   .btn.primary{background:var(--primary);border-color:#1d4ed8}
   .btn.danger{background:var(--danger);border-color:#991b1b}
   .btn:disabled{opacity:.5;cursor:not-allowed}
-
   .muted{color:var(--muted);font-size:12px}
   .small{font-size:12px;color:var(--muted)}
   .err{font-size:12px;color:var(--err)}
-
-  /* ======= SALDO PILL (destacado) ======= */
-  .saldoPill{
-    min-width:min(360px, 92vw);
-    background:linear-gradient(180deg, rgba(59,130,246,.18), rgba(2,6,23,.0));
-    border:1px solid rgba(59,130,246,.35);
-    border-radius:16px;
-    padding:12px 14px;
-    box-shadow:0 12px 28px rgba(0,0,0,.35);
-  }
-  .saldoTitle{font-size:12px;color:#c7d2fe;opacity:.95;margin:0 0 4px 0}
-  .saldoValue{font-size:30px;font-weight:900;letter-spacing:.2px;margin:0;line-height:1.05}
-  .saldoMeta{margin-top:6px;color:#cbd5e1;font-size:13px;opacity:.9}
-
-  /* ======= SECCIONES DESPLEGABLES ======= */
-  .section{
-    background:var(--panel);
-    border:1px solid var(--line);
-    border-radius:16px;
-    margin:14px 0;
-    overflow:hidden; /* evita desbordes de líneas */
-  }
-  .secHead{
-    display:flex; align-items:center; justify-content:space-between; gap:10px;
-    padding:12px 12px;
-    background:rgba(255,255,255,.02);
-  }
-  .secLeft{display:flex; align-items:center; gap:10px; min-width:0}
-  .icon{
-    width:28px;height:28px;border-radius:10px;
-    display:grid;place-items:center;
-    background:#0b1630;border:1px solid rgba(147,197,253,.25);
-    color:#93c5fd;font-weight:900;
-    flex:0 0 auto;
-  }
-  .secTitles{min-width:0}
-  .secTitle{font-weight:850; margin:0; font-size:16px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
-  .secSub{margin:0; font-size:12px; color:var(--muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
-  .secToggle{
-    border:1px solid var(--line);
-    background:#111827;
-    color:var(--text);
-    padding:8px 10px;
-    border-radius:999px;
-    font-weight:800;
-    cursor:pointer;
-    display:flex; align-items:center; gap:6px;
-    white-space:nowrap;
-  }
-  .chev{display:inline-block; transition:.16s transform}
-  .section.open .chev{transform:rotate(180deg)}
-  .secBody{display:none; padding:12px; overflow:hidden}
-  .section.open .secBody{display:block}
-
-  /* ======= TABLAS (una sola, responsive sin scroll horizontal) ======= */
-  table{
-    width:100%;
-    border-collapse:collapse;
-    font-size:13px;
-    table-layout:fixed;
-  }
-  th,td{
-    border-bottom:1px solid var(--line);
-    padding:10px 8px;
-    vertical-align:top;
-    overflow:hidden;
-    text-overflow:ellipsis;
-  }
-  th{color:var(--muted);text-align:left;font-weight:750}
+  table{width:100%;border-collapse:collapse;font-size:13px;margin-top:6px}
+  th,td{border-bottom:1px solid var(--line);padding:8px;vertical-align:top}
+  th{color:var(--muted);text-align:left;font-weight:650}
   td.num{text-align:right;white-space:nowrap}
-
-  /* FIX: evitar “texto vertical” en CONCEPTO, wrap normal */
-  td.concept, th.concept{
-    white-space:normal !important;
-    overflow:visible !important;
-    text-overflow:clip !important;
-    word-break:break-word;
-    overflow-wrap:anywhere;
-    hyphens:auto;
-    writing-mode:horizontal-tb !important;
-    transform:none !important;
-    text-orientation:mixed !important;
-  }
-
   a{color:#93c5fd;text-decoration:none}
   a:hover{text-decoration:underline}
-
   .grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
   @media (max-width:900px){ .grid{grid-template-columns:1fr} }
-
-  input,select,textarea{
-    background:#0f1115;color:var(--text);
-    border:1px solid var(--line);
-    border-radius:12px;
-    padding:10px;width:100%
-  }
+  input,select,textarea{background:#0f1115;color:var(--text);border:1px solid var(--line);border-radius:10px;padding:10px;width:100%}
   textarea{min-height:70px;resize:vertical}
   hr{border:none;border-top:1px solid var(--line);margin:10px 0}
 
@@ -145,204 +51,99 @@
   }
   .modal.show{display:flex}
   .modal .card{ max-width:920px; width:100%; margin:auto; }
-  .card{
-    background:var(--panel);
-    border:1px solid var(--line);
-    border-radius:16px;
-    padding:14px;
-  }
 
   #i_preview img{ max-height:40vh; width:auto; display:block; }
+
   .ck{display:flex;gap:8px;align-items:flex-start}
   .ck input{width:auto;margin-top:3px}
-
-  /* Responsive “lista con labels”, SIN duplicar tablas */
-  @media (max-width:900px){
-    thead{display:none}
-    table, tbody, tr, td{display:block; width:100%}
-    tr{border-bottom:1px solid var(--line)}
-    td{border-bottom:none;padding:8px 10px}
-    td::before{
-      content: attr(data-label);
-      display:block;
-      font-size:11px;
-      color: var(--muted);
-      margin-bottom:3px;
-      letter-spacing:.2px;
-    }
-    td.num{text-align:left;white-space:normal}
-  }
-
-  /* barra superior */
-  .topArea{
-    display:grid;
-    grid-template-columns: 1fr auto;
-    gap:12px;
-    align-items:start;
-  }
-  @media (max-width:900px){
-    .topArea{grid-template-columns: 1fr}
-    .right{justify-content:flex-start}
-  }
-
-  /* Botón grande */
-  .btn.big{
-    padding:12px 16px;
-    border-radius:14px;
-    font-size:14px;
-    font-weight:900;
-  }
 </style>
 </head>
 
 <body>
 <div class="wrap">
 
-  <div class="topArea">
+  <div class="row">
     <div>
       <h1>Cuenta Corriente – Bertinelli / Lin Racioppi</h1>
       <div id="authBar" class="muted"></div>
     </div>
-
     <div class="right" id="btnBar">
-      <div class="saldoPill" id="saldoPill">
-        <div class="saldoTitle">Saldo actual – cuenta corriente</div>
-        <div class="saldoValue" id="saldoBig">U$S —</div>
-        <div class="saldoMeta" id="saldoMeta">—</div>
-      </div>
-
-      <button class="btn primary big" id="btnPrintPlan">Ver acuerdo + plan de pagos</button>
+      <span class="badge" id="saldoBadge">Saldo: —</span>
       <button class="btn primary" id="btnEmitir">Emitir recibo</button>
       <button class="btn primary" id="btnImputar">Imputar pago</button>
+      <button class="btn" id="btnPrintPlan"> Ver Acuerdo + Plan de Pagos </button>
       <button class="btn" id="btnExport">Exportar JSON</button>
       <button class="btn" id="btnImport">Importar JSON</button>
       <button class="btn danger" id="btnReset">Reset TOTAL</button>
     </div>
   </div>
 
-  <!-- Cabecera (cerrado por defecto) -->
-  <div class="section" id="secCabecera">
-    <div class="secHead">
-      <div class="secLeft">
-        <div class="icon">i</div>
-        <div class="secTitles">
-          <p class="secTitle">Cabecera</p>
-          <p class="secSub">Escritura, inmueble, partes</p>
-        </div>
-      </div>
-      <button class="secToggle" data-toggle="secCabecera">Ver más <span class="chev">▾</span></button>
-    </div>
-    <div class="secBody">
-      <div><b>Escritura Nº 434</b> – Registro Notarial Nº <b>30</b> – Escribano: <b>Norberto Gustavo Soler</b></div>
-      <div>Operación: <b>Compraventa inmueble – 25 de Mayo 8, 6º C, Ciudadela</b></div>
-      <div>Vendedor: <b>José Orlando Bertinelli</b> · Comprador: <b>Lautaro Nahuel Lin Racioppi</b></div>
-    </div>
+  <div class="card">
+    <h2>Cabecera</h2>
+    <div><b>Escritura Nº 434</b> – Registro Notarial Nº <b>30</b> – Escribano: <b>Norberto Gustavo Soler</b></div>
+    <div>Operación: <b>Compraventa inmueble – 25 de Mayo 8, 6º C, Ciudadela</b></div>
+    <div>Vendedor: <b>José Orlando Bertinelli</b> · Comprador: <b>Lautaro Nahuel Lin Racioppi</b></div>
   </div>
 
-  <!-- Anexo económico (cerrado por defecto) -->
-  <div class="section" id="secEconomico">
-    <div class="secHead">
-      <div class="secLeft">
-        <div class="icon">$</div>
-        <div class="secTitles">
-          <p class="secTitle">Anexo económico</p>
-          <p class="secSub">Precios, crédito, saldo inicial</p>
-        </div>
-      </div>
-      <button class="secToggle" data-toggle="secEconomico">Ver más <span class="chev">▾</span></button>
-    </div>
-    <div class="secBody">
-      <div>Precio solicitado: USD 44.000</div>
-      <div>Precio escriturado: USD 41.000</div>
-      <div>Crédito Banco Nación: USD 30.850</div>
-      <div>Entrega inicial: USD 5.000</div>
-      <div>Saldo inicial convenido en cuenta corriente: USD 8.150</div>
-    </div>
+  <div class="card">
+    <h2>Anexo económico</h2>
+    <div>Precio solicitado: USD 44.000</div>
+    <div>Precio escriturado: USD 41.000</div>
+    <div>Crédito Banco Nación: USD 30.850</div>
+    <div>Entrega inicial: USD 5.000</div>
+    <div>Saldo inicial convenido en cuenta corriente: USD 8.150</div>
   </div>
 
-  <!-- Plan (cerrado por defecto) -->
-  <div class="section" id="secPlan">
-    <div class="secHead">
-      <div class="secLeft">
-        <div class="icon">≡</div>
-        <div class="secTitles">
-          <p class="secTitle">Plan de pagos proyectado</p>
-          <p class="secSub">Detalle por período</p>
-        </div>
-      </div>
-      <button class="secToggle" data-toggle="secPlan">Ver más <span class="chev">▾</span></button>
+  <div class="card">
+    <div class="row" style="align-items:flex-end">
+      <h2 style="margin:0">Plan de pagos proyectado</h2>
+      <div class="muted" id="planResumen">—</div>
     </div>
-    <div class="secBody">
-      <table>
-        <thead>
-          <tr>
-            <th style="width:110px">Período</th>
-            <th class="concept">Concepto</th>
-            <th class="num" style="width:120px">Monto (U$S)</th>
-            <th style="width:160px">Estado</th>
-            <th class="num" style="width:150px">Saldo proyectado</th>
-          </tr>
-        </thead>
-        <tbody id="tbodyPlan"></tbody>
-      </table>
-    </div>
+    <table>
+      <thead>
+        <tr>
+          <th style="width:110px">Período</th>
+          <th>Concepto</th>
+          <th class="num" style="width:120px">Monto (U$S)</th>
+          <th style="width:200px">Estado</th>
+          <th class="num" style="width:150px">Saldo proyectado</th>
+        </tr>
+      </thead>
+      <tbody id="tbodyPlan"></tbody>
+    </table>
   </div>
 
-  <!-- Recibos (oculto en visualizador) -->
-  <div class="section" id="secRecibos">
-    <div class="secHead">
-      <div class="secLeft">
-        <div class="icon">R</div>
-        <div class="secTitles">
-          <p class="secTitle">Recibos emitidos</p>
-          <p class="secSub">Emisión y estado (pendiente / imputado)</p>
-        </div>
-      </div>
-      <button class="secToggle" data-toggle="secRecibos">Ver más <span class="chev">▾</span></button>
-    </div>
-    <div class="secBody">
-      <table>
-        <thead>
-          <tr>
-            <th style="width:110px">Período</th>
-            <th class="concept">Concepto</th>
-            <th class="num" style="width:120px">Monto (U$S)</th>
-            <th style="width:170px">Recibo</th>
-            <th style="width:140px">Estado</th>
-          </tr>
-        </thead>
-        <tbody id="tbodyRec"></tbody>
-      </table>
-    </div>
+  <div class="card">
+    <h2>Recibos emitidos</h2>
+    <table>
+      <thead>
+        <tr>
+          <th style="width:110px">Período</th>
+          <th>Concepto</th>
+          <th class="num" style="width:120px">Monto (U$S)</th>
+          <th style="width:220px">Recibo</th>
+          <th style="width:140px">Estado</th>
+        </tr>
+      </thead>
+      <tbody id="tbodyRec"></tbody>
+    </table>
   </div>
 
-  <!-- Movimientos -->
-  <div class="section" id="secMov">
-    <div class="secHead">
-      <div class="secLeft">
-        <div class="icon">L</div>
-        <div class="secTitles">
-          <p class="secTitle">Libro de movimientos</p>
-          <p class="secSub">Débitos / créditos y saldo</p>
-        </div>
-      </div>
-      <button class="secToggle" data-toggle="secMov">Ver más <span class="chev">▾</span></button>
-    </div>
-    <div class="secBody">
-      <table>
-        <thead>
-          <tr>
-            <th style="width:110px">Período</th>
-            <th class="concept">Concepto</th>
-            <th class="num" style="width:110px">Débito</th>
-            <th class="num" style="width:110px">Crédito</th>
-            <th class="num" style="width:110px">Saldo</th>
-            <th style="width:190px">Adjunto</th>
-          </tr>
-        </thead>
-        <tbody id="tbodyMov"></tbody>
-      </table>
-    </div>
+  <div class="card">
+    <h2>Libro de movimientos</h2>
+    <table>
+      <thead>
+        <tr>
+          <th style="width:110px">Período</th>
+          <th>Concepto</th>
+          <th class="num" style="width:110px">Débito</th>
+          <th class="num" style="width:110px">Crédito</th>
+          <th class="num" style="width:110px">Saldo</th>
+          <th style="width:190px">Adjunto</th>
+        </tr>
+      </thead>
+      <tbody id="tbodyMov"></tbody>
+    </table>
   </div>
 
 </div>
@@ -467,16 +268,6 @@
     const fmt = (n) => Number(n || 0).toLocaleString("es-AR", { maximumFractionDigits: 0 });
     const MESES = {"01":"Enero","02":"Febrero","03":"Marzo","04":"Abril","05":"Mayo","06":"Junio","07":"Julio","08":"Agosto","09":"Septiembre","10":"Octubre","11":"Noviembre","12":"Diciembre"};
 
-    // ====== desplegables: por defecto cerrados ======
-    document.querySelectorAll(".secToggle").forEach(btn=>{
-      btn.addEventListener("click", ()=>{
-        const id = btn.getAttribute("data-toggle");
-        const el = document.getElementById(id);
-        if(!el) return;
-        el.classList.toggle("open");
-      });
-    });
-
     function show(id){ $(id).classList.add("show"); }
     function hide(id){ $(id).classList.remove("show"); }
     function isPeriodo(x){ return /^\d{2}\/\d{4}$/.test(String(x||"").trim()); }
@@ -533,7 +324,6 @@
       return state.movs.reduce((acc,m)=> acc + Number(m.credito||0), 0);
     }
 
-    // ====== NÚMEROS A LETRAS (USD, enteros) ======
     function unidades(n){ return ["CERO","UNO","DOS","TRES","CUATRO","CINCO","SEIS","SIETE","OCHO","NUEVE"][n] || ""; }
     function decenas(n){
       const esp = {
@@ -598,7 +388,7 @@
       });
     }
 
-    // ===== MAILTO (texto) =====
+    // ===== MAILTO (Spark-friendly) =====
     function abrirMailImputacion({ to, cc, subject, body }) {
       const enc = encodeURIComponent;
       const normalized = String(body || "").replace(/\n/g, "\r\n");
@@ -609,6 +399,7 @@
 
     function generarPlanBase(state){
       const plan = [];
+
       plan.push({
         periodo: "12/2025",
         concepto: state.meta.entrega_inicial_label || "Entrega inicial ya efectuada",
@@ -637,6 +428,7 @@
 
     function aplicarPagosAlPlan(plan, state){
       let pagado = totalPagado(state);
+
       for(const fila of plan){
         if(fila.tipo === "antecedente") continue;
         if(pagado <= 0) break;
@@ -660,11 +452,11 @@
       return { fin: lastNotPagada ? lastNotPagada.periodo : "(—)", cuotasRestantes: cuotas.slice(firstPendingIdx).length };
     }
 
-    // ==================================================
-    // RECIBO A5 apaisado - 1 sola hoja + bordes
-    // - asegura UNA hoja: contenido con tamaños controlados
-    // - @page A5 landscape, márgenes, y caja con borde
-    // ==================================================
+    // ======================
+    // RECIBO (A5 apaisado) + RESPONSIVE
+    // Desktop: IMPRIMIR
+    // Mobile: COMPARTIR
+    // ======================
     function openReciboPrint(state, rec, modo, saldoLuego){
       const isImputado = (modo === "imputado");
       const [mm,yyyy] = String(rec.periodo).split("/");
@@ -688,12 +480,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
 <title>${docTitle}</title>
 <style>
-  /* ===== A5 landscape, 1 hoja ===== */
   @page{ size:A5 landscape; margin:10mm; }
+  :root{ --barH:56px; }
   html,body{ height:100%; }
   body{ margin:0; font-family:system-ui,Segoe UI,Arial; color:#111; background:#fff; }
-
-  :root{ --barH:56px; }
 
   .topbar{
     position: sticky;
@@ -724,44 +514,42 @@
     cursor:pointer;
   }
 
-  /* Caja "hoja" que entra sí o sí en 1 página en impresión */
   .sheet{
-    border:1.5px solid #111;
+    background:#fff;
+    border:1px solid #111;
     border-radius:10px;
     box-sizing:border-box;
+
     width: min(1100px, calc(100vw - 24px));
     margin: 12px auto;
     padding: 14px;
-
-    /* En móvil: ocupa pantalla */
     min-height: calc(100dvh - var(--barH) - 24px);
-    background:#fff;
   }
 
-  /* Tipografías calibradas para no exceder 1 hoja A5 */
-  .h1{font-size:18.5px;font-weight:900;margin:0 0 4px 0}
-  .sub{font-size:13px;color:#333;margin:0 0 10px 0}
-  .txt{font-size:14.2px;line-height:1.55;margin:0 0 10px 0}
+  p, li{
+    text-align: justify;
+    text-justify: inter-word;
+    hyphens: auto;
+    -webkit-hyphens: auto;
+    -ms-hyphens: auto;
+    overflow-wrap: break-word;
+  }
+
+  .h1{font-size:20px;font-weight:900;margin:0 0 4px 0}
+  .sub{font-size:14px;color:#333;margin:0 0 10px 0}
+  .txt{font-size:15.5px;line-height:1.65;margin:0 0 10px 0}
   .b{font-weight:900}
   .upper{font-weight:900;text-transform:uppercase}
 
-  .kv{margin:7px 0;font-size:13.8px}
+  .kv{margin:8px 0;font-size:15px}
   .k{color:#222}
 
-  p{
-    text-align: justify;
-    hyphens: auto;
-    -webkit-hyphens: auto;
-    overflow-wrap:anywhere;
-    margin:0 0 10px 0;
-  }
-
-  .vbox{ display:flex; flex-direction:column; height:100%; }
+  .vbox{ display:flex; flex-direction:column; min-height:100%; }
   .grow{ flex:1; }
 
-  .sigGrid{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:10px}
-  .lineLabel{font-size:12.2px;color:#333;margin-top:6px}
-  .line{border-top:1px solid #111;margin-top:16px}
+  .sigGrid{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:12px}
+  .lineLabel{font-size:12.5px;color:#333;margin-top:6px}
+  .line{border-top:1px solid #111;margin-top:18px}
 
   @media (max-width: 900px){
     .sheet{
@@ -775,28 +563,16 @@
     }
   }
 
-  /* ===== Impresión: UNA hoja sí o sí ===== */
   @media print{
     .topbar{ display:none; }
-
-    /* Evita cortes, fuerza a no desbordar */
-    body{ background:#fff; }
     .sheet{
-      width: 100%;
+      border:1px solid #111;
+      border-radius:10px;
+      width:100%;
       margin:0;
       padding:10mm;
-      border:1.5px solid #111;
-      border-radius:10px;
-
-      /* A5 landscape útil aprox: 210x148mm, menos márgenes.
-         Esto ayuda a mantener todo en la primera hoja. */
-      height: 100%;
-      max-height: 100%;
-      page-break-inside: avoid;
-      break-inside: avoid;
-      overflow: hidden;
+      min-height:148mm;
     }
-    .sigGrid, p, .kv{ break-inside: avoid; page-break-inside: avoid; }
   }
 </style>
 </head>
@@ -906,7 +682,11 @@
       w.document.close();
     }
 
-    // ===== Adjunto: abrir + compartir/print (igual a tu lógica original, simplificada) =====
+    // ======================
+    // ADJUNTO: RESPONSIVE
+    // Desktop: IMPRIMIR
+    // Mobile: COMPARTIR
+    // ======================
     function abrirAdjunto(adjunto){
       const w = window.open("", "_blank");
       if(!adjunto?.dataUrl){
@@ -930,44 +710,141 @@
   :root{ --barH:56px; }
   html,body{ height:100%; }
   body{ margin:0; font-family:system-ui,Segoe UI,Arial; background:#fff; color:#111; }
+
   .topbar{
-    position: sticky; top:0; z-index:10;
+    position: sticky;
+    top:0;
+    z-index:10;
     height: var(--barH);
-    display:flex; align-items:center; justify-content:space-between; gap:10px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
     padding: 10px 12px;
-    background:#fff; border-bottom: 1px solid #e5e7eb;
+    background:#fff;
+    border-bottom: 1px solid #e5e7eb;
   }
-  .ttl{ font-size:14px; font-weight:900; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-  .btn{ border:1px solid #111; background:#f2f2f2; padding:8px 12px; border-radius:10px; font-weight:800; cursor:pointer; }
-  .viewer{ height: calc(100dvh - var(--barH)); width: 100vw; overflow:auto; background:#fff; }
+  .ttl{
+    font-size:14px;
+    font-weight:900;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+  }
+  .btn{
+    border:1px solid #111;
+    background:#f2f2f2;
+    padding:8px 12px;
+    border-radius:10px;
+    font-weight:800;
+    cursor:pointer;
+  }
+
+  .viewer{
+    height: calc(100dvh - var(--barH));
+    width: 100vw;
+    overflow:auto;
+    background:#fff;
+  }
+
   .imgWrap{ display:flex; justify-content:center; padding: 12px; }
   img{ max-width: 100%; height: auto; border:1px solid #ddd; border-radius:10px; }
   embed{ width:100%; height:100%; border:none; }
-  @media print{ .topbar{ display:none; } .viewer{ height:auto; } }
+
+  @media print{
+    .topbar{ display:none; }
+    .viewer{ height:auto; }
+  }
 </style>
 </head>
 <body>
+
 <div class="topbar">
   <div class="ttl">${title}</div>
-  <button class="btn" id="btnCta">Imprimir</button>
+  <button class="btn" id="btnCta">...</button>
 </div>
+
 <div class="viewer">
-  ${isPdf ? `<embed src="${adjunto.dataUrl}" type="application/pdf" />`
-          : `<div class="imgWrap"><img src="${adjunto.dataUrl}" alt="Adjunto"/></div>`}
+  ${isPdf
+    ? `<embed src="${adjunto.dataUrl}" type="application/pdf" />`
+    : `<div class="imgWrap"><img src="${adjunto.dataUrl}" alt="Adjunto"/></div>`
+  }
 </div>
+
 <script>
-  document.getElementById("btnCta").onclick = ()=> window.print();
+  function dataUrlToBlob(dataUrl){
+    const [meta, b64] = dataUrl.split(",");
+    const m = /data:(.*?);base64/.exec(meta);
+    const type = m ? m[1] : "application/octet-stream";
+    const bin = atob(b64);
+    const len = bin.length;
+    const arr = new Uint8Array(len);
+    for(let i=0;i<len;i++) arr[i] = bin.charCodeAt(i);
+    return new Blob([arr], {type});
+  }
+
+  async function shareAdj(){
+    const blob = dataUrlToBlob(${JSON.stringify(adjunto.dataUrl)});
+    const file = new File([blob], ${JSON.stringify(safeName)}, { type: ${JSON.stringify(adjunto.type || "application/octet-stream")} });
+
+    if(navigator.share && navigator.canShare && navigator.canShare({ files:[file] })){
+      await navigator.share({
+        title: ${JSON.stringify(title)},
+        text: ${JSON.stringify(title)},
+        files: [file]
+      });
+      return true;
+    }
+
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = file.name;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(()=>URL.revokeObjectURL(url), 1000);
+    alert("Tu navegador no soporta compartir. Se descargó el archivo para que lo envíes.");
+    return false;
+  }
+
+  function isShareMode(){
+    const canShare = !!(navigator.share && navigator.canShare);
+    const isTouch = (navigator.maxTouchPoints || 0) > 0;
+    const isSmall = window.matchMedia && window.matchMedia("(max-width: 900px)").matches;
+    return canShare && (isTouch || isSmall);
+  }
+
+  const btn = document.getElementById("btnCta");
+  function syncCTA(){
+    if(isShareMode()){
+      btn.textContent = "Compartir";
+      btn.onclick = ()=> shareAdj().catch(err=>{ console.error(err); alert("No se pudo compartir."); });
+    } else {
+      btn.textContent = "Imprimir";
+      btn.onclick = ()=> window.print();
+    }
+  }
+  syncCTA();
+  window.addEventListener("resize", syncCTA);
 <\/script>
+
 </body>
 </html>`;
+
       w.document.open();
       w.document.write(html);
       w.document.close();
     }
 
-    // ===== Acuerdo + plan (dejé una versión funcional) =====
+    // ==========================
+    // ACUERDO + ANEXO (TEXTO REAL)
+    // Desktop: IMPRIMIR
+    // Mobile: COMPARTIR
+    // ==========================
     function printPlanYAcuerdo(state){
       const plan = aplicarPagosAlPlan(generarPlanBase(state), state);
+
       const filas = plan.map(p=>`
         <tr>
           <td>${p.periodo}</td>
@@ -979,9 +856,65 @@
       `).join("");
 
       const docTitle = "Acuerdo y Anexo – Cuenta Corriente";
+
       const fechaObj = new Date(Date.now());
       const meses = ["enero","febrero","marzo","abril","mayo","junio","julio","agosto","septiembre","octubre","noviembre","diciembre"];
       const fecha = `${fechaObj.getDate()} de ${meses[fechaObj.getMonth()]} de ${fechaObj.getFullYear()}`;
+
+      // === ACUERDO REAL (RESPETADO) ===
+      const acuerdo = `
+        <h1>ACUERDO PRIVADO DE CANCELACIÓN DE SALDO</h1>
+        <p class="fecha">Buenos Aires, ${fecha}</p>
+
+        <p>
+          Entre el Sr. <b>${state.meta.vendedor}</b>, DNI <b>${state.meta.dni_vendedor}</b>, en adelante <b>EL VENDEDOR</b>, y el Sr.
+          <b>${state.meta.comprador}</b>, DNI <b>${state.meta.dni_comprador}</b>, en adelante <b>EL COMPRADOR</b>, se celebra el presente
+          acuerdo, sujeto a las siguientes cláusulas:
+        </p>
+
+        <p><b>PRIMERA – Antecedentes.</b> Las partes manifiestan que celebraron la compraventa del inmueble sito en
+          <b>${state.meta.inmueble}</b>, instrumentada mediante <b>Escritura Pública Nº ${state.meta.escritura_num}</b>, pasada ante el
+          <b>Registro Notarial Nº ${state.meta.registro}</b>, referida al mes de <b>${state.meta.ref_mes}</b>.
+        </p>
+
+        <p><b>SEGUNDA – Entrega inicial ya efectuada.</b> Las partes dejan constancia de que el COMPRADOR entregó en concepto de entrega
+          inicial la suma de <b>U$S ${fmt(state.meta.entrega_inicial)}</b>, quedando el saldo convenido en cuenta corriente determinado
+          en función de dicha entrega.
+        </p>
+
+        <p><b>TERCERA – Saldo pendiente.</b> Las partes reconocen un saldo pendiente a cargo del COMPRADOR por
+          <b>U$S ${fmt(state.meta.saldo_inicial)}</b>.
+        </p>
+
+        <p><b>CUARTA – Forma de pago.</b> El saldo será cancelado conforme esquema: a) enero 2026: U$S 150; b) desde el período siguiente:
+          pagos mensuales de referencia de U$S 500 hasta cancelar el saldo.
+        </p>
+
+        <p><b>QUINTA – Adelantos.</b> El COMPRADOR podrá efectuar pagos adelantados o superiores sin penalidad. Dichos adelantos se imputarán
+          al saldo y acortarán la duración total del plan.
+        </p>
+
+        <p><b>SEXTA – Carácter.</b> El plan se recalcula por adelantos, manteniéndose la obligación de cancelar el saldo hasta cero.</p>
+
+        <p><b>SÉPTIMA – Recibos.</b> Cada pago se documentará mediante recibo firmado por ambas partes.</p>
+
+        <p><b>OCTAVA – Naturaleza.</b> El presente acuerdo es complementario de la escritura referida y regula exclusivamente la modalidad de
+          cancelación del saldo pendiente.
+        </p>
+
+        <p>En prueba de conformidad, se firman dos ejemplares de un mismo tenor, en la ciudad de Buenos Aires, en la fecha indicada al inicio.</p>
+
+        <div class="signRow">
+          <div class="sign">
+            <div class="line"></div>
+            <div class="lbl">Firma EL VENDEDOR</div>
+          </div>
+          <div class="sign">
+            <div class="line"></div>
+            <div class="lbl">Firma EL COMPRADOR</div>
+          </div>
+        </div>
+      `;
 
       const html = `
 <!doctype html>
@@ -992,64 +925,164 @@
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <style>
     @page{ size:A4 portrait; margin:16mm; }
+
     body{ margin:0; background:#e5e7eb; font-family: Arial, sans-serif; color:#111; }
-    .noprint{ padding:12px; position:sticky; top:0; background:#fff; border-bottom:1px solid #ddd; }
+    .fecha{ text-align:right; }
+
+    .noprint{
+      padding:12px;
+      position: sticky;
+      top:0;
+      background:#fff;
+      z-index:10;
+      border-bottom:1px solid #ddd;
+      display:flex;
+      justify-content:flex-end;
+    }
     .btn{border:1px solid #111;background:#f2f2f2;padding:10px 14px;border-radius:12px;font-weight:800;cursor:pointer}
+
     .sheet{
       width: min(210mm, 100vw);
-      min-height: 100vh;
       background:#fff;
       margin:0 auto;
       padding: clamp(12px, 3vw, 16mm);
       box-shadow:0 10px 30px rgba(0,0,0,.15);
       box-sizing:border-box;
     }
-    p{ line-height:1.78; margin:0 0 12px 0; font-size:15.8px; text-align:justify; hyphens:auto; overflow-wrap:anywhere; }
-    h1{ font-size:22px; margin:0; text-align:center; }
+
+    @media (max-width: 900px){
+      body{ background:#fff; }
+      .sheet{
+        width:100vw;
+        margin:0;
+        padding: 14px;
+        box-shadow:none;
+      }
+    }
+
+    p, li{
+      text-align: justify;
+      text-justify: inter-word;
+      hyphens: auto;
+      -webkit-hyphens: auto;
+      -ms-hyphens: auto;
+      overflow-wrap: break-word;
+    }
+
+    p{ line-height:1.78; margin:0 0 12px 0; font-size:15.8px; }
+    h1{ font-size:22px; margin:0 0 10px 0; text-align:center; letter-spacing:.2px; }
     h2{ font-size:17px; margin:0 0 10px 0; }
-    table{ width:100%; border-collapse: collapse; margin:12px 0; font-size:13.8px; table-layout:fixed; }
+    .small{ font-size:14.2px; color:#333; }
+
+    table{ width:100%; border-collapse: collapse; margin:12px 0; font-size:13.8px; }
     th,td{ border:1px solid #000; padding:6px; vertical-align:top; }
     th{ background:#eee; text-align:left; }
     td.num{ text-align:right; white-space:nowrap; }
+
     .pageBreak{ break-before: page; page-break-before: always; }
-    @media print{ .noprint{display:none} body{background:#fff} .sheet{box-shadow:none; padding:0; width:auto; min-height:auto} }
+
+    .signRow{ display:flex; gap:40px; margin-top:28px; }
+    .sign{ flex:1; }
+    .line{ border-top:1px solid #000; margin-top:24px; }
+    .lbl{ font-size:13.2px; padding-top:6px; }
+
+    @media print{
+      body{ background:#fff; }
+      .noprint{ display:none; }
+      .sheet{
+        width:auto; margin:0; padding:0; box-shadow:none;
+      }
+    }
   </style>
 </head>
 <body>
-  <div class="noprint"><button class="btn" onclick="window.print()">Imprimir</button></div>
-  <div class="sheet">
-    <h1>ACUERDO PRIVADO DE CANCELACIÓN DE SALDO</h1>
-    <p style="text-align:right;margin-top:18px">Buenos Aires, ${fecha}</p>
-    <p>Entre el Sr. <b>${state.meta.vendedor}</b>, DNI ${state.meta.dni_vendedor} (EL VENDEDOR) y el Sr. <b>${state.meta.comprador}</b>, DNI ${state.meta.dni_comprador} (EL COMPRADOR), se acuerda la cancelación del saldo pendiente conforme el plan adjunto.</p>
-    <p><b>Saldo reconocido:</b> U$S ${fmt(state.meta.saldo_inicial)}. <b>Entrega inicial:</b> U$S ${fmt(state.meta.entrega_inicial)}.</p>
+  <div class="noprint">
+    <button class="btn" id="btnCta">...</button>
+  </div>
 
+  <div class="sheet">
+    ${acuerdo}
     <div class="pageBreak"></div>
-    <h2>ANEXO – PLAN DE PAGOS</h2>
+
+    <h2>ANEXO PLAN DE PAGOS</h2>
+    <p class="small">
+      Inmueble: <b>${state.meta.inmueble}</b><br/>
+      Escritura Nº <b>${state.meta.escritura_num}</b> – Registro Notarial Nº <b>${state.meta.registro}</b>.
+    </p>
+
     <table>
       <thead>
         <tr>
-          <th style="width:90px">Período</th>
+          <th>Período</th>
           <th>Concepto</th>
-          <th class="num" style="width:110px">Cuota</th>
-          <th style="width:110px">Estado</th>
-          <th class="num" style="width:140px">Saldo</th>
+          <th class="num">Cuota (U$S)</th>
+          <th>Estado</th>
+          <th class="num">Saldo proyectado</th>
         </tr>
       </thead>
       <tbody>${filas}</tbody>
     </table>
   </div>
+
+  <script>
+    document.title = ${JSON.stringify(docTitle)};
+
+    async function shareHtml(){
+      const html = document.documentElement.outerHTML;
+      const file = new File([html], "acuerdo_y_anexo.html", { type:"text/html" });
+
+      if(navigator.share && navigator.canShare && navigator.canShare({ files:[file] })){
+        await navigator.share({ title: document.title, text: document.title, files: [file] });
+        return true;
+      }
+
+      const blob = new Blob([html], {type:"text/html"});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = file.name;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(()=>URL.revokeObjectURL(url), 1000);
+      alert("Tu navegador no soporta compartir. Se descargó el HTML para que lo envíes.");
+      return false;
+    }
+
+    function isShareMode(){
+      const canShare = !!(navigator.share && navigator.canShare);
+      const isTouch = (navigator.maxTouchPoints || 0) > 0;
+      const isSmall = window.matchMedia && window.matchMedia("(max-width: 900px)").matches;
+      return canShare && (isTouch || isSmall);
+    }
+
+    const btn = document.getElementById("btnCta");
+    function syncCTA(){
+      if(isShareMode()){
+        btn.textContent = "Compartir";
+        btn.onclick = ()=> shareHtml().catch(err=>{ console.error(err); alert("No se pudo compartir."); });
+      } else {
+        btn.textContent = "Imprimir";
+        btn.onclick = ()=> window.print();
+      }
+    }
+    syncCTA();
+    window.addEventListener("resize", syncCTA);
+  <\/script>
 </body>
 </html>`;
-      const w = window.open("", "_blank");
+
+      const w = window.open("", "acuerdo_anexo");
       w.document.open();
       w.document.write(html);
       w.document.close();
+      try { w.document.title = docTitle; } catch(e) {}
     }
 
     // ========== AUTH UI ==========
     const authBar = $("authBar");
     authBar.innerHTML = `
-      <span id="authStatus">Modo visualizador (solo lectura)</span>
+      <span id="authStatus">Modo visualizador</span>
       <span style="opacity:.7"> · </span>
       <input id="loginEmail" placeholder="Email editor" style="max-width:220px" />
       <input id="loginPass" placeholder="Contraseña" type="password" style="max-width:160px" />
@@ -1080,8 +1113,6 @@
       $("btnExport").style.display = "none";
       $("btnImport").style.display = "none";
       $("btnReset").style.display = "none";
-      $("secRecibos").style.display = "none";
-      $("btnPrintPlan").classList.add("big");
     }
     function setEditorUI(){
       $("btnEmitir").style.display = "";
@@ -1089,8 +1120,6 @@
       $("btnExport").style.display = "";
       $("btnImport").style.display = "";
       $("btnReset").style.display = "";
-      $("secRecibos").style.display = "";
-      $("btnPrintPlan").classList.add("big");
     }
 
     onAuthStateChanged(auth, (user)=>{
@@ -1139,61 +1168,54 @@
     // ========== RENDER ==========
     function render(){
       if(!state || !state.meta || !Array.isArray(state.movs) || !Array.isArray(state.recibos)){
-        $("saldoBig").textContent = "U$S —";
-        $("saldoMeta").textContent = "Estado inválido (no se pudo cargar).";
+        $("saldoBadge").textContent = "Saldo: —";
+        $("planResumen").textContent = "Estado inválido (no se pudo cargar).";
         return;
       }
 
       const movs = calcSaldos(state);
       const saldo = movs.length ? movs[movs.length-1].saldo : 0;
+      $("saldoBadge").textContent = "Saldo: U$S " + fmt(saldo);
 
       const plan = aplicarPagosAlPlan(generarPlanBase(state), state);
       const { fin, cuotasRestantes } = estimacionFin(plan);
       const saldoRestante = Math.max(0, Number(state.meta.saldo_inicial||0) - totalPagado(state));
+      $("planResumen").textContent = `Saldo restante: U$S ${fmt(saldoRestante)} · Fin estimado: ${fin} · Cuotas restantes: ${cuotasRestantes}`;
 
-      $("saldoBig").textContent = "U$S " + fmt(saldo);
-      $("saldoMeta").textContent = `Saldo restante: U$S ${fmt(saldoRestante)} · Fin estimado: ${fin} · Cuotas restantes: ${cuotasRestantes}`;
-
-      // Plan
       const tbPlan = $("tbodyPlan");
       tbPlan.innerHTML = "";
       plan.forEach(p=>{
         const tr = document.createElement("tr");
         tr.innerHTML = `
-          <td data-label="Período">${p.periodo}</td>
-          <td data-label="Concepto" class="concept">${p.concepto}${p.tipo==="antecedente" ? `<div class="small">Antecedente</div>` : ""}</td>
-          <td data-label="Monto (U$S)" class="num">${fmt(p.cuota)}</td>
-          <td data-label="Estado">${p.estado}</td>
-          <td data-label="Saldo" class="num">${fmt(p.saldo_proyectado)}</td>
+          <td>${p.periodo}</td>
+          <td>${p.concepto}${p.tipo==="antecedente" ? `<div class="small">Antecedente</div>` : ""}</td>
+          <td class="num">${fmt(p.cuota)}</td>
+          <td>${p.estado}</td>
+          <td class="num">${fmt(p.saldo_proyectado)}</td>
         `;
         tbPlan.appendChild(tr);
       });
 
-      // Recibos
       const tbRec = $("tbodyRec");
       tbRec.innerHTML = "";
       if(state.recibos.length === 0){
-        tbRec.innerHTML = `<tr><td data-label="Info" colspan="5" class="muted">Todavía no hay recibos emitidos.</td></tr>`;
+        tbRec.innerHTML = `<tr><td colspan="5" class="muted">Todavía no hay recibos emitidos.</td></tr>`;
       } else {
         state.recibos.slice().sort((a,b)=>a.numero.localeCompare(b.numero)).forEach(r=>{
           const est = (r.estado==="pendiente" ? "Pendiente" : "Imputado");
           const ver = `<a href="#" class="lnkRec" data-id="${r.id}">Ver</a>`;
           const tr = document.createElement("tr");
           tr.innerHTML = `
-            <td data-label="Período">${r.periodo}</td>
-            <td data-label="Concepto" class="concept">
-              ${r.concepto}
-              <div class="small">${(MESES[r.periodo.split("/")[0]]||r.periodo.split("/")[0])} ${r.periodo.split("/")[1]}</div>
-            </td>
-            <td data-label="Monto (U$S)" class="num">${fmt(r.monto)}</td>
-            <td data-label="Recibo">R${r.numero} · ${ver}</td>
-            <td data-label="Estado">${est}</td>
+            <td>${r.periodo}</td>
+            <td>${r.concepto}<div class="small">${(MESES[r.periodo.split("/")[0]]||r.periodo.split("/")[0])} ${r.periodo.split("/")[1]}</div></td>
+            <td class="num">${fmt(r.monto)}</td>
+            <td>R${r.numero} · ${ver}</td>
+            <td>${est}</td>
           `;
           tbRec.appendChild(tr);
         });
       }
 
-      // Movimientos
       const tbMov = $("tbodyMov");
       tbMov.innerHTML = "";
       movs.forEach(m=>{
@@ -1206,21 +1228,16 @@
 
         const tr = document.createElement("tr");
         tr.innerHTML = `
-          <td data-label="Período">${m.periodo}</td>
-          <td data-label="Concepto" class="concept">
-            ${m.concepto}
-            ${m.recibo_num ? ` <span class="small">(${m.recibo_num})</span>` : ""}
-            ${m.obs ? `<div class="small">Obs.: ${m.obs}</div>`:""}
-          </td>
-          <td data-label="Débito" class="num">${m.debito ? fmt(m.debito) : "—"}</td>
-          <td data-label="Crédito" class="num">${m.credito ? fmt(m.credito) : "—"}</td>
-          <td data-label="Saldo" class="num"><b>${fmt(m.saldo)}</b></td>
-          <td data-label="Adjunto">${adj}</td>
+          <td>${m.periodo}</td>
+          <td>${m.concepto}${m.recibo_num ? ` <span class="small">(${m.recibo_num})</span>` : ""}${m.obs ? `<div class="small">Obs.: ${m.obs}</div>`:""}</td>
+          <td class="num">${m.debito ? fmt(m.debito) : "—"}</td>
+          <td class="num">${m.credito ? fmt(m.credito) : "—"}</td>
+          <td class="num"><b>${fmt(m.saldo)}</b></td>
+          <td>${adj}</td>
         `;
         tbMov.appendChild(tr);
       });
 
-      // Click Ver recibo
       document.querySelectorAll(".lnkRec").forEach(a=>{
         a.onclick = (e)=>{
           e.preventDefault();
@@ -1238,7 +1255,6 @@
         };
       });
 
-      // Click Ver adjunto
       document.querySelectorAll(".lnkAdj").forEach(a=>{
         a.onclick = (e)=>{
           e.preventDefault();
@@ -1248,7 +1264,6 @@
         };
       });
 
-      // Select imputación
       const pendientes = state.recibos.filter(r=>r.estado==="pendiente");
       $("btnImputar").disabled = pendientes.length===0;
 
@@ -1288,8 +1303,6 @@
       saveState();
       hide("modalEmitir");
       render();
-
-      // Abrir el recibo imprimible al emitir
       openReciboPrint(state, rec, "pendiente");
     };
 
@@ -1368,7 +1381,6 @@
       hide("modalImputar");
       render();
 
-      // Mail
       const to = "l.linracioppi@gmail.com";
       const cc = "l.linracioppi@gmail.com";
       const subject = `Imputación de pago – Recibo R${rec.numero} – ${rec.periodo}`;
@@ -1383,6 +1395,7 @@
         "",
         "Cuenta: Bertinelli / Lin Racioppi"
       ].join("\n");
+
       abrirMailImputacion({ to, cc, subject, body });
     };
 
@@ -1425,39 +1438,6 @@
     };
 
     $("btnReset").onclick = ()=> hardReset();
-
-    // ===== init viewer/editor UI =====
-    function setViewerUI(){
-      $("btnEmitir").style.display = "none";
-      $("btnImputar").style.display = "none";
-      $("btnExport").style.display = "none";
-      $("btnImport").style.display = "none";
-      $("btnReset").style.display = "none";
-      $("secRecibos").style.display = "none";
-      $("btnPrintPlan").classList.add("big");
-    }
-    function setEditorUI(){
-      $("btnEmitir").style.display = "";
-      $("btnImputar").style.display = "";
-      $("btnExport").style.display = "";
-      $("btnImport").style.display = "";
-      $("btnReset").style.display = "";
-      $("secRecibos").style.display = "";
-      $("btnPrintPlan").classList.add("big");
-    }
-    onAuthStateChanged(auth, (user)=>{
-      if(user){
-        canWrite = true;
-        authStatus.textContent = "Modo editor habilitado";
-        btnLogout.style.display = "";
-        setEditorUI();
-      } else {
-        canWrite = false;
-        authStatus.textContent = "Modo visualizador (solo lectura)";
-        btnLogout.style.display = "none";
-        setViewerUI();
-      }
-    });
 
     render();
   });
