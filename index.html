@@ -1,9 +1,11 @@
+```html
 <!doctype html>
 <html lang="es">
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Cuenta Corriente – Bertinelli / Lin Racioppi</title>
+
 <style>
   :root{
     --bg:#0f1115;--panel:#171a21;--line:#2a3140;
@@ -14,47 +16,50 @@
   }
 
   *{ box-sizing:border-box; }
+  html, body{ max-width:100%; overflow-x:hidden; }
   body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;background:var(--bg);color:var(--text)}
   .wrap{max-width:1200px;margin:auto;padding:16px}
-  .card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px;margin:14px 0; overflow:hidden;}
+
+  .card{
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:14px;
+    padding:14px;
+    margin:14px 0;
+    overflow:hidden; /* evita que se “salgan” bordes/divisorias */
+  }
+
   h1{margin:0 0 6px 0;font-size:20px}
   h2{margin:0 0 8px 0;font-size:15px;color:var(--muted)}
 
   .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;justify-content:space-between}
-  .right{display:flex;gap:8px;flex-wrap:wrap;align-items:center;justify-content:flex-end}
+  .right{display:flex;gap:8px;flex-wrap:wrap;align-items:center;justify-content:flex-end;min-width:0}
 
-  /* ======= SALDO DESTACADO “primero para ver” ======= */
+  /* ===== Saldo grande, bien visible ===== */
   .saldoHero{
     display:flex;
-    align-items:baseline;
-    gap:10px;
-    padding:10px 12px;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+
+    padding:12px 14px;
+    border-radius:16px;
+
     border:1px solid #1d4ed8;
-    background:linear-gradient(180deg, rgba(37,99,235,.22), rgba(17,24,39,.0));
-    border-radius:14px;
-    box-shadow:0 10px 24px rgba(37,99,235,.18);
-    min-width: 260px;
+    background:linear-gradient(180deg, rgba(37,99,235,.30), rgba(17,24,39,.0));
+    box-shadow:0 12px 28px rgba(37,99,235,.22);
+    width: min(460px, 100%);
   }
-  .saldoHero .lbl{
-    font-size:12px;
-    color:#c7d2fe;
-    font-weight:800;
-    letter-spacing:.2px;
-    text-transform:uppercase;
-  }
+  .saldoHero .left{display:flex;flex-direction:column;gap:4px;min-width:0}
+  .saldoHero .lbl{font-size:12px;color:#c7d2fe;font-weight:900;letter-spacing:.2px;text-transform:uppercase}
   .saldoHero .val{
-    font-size:18px;
+    font-size:28px; /* MÁS GRANDE */
     font-weight:950;
-    line-height:1;
+    line-height:1.05;
     font-variant-numeric: tabular-nums;
-  }
-  .saldoHero .sub{
-    margin-left:auto;
-    font-size:12px;
-    color:var(--muted);
-    font-weight:650;
     white-space:nowrap;
   }
+  .saldoHero .hint{font-size:12px;color:var(--muted);font-weight:700;white-space:nowrap}
 
   .badge{border:1px solid var(--line);padding:6px 12px;border-radius:999px;background:var(--chip)}
   .btn{border:1px solid var(--line);background:#222733;color:var(--text);padding:8px 12px;border-radius:10px;font-weight:650;cursor:pointer}
@@ -62,63 +67,39 @@
   .btn.danger{background:var(--danger);border-color:#991b1b}
   .btn:disabled{opacity:.5;cursor:not-allowed}
 
-  /* Botón acuerdo/plan destacado en modo visualizador */
-  .btn.bigPrimary{
-    background:var(--primary);
-    border-color:#1d4ed8;
-    padding:12px 16px;
-    font-weight:900;
-    border-radius:12px;
-    box-shadow:0 8px 18px rgba(37,99,235,.25);
-  }
-  .btn.bigPrimary:hover{ filter:brightness(1.03); }
-
   .muted{color:var(--muted);font-size:12px}
   .small{font-size:12px;color:var(--muted)}
   .err{font-size:12px;color:var(--err)}
 
-  /* ======== planResumen: grande y NO muteado ======== */
+  /* Plan resumen: grande y no muteado */
   #planResumen{
-    font-size:14px;
-    font-weight:800;
+    font-size:15px;
+    font-weight:900;
     color:var(--text);
     line-height:1.25;
+    text-wrap:balance;
   }
-  @media (min-width:901px){ #planResumen{ font-size:15px; } }
 
-  /* ======== Cards desplegables (Cabecera / Anexo económico) ======== */
-  .disclosureHead{
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    gap:10px;
-    cursor:pointer;
-    user-select:none;
+  /* ===== Tablas: alineadas y sin scroll horizontal en móvil ===== */
+  table{
+    width:100%;
+    border-collapse:collapse;
+    font-size:13px;
+    margin-top:6px;
+    table-layout:fixed; /* clave para alinear + evitar desborde */
   }
-  .disclosureHead h2{ margin:0; }
-  .chev{
-    width:34px;height:34px;
-    display:grid;place-items:center;
-    border:1px solid var(--line);
-    border-radius:10px;
-    background:#111827;
-    font-weight:900;
-    transition:transform .15s ease;
+  th,td{
+    border-bottom:1px solid var(--line);
+    padding:8px;
+    vertical-align:top;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    min-width:0;
   }
-  .disclosureBody{ margin-top:10px; }
-  .collapsed .disclosureBody{ display:none; }
-  .collapsed .chev{ transform:rotate(-90deg); }
+  th{color:var(--muted);text-align:left;font-weight:650}
+  td.num, th.num{text-align:right;white-space:nowrap;font-variant-numeric: tabular-nums;}
 
-  /* ======== TABLAS: desktop fijo / mobile “stacked” sin scroll horizontal ======== */
-  table{width:100%;border-collapse:collapse;font-size:13px;margin-top:6px; table-layout:fixed;}
-  th,td{border-bottom:1px solid var(--line);padding:8px;vertical-align:top}
-  th{color:var(--muted);text-align:left;font-weight:700}
-  td.num, th.num{text-align:right;white-space:nowrap; font-variant-numeric: tabular-nums;}
-  td{overflow:hidden; text-overflow:ellipsis;}
-  a{color:#93c5fd;text-decoration:none}
-  a:hover{text-decoration:underline}
-
-  /* Col widths desktop (alineación) */
+  /* columnas: fija anchos para alinear */
   table.plan col.c-periodo{width:110px}
   table.plan col.c-monto{width:120px}
   table.plan col.c-estado{width:200px}
@@ -135,55 +116,17 @@
   table.mov col.c-saldo{width:110px}
   table.mov col.c-adj{width:190px}
 
-  /* MOBILE: convierte cada fila en “tarjeta” sin tabla horizontal */
-  @media (max-width:900px){
-    .wrap{padding:12px}
-
-    /* Barra superior: saldo primero y bien visible */
-    #btnBar{ width:100%; justify-content:flex-start; }
-    .saldoHero{ width:100%; min-width:unset; }
-    .saldoHero .val{ font-size:20px; }
-    .saldoHero .sub{ display:none; } /* menos ruido arriba */
-
-    table thead{ display:none; }
-    table, tbody, tr{ display:block; width:100%; }
-    table{ margin-top:10px; }
-    tr{
-      border:1px solid var(--line);
-      border-radius:12px;
-      padding:10px;
-      margin:10px 0;
-      background:rgba(17,24,39,.35);
-    }
-    td{
-      display:flex;
-      justify-content:space-between;
-      gap:10px;
-      padding:7px 0;
-      border-bottom:1px solid rgba(42,49,64,.75);
-      overflow:visible;
-      text-overflow:unset;
-      white-space:normal;
-    }
-    td:last-child{ border-bottom:none; padding-bottom:0; }
-    td:first-child{ padding-top:0; }
-
-    td::before{
-      content: attr(data-label);
-      color:var(--muted);
-      font-size:12px;
-      font-weight:750;
-      text-transform:uppercase;
-      letter-spacing:.15px;
-      flex: 0 0 44%;
-    }
-
-    td.num{ text-align:right; }
-    td.num::before{ justify-self:flex-start; }
-
-    /* mantiene colgroup sólo para desktop; en mobile es block, no rompe nada */
-    colgroup{ display:none; }
+  /* permite cortar textos largos sin agrandar ancho */
+  td.wrap{
+    white-space:normal;
+    overflow:visible;
+    text-overflow:unset;
+    word-break:break-word;
+    overflow-wrap:anywhere;
   }
+
+  a{color:#93c5fd;text-decoration:none}
+  a:hover{text-decoration:underline}
 
   .grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
   @media (max-width:900px){ .grid{grid-template-columns:1fr} }
@@ -192,6 +135,41 @@
   textarea{min-height:70px;resize:vertical}
   hr{border:none;border-top:1px solid var(--line);margin:10px 0}
 
+  /* ===== Desplegables: “Ver más” con símbolo lindo ===== */
+  .discHead{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+  }
+  .discHead h2{ margin:0; }
+  .discToggle{
+    border:1px solid var(--line);
+    background:#111827;
+    color:var(--text);
+    padding:8px 10px;
+    border-radius:12px;
+    font-weight:850;
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    gap:8px;
+    white-space:nowrap;
+  }
+  .discToggle .ico{
+    width:22px;height:22px;
+    display:grid;place-items:center;
+    border-radius:8px;
+    background:rgba(147,197,253,.10);
+    border:1px solid rgba(147,197,253,.22);
+    font-size:14px;
+    line-height:1;
+  }
+  .discBody{ margin-top:10px; }
+  .collapsed .discBody{ display:none; }
+  .collapsed .discToggle .ico{ transform:rotate(-90deg); } /* solo un guiño */
+
+  /* ===== Modales ===== */
   .modal{
     position:fixed; inset:0;
     display:none;
@@ -204,11 +182,37 @@
   }
   .modal.show{display:flex}
   .modal .card{ max-width:920px; width:100%; margin:auto; }
-
   #i_preview img{ max-height:40vh; width:auto; display:block; }
-
   .ck{display:flex;gap:8px;align-items:flex-start}
   .ck input{width:auto;margin-top:3px}
+
+  /* ===== MOBILE: sin scroll horizontal, sin “cuadros” ===== */
+  @media (max-width:900px){
+    .wrap{padding:12px}
+
+    /* botones full-width para evitar desborde lateral */
+    #btnBar{ width:100%; justify-content:flex-start; }
+    #btnBar .btn{ width:100%; }
+
+    .saldoHero{
+      width:100%;
+      position:sticky;
+      top:10px;
+      z-index:15;
+      backdrop-filter: blur(6px);
+    }
+    .saldoHero .val{ font-size:30px; }
+
+    /* achica columnas fijas para que entren mejor */
+    table.plan col.c-estado{width:150px}
+    table.plan col.c-saldo{width:130px}
+    table.rec col.c-recibo{width:170px}
+    table.mov col.c-adj{width:150px}
+
+    /* en móvil, el texto “Concepto” y “Adjunto” deben poder romper línea */
+    table td:nth-child(2){ white-space:normal; overflow:visible; text-overflow:unset; overflow-wrap:anywhere; }
+    table.mov td:nth-child(6){ white-space:normal; overflow:visible; text-overflow:unset; overflow-wrap:anywhere; }
+  }
 </style>
 </head>
 
@@ -220,13 +224,14 @@
       <h1>Cuenta Corriente – Bertinelli / Lin Racioppi</h1>
       <div id="authBar" class="muted"></div>
     </div>
+
     <div class="right" id="btnBar">
-      <div class="saldoHero" id="saldoHero" title="Saldo actual de la cuenta corriente">
-        <div>
-          <div class="lbl">Saldo</div>
+      <div class="saldoHero" title="Saldo actual">
+        <div class="left">
+          <div class="lbl">Saldo actual</div>
           <div class="val" id="saldoBadge">U$S —</div>
+          <div class="hint">Cuenta corriente</div>
         </div>
-        <div class="sub" id="saldoSub">Actual</div>
       </div>
 
       <button class="btn primary" id="btnEmitir">Emitir recibo</button>
@@ -238,26 +243,32 @@
     </div>
   </div>
 
-  <!-- Cabecera (desplegable) -->
-  <div class="card" id="cardCabecera">
-    <div class="disclosureHead" id="cabHead" role="button" aria-expanded="true">
+  <!-- Cabecera (colapsado por defecto) -->
+  <div class="card collapsed" id="cardCabecera">
+    <div class="discHead">
       <h2>Cabecera</h2>
-      <div class="chev" aria-hidden="true">⌄</div>
+      <button class="discToggle" id="cabToggle" type="button" aria-expanded="false">
+        <span class="ico">▸</span>
+        <span id="cabToggleTxt">Ver más</span>
+      </button>
     </div>
-    <div class="disclosureBody" id="cabBody">
+    <div class="discBody">
       <div><b>Escritura Nº 434</b> – Registro Notarial Nº <b>30</b> – Escribano: <b>Norberto Gustavo Soler</b></div>
       <div>Operación: <b>Compraventa inmueble – 25 de Mayo 8, 6º C, Ciudadela</b></div>
       <div>Vendedor: <b>José Orlando Bertinelli</b> · Comprador: <b>Lautaro Nahuel Lin Racioppi</b></div>
     </div>
   </div>
 
-  <!-- Anexo económico (desplegable) -->
-  <div class="card" id="cardAnexo">
-    <div class="disclosureHead" id="anxHead" role="button" aria-expanded="true">
+  <!-- Anexo (colapsado por defecto) -->
+  <div class="card collapsed" id="cardAnexo">
+    <div class="discHead">
       <h2>Anexo económico</h2>
-      <div class="chev" aria-hidden="true">⌄</div>
+      <button class="discToggle" id="anxToggle" type="button" aria-expanded="false">
+        <span class="ico">▸</span>
+        <span id="anxToggleTxt">Ver más</span>
+      </button>
     </div>
-    <div class="disclosureBody" id="anxBody">
+    <div class="discBody">
       <div>Precio solicitado: USD 44.000</div>
       <div>Precio escriturado: USD 41.000</div>
       <div>Crédito Banco Nación: USD 30.850</div>
@@ -266,34 +277,44 @@
     </div>
   </div>
 
-  <div class="card">
-    <div class="row" style="align-items:flex-end">
-      <h2 style="margin:0">Plan de pagos proyectado</h2>
-      <div id="planResumen">—</div>
+  <!-- Plan (colapsado por defecto) -->
+  <div class="card collapsed" id="cardPlan">
+    <div class="discHead">
+      <div class="row" style="align-items:flex-end; width:100%">
+        <h2 style="margin:0">Plan de pagos proyectado</h2>
+        <div id="planResumen">—</div>
+      </div>
+      <button class="discToggle" id="planToggle" type="button" aria-expanded="false">
+        <span class="ico">▸</span>
+        <span id="planToggleTxt">Ver más</span>
+      </button>
     </div>
 
-    <table class="plan">
-      <colgroup>
-        <col class="c-periodo">
-        <col>
-        <col class="c-monto">
-        <col class="c-estado">
-        <col class="c-saldo">
-      </colgroup>
-      <thead>
-        <tr>
-          <th>Período</th>
-          <th>Concepto</th>
-          <th class="num">Monto (U$S)</th>
-          <th>Estado</th>
-          <th class="num">Saldo proyectado</th>
-        </tr>
-      </thead>
-      <tbody id="tbodyPlan"></tbody>
-    </table>
+    <div class="discBody">
+      <table class="plan">
+        <colgroup>
+          <col class="c-periodo">
+          <col>
+          <col class="c-monto">
+          <col class="c-estado">
+          <col class="c-saldo">
+        </colgroup>
+        <thead>
+          <tr>
+            <th>Período</th>
+            <th>Concepto</th>
+            <th class="num">Monto (U$S)</th>
+            <th>Estado</th>
+            <th class="num">Saldo proyectado</th>
+          </tr>
+        </thead>
+        <tbody id="tbodyPlan"></tbody>
+      </table>
+    </div>
   </div>
 
-  <div class="card">
+  <!-- Recibos emitidos (NO visible en visualizador) -->
+  <div class="card" id="cardRecibos">
     <h2>Recibos emitidos</h2>
     <table class="rec">
       <colgroup>
@@ -316,7 +337,7 @@
     </table>
   </div>
 
-  <div class="card">
+  <div class="card" id="cardMovs">
     <h2>Libro de movimientos</h2>
     <table class="mov">
       <colgroup>
@@ -467,16 +488,30 @@
     function hide(id){ $(id).classList.remove("show"); }
     function isPeriodo(x){ return /^\d{2}\/\d{4}$/.test(String(x||"").trim()); }
 
-    // ====== desplegables (Cabecera / Anexo) ======
-    function toggleCard(cardId, headId){
-      const el = $(cardId);
-      const isCollapsed = el.classList.toggle("collapsed");
-      const open = !isCollapsed;
-      $(headId).setAttribute("aria-expanded", String(open));
-      return open;
+    // ===== Desplegables: colapsados por defecto =====
+    function setToggleText(cardEl, txtEl, btnEl){
+      const collapsed = cardEl.classList.contains("collapsed");
+      txtEl.textContent = collapsed ? "Ver más" : "Ver menos";
+      btnEl.setAttribute("aria-expanded", collapsed ? "false" : "true");
+      // símbolo “▸” se usa como guiño; no dependemos del rotate (porque es decorativo)
+      btnEl.querySelector(".ico").textContent = collapsed ? "▸" : "▾";
     }
-    $("cabHead").onclick = ()=> toggleCard("cardCabecera", "cabHead");
-    $("anxHead").onclick = ()=> toggleCard("cardAnexo", "anxHead");
+    function toggleCard(cardId, btnId, txtId){
+      const card = $(cardId);
+      const btn = $(btnId);
+      const txt = $(txtId);
+      card.classList.toggle("collapsed");
+      setToggleText(card, txt, btn);
+    }
+
+    // init textos (porque arrancan colapsadas)
+    setToggleText($("cardCabecera"), $("cabToggleTxt"), $("cabToggle"));
+    setToggleText($("cardAnexo"), $("anxToggleTxt"), $("anxToggle"));
+    setToggleText($("cardPlan"), $("planToggleTxt"), $("planToggle"));
+
+    $("cabToggle").onclick = ()=> toggleCard("cardCabecera","cabToggle","cabToggleTxt");
+    $("anxToggle").onclick = ()=> toggleCard("cardAnexo","anxToggle","anxToggleTxt");
+    $("planToggle").onclick = ()=> toggleCard("cardPlan","planToggle","planToggleTxt");
 
     function makeInitialState(){
       return {
@@ -657,9 +692,9 @@
       return { fin: lastNotPagada ? lastNotPagada.periodo : "(—)", cuotasRestantes: cuotas.slice(firstPendingIdx).length };
     }
 
-    // ==================================================
-    // (Recibo/Adjunto/Acuerdo) se mantiene igual a tu versión previa
-    // ==================================================
+    // ======================
+    // RECIBO + ADJUNTO + ACUERDO (igual que tu lógica original, solo con estilos básicos)
+    // ======================
     function openReciboPrint(state, rec, modo, saldoLuego){
       const isImputado = (modo === "imputado");
       const [mm,yyyy] = String(rec.periodo).split("/");
@@ -673,7 +708,6 @@
         : ``;
 
       const docTitle = `Recibo R${rec.numero} – ${rec.periodo}`;
-      const fileName = `recibo_R${rec.numero}_${String(rec.periodo).replace("/","-")}.html`;
 
       const html = `
 <!doctype html>
@@ -684,156 +718,64 @@
 <title>${docTitle}</title>
 <style>
   @page{ size:A5 landscape; margin:10mm; }
-  :root{ --barH:56px; }
-  html,body{ height:100%; }
   body{ margin:0; font-family:system-ui,Segoe UI,Arial; color:#111; background:#fff; }
-
-  .topbar{
-    position: sticky;
-    top:0;
-    z-index:10;
-    height: var(--barH);
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    gap:10px;
-    padding: 10px 12px;
-    background:#fff;
-    border-bottom: 1px solid #e5e7eb;
-  }
-  .topbar .ttl{
-    font-size:14px;
-    font-weight:900;
-    white-space:nowrap;
-    overflow:hidden;
-    text-overflow:ellipsis;
-  }
-  .btn{
-    border:1px solid #111;
-    background:#f2f2f2;
-    padding:8px 12px;
-    border-radius:10px;
-    font-weight:800;
-    cursor:pointer;
-  }
-
-  .sheet{
-    background:#fff;
-    border:1px solid #111;
-    border-radius:10px;
-    box-sizing:border-box;
-
-    width: min(1100px, calc(100vw - 24px));
-    margin: 12px auto;
-    padding: 14px;
-    min-height: calc(100dvh - var(--barH) - 24px);
-  }
-
-  p, li{
-    text-align: justify;
-    text-justify: inter-word;
-    hyphens: auto;
-    -webkit-hyphens: auto;
-    -ms-hyphens: auto;
-    overflow-wrap: break-word;
-  }
-
+  .topbar{ position:sticky; top:0; z-index:10; padding:10px 12px; background:#fff; border-bottom:1px solid #e5e7eb; display:flex; align-items:center; justify-content:space-between; gap:10px; }
+  .ttl{ font-size:14px; font-weight:900; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .btn{ border:1px solid #111; background:#f2f2f2; padding:8px 12px; border-radius:10px; font-weight:800; cursor:pointer; }
+  .sheet{ border:1px solid #111; border-radius:10px; width:min(1100px, calc(100vw - 24px)); margin:12px auto; padding:14px; box-sizing:border-box; }
+  p{ text-align:justify; hyphens:auto; overflow-wrap:break-word; }
   .h1{font-size:20px;font-weight:900;margin:0 0 4px 0}
   .sub{font-size:14px;color:#333;margin:0 0 10px 0}
   .txt{font-size:15.5px;line-height:1.65;margin:0 0 10px 0}
   .b{font-weight:900}
   .upper{font-weight:900;text-transform:uppercase}
-
   .kv{margin:8px 0;font-size:15px}
-  .k{color:#222}
-
-  .vbox{ display:flex; flex-direction:column; min-height:100%; }
-  .grow{ flex:1; }
-
   .sigGrid{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:12px}
   .lineLabel{font-size:12.5px;color:#333;margin-top:6px}
   .line{border-top:1px solid #111;margin-top:18px}
-
-  @media (max-width: 900px){
-    .sheet{
-      width:100vw;
-      margin:0;
-      border-radius:0;
-      border-left:none;
-      border-right:none;
-      min-height: calc(100dvh - var(--barH));
-      padding: 16px;
-    }
-  }
-
-  @media print{
-    .topbar{ display:none; }
-    .sheet{
-      border:1px solid #111;
-      border-radius:10px;
-      width:100%;
-      margin:0;
-      padding:10mm;
-      min-height:148mm;
-    }
-  }
+  @media print{ .topbar{ display:none; } .sheet{ width:100%; margin:0; padding:10mm; } }
 </style>
 </head>
 <body>
-
 <div class="topbar">
   <div class="ttl">${docTitle}</div>
-  <button class="btn" id="btnCta">Imprimir</button>
+  <button class="btn" onclick="window.print()">Imprimir</button>
 </div>
 
 <div class="sheet">
-  <div class="vbox">
+  <div class="h1">RECIBO N° ${rec.numero}</div>
+  <div class="sub">Cuenta Corriente – Bertinelli / Lin Racioppi</div>
+
+  <p class="txt">
+    En la ciudad de Buenos Aires, en el mes de <span class="b">${mes} de ${yyyy}</span>,
+    recibí de <span class="b">${state.meta.comprador}</span> la suma de
+    <span class="upper">${montoLinea}</span>,
+    en concepto de pago a cuenta del saldo pendiente de la operación de compraventa instrumentada mediante
+    <span class="b">Escritura N° ${state.meta.escritura_num}</span> (Registro Notarial N° ${state.meta.registro}).
+  </p>
+
+  <div class="kv"><span class="b">Concepto:</span> ${rec.concepto}</div>
+  <div class="kv"><span class="b">Período imputado:</span> ${rec.periodo}</div>
+
+  ${saldoBlock}
+
+  <div class="sigGrid">
     <div>
-      <div class="h1">RECIBO N° ${rec.numero}</div>
-      <div class="sub">Cuenta Corriente – Bertinelli / Lin Racioppi</div>
-
-      <p class="txt">
-        En la ciudad de Buenos Aires, en el mes de <span class="b">${mes} de ${yyyy}</span>,
-        recibí de <span class="b">${state.meta.comprador}</span> la suma de
-        <span class="upper">${montoLinea}</span>,
-        en concepto de pago a cuenta del saldo pendiente de la operación de compraventa instrumentada mediante
-        <span class="b">Escritura N° ${state.meta.escritura_num}</span> (Registro Notarial N° ${state.meta.registro}).
-      </p>
-
-      <div class="kv"><span class="k">Concepto:</span> <span class="b">${rec.concepto}</span></div>
-      <div class="kv"><span class="k">Período imputado:</span> <span class="b">${rec.periodo}</span></div>
-
-      ${saldoBlock}
+      <div class="line"></div>
+      <div class="lineLabel">Firma comprador</div>
+      <div class="line"></div>
+      <div class="lineLabel">${state.meta.comprador} / ${state.meta.dni_comprador}</div>
     </div>
-
-    <div class="grow"></div>
-
-    <div class="sigGrid">
-      <div>
-        <div class="line"></div>
-        <div class="lineLabel">Firma comprador</div>
-
-        <div class="line"></div>
-        <div class="lineLabel">${state.meta.comprador} / ${state.meta.dni_comprador}</div>
-      </div>
-
-      <div>
-        <div class="line"></div>
-        <div class="lineLabel">Firma vendedor</div>
-
-        <div class="line"></div>
-        <div class="lineLabel">${state.meta.vendedor} / ${state.meta.dni_vendedor}</div>
-      </div>
+    <div>
+      <div class="line"></div>
+      <div class="lineLabel">Firma vendedor</div>
+      <div class="line"></div>
+      <div class="lineLabel">${state.meta.vendedor} / ${state.meta.dni_vendedor}</div>
     </div>
   </div>
 </div>
-
-<script>
-  document.getElementById("btnCta").onclick = ()=>window.print();
-<\/script>
 </body>
 </html>`;
-
       const w = window.open("", "_blank");
       w.document.open();
       w.document.write(html);
@@ -847,9 +789,11 @@
         w.document.close();
         return;
       }
+
       const safeName = (adjunto.name || "adjunto").replaceAll("<","").replaceAll(">","");
       const isPdf = (adjunto.type||"").includes("pdf");
       const title = `Adjunto – ${safeName}`;
+
       const html = `
 <!doctype html>
 <html lang="es">
@@ -858,17 +802,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
 <title>${title}</title>
 <style>
-  :root{ --barH:56px; }
-  html,body{ height:100%; }
   body{ margin:0; font-family:system-ui,Segoe UI,Arial; background:#fff; color:#111; }
-  .topbar{
-    position: sticky; top:0; z-index:10; height: var(--barH);
-    display:flex; align-items:center; justify-content:space-between; gap:10px;
-    padding: 10px 12px; background:#fff; border-bottom: 1px solid #e5e7eb;
-  }
+  .topbar{ position:sticky; top:0; z-index:10; padding:10px 12px; background:#fff; border-bottom:1px solid #e5e7eb; display:flex; align-items:center; justify-content:space-between; gap:10px; }
   .ttl{ font-size:14px; font-weight:900; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
   .btn{ border:1px solid #111; background:#f2f2f2; padding:8px 12px; border-radius:10px; font-weight:800; cursor:pointer; }
-  .viewer{ height: calc(100dvh - var(--barH)); width: 100vw; overflow:auto; background:#fff; }
+  .viewer{ height: calc(100dvh - 56px); width: 100vw; overflow:auto; background:#fff; }
   .imgWrap{ display:flex; justify-content:center; padding: 12px; }
   img{ max-width: 100%; height: auto; border:1px solid #ddd; border-radius:10px; }
   embed{ width:100%; height:100%; border:none; }
@@ -878,15 +816,12 @@
 <body>
 <div class="topbar">
   <div class="ttl">${title}</div>
-  <button class="btn" id="btnCta">Imprimir</button>
+  <button class="btn" onclick="window.print()">Imprimir</button>
 </div>
+
 <div class="viewer">
-  ${isPdf ? `<embed src="${adjunto.dataUrl}" type="application/pdf" />`
-          : `<div class="imgWrap"><img src="${adjunto.dataUrl}" alt="Adjunto"/></div>`}
+  ${isPdf ? `<embed src="${adjunto.dataUrl}" type="application/pdf" />` : `<div class="imgWrap"><img src="${adjunto.dataUrl}" alt="Adjunto"/></div>`}
 </div>
-<script>
-  document.getElementById("btnCta").onclick = ()=>window.print();
-<\/script>
 </body>
 </html>`;
       w.document.open();
@@ -914,50 +849,39 @@
       const acuerdo = `
         <h1>ACUERDO PRIVADO DE CANCELACIÓN DE SALDO</h1>
         <div class="titleGap"></div>
+
         <p class="fecha">Buenos Aires, ${fecha}</p>
         <div class="dateGap"></div>
+
         <p>
           Entre el Sr. <b>${state.meta.vendedor}</b>, DNI ${state.meta.dni_vendedor}, en adelante <b>EL VENDEDOR</b>,
           y el Sr. <b>${state.meta.comprador}</b>, DNI ${state.meta.dni_comprador}, en adelante <b>EL COMPRADOR</b>,
           se celebra el presente acuerdo, sujeto a las siguientes cláusulas:
         </p>
-        <p><b>PRIMERA – Antecedentes.</b> Las partes manifiestan que celebraron la compraventa del inmueble sito en
-          <b>${state.meta.inmueble}</b>, instrumentada mediante <b>Escritura Pública Nº ${state.meta.escritura_num}</b>,
-          pasada ante el <b>Registro Notarial Nº ${state.meta.registro}</b>, referida al mes de <b>${state.meta.ref_mes}</b>.
+
+        <p><b>PRIMERA – Antecedentes.</b> Inmueble: <b>${state.meta.inmueble}</b>. Escritura Pública Nº <b>${state.meta.escritura_num}</b>,
+          Registro Notarial Nº <b>${state.meta.registro}</b>, referida al mes de <b>${state.meta.ref_mes}</b>.
         </p>
-        <p><b>SEGUNDA – Entrega inicial ya efectuada.</b> Las partes dejan constancia de que el COMPRADOR entregó
-          en concepto de entrega inicial la suma de <b>U$S ${fmt(state.meta.entrega_inicial)}</b>, quedando el saldo
-          convenido en cuenta corriente determinado en función de dicha entrega.
-        </p>
-        <p><b>TERCERA – Saldo pendiente.</b> Las partes reconocen un saldo pendiente a cargo del COMPRADOR por
-          <b>U$S ${fmt(state.meta.saldo_inicial)}</b>.
-        </p>
-        <p><b>CUARTA – Forma de pago.</b> El saldo será cancelado conforme esquema: a) <b>enero 2026</b>: U$S 150;
-          b) desde el período siguiente: pagos mensuales de referencia de U$S 500 hasta cancelar el saldo.
-        </p>
-        <p><b>QUINTA – Adelantos.</b> El COMPRADOR podrá efectuar pagos adelantados o superiores sin penalidad.
-          Dichos adelantos se imputarán al saldo y acortarán la duración total del plan.
-        </p>
-        <p><b>SEXTA – Carácter.</b> El plan se recalcula por adelantos, manteniéndose la obligación de cancelar el saldo
-          hasta cero.
-        </p>
-        <p><b>SÉPTIMA – Recibos.</b> Cada pago se documentará mediante recibo firmado por ambas partes.</p>
-        <p><b>OCTAVA – Naturaleza.</b> El presente acuerdo es complementario de la escritura referida y regula exclusivamente
-          la modalidad de cancelación del saldo pendiente.
-        </p>
-        <p>
-          En prueba de conformidad, se firman dos ejemplares de un mismo tenor, en la ciudad de Buenos Aires,
-          en la fecha indicada al inicio.
-        </p>
+
+        <p><b>SEGUNDA – Entrega inicial ya efectuada.</b> Entrega inicial: <b>U$S ${fmt(state.meta.entrega_inicial)}</b>.</p>
+
+        <p><b>TERCERA – Saldo pendiente.</b> Saldo pendiente: <b>U$S ${fmt(state.meta.saldo_inicial)}</b>.</p>
+
+        <p><b>CUARTA – Forma de pago.</b> Enero 2026: U$S 150. Luego pagos mensuales de referencia U$S 500 hasta cancelar.</p>
+
+        <p><b>QUINTA – Adelantos.</b> Podrá adelantar sin penalidad. Se imputará a saldo.</p>
+
+        <p><b>SEXTA – Carácter.</b> El plan se recalcula por adelantos hasta saldo cero.</p>
+
+        <p><b>SÉPTIMA – Recibos.</b> Cada pago se documentará con recibo firmado por ambas partes.</p>
+
+        <p><b>OCTAVA – Naturaleza.</b> Complementario de la escritura referida.</p>
+
+        <p>En prueba de conformidad, se firman dos ejemplares de un mismo tenor.</p>
+
         <div class="signRow">
-          <div class="sign">
-            <div class="line"></div>
-            <div class="lbl">Firma EL VENDEDOR</div>
-          </div>
-          <div class="sign">
-            <div class="line"></div>
-            <div class="lbl">Firma EL COMPRADOR</div>
-          </div>
+          <div class="sign"><div class="line"></div><div class="lbl">Firma EL VENDEDOR</div></div>
+          <div class="sign"><div class="line"></div><div class="lbl">Firma EL COMPRADOR</div></div>
         </div>
       `;
 
@@ -972,24 +896,10 @@
     @page{ size:A4 portrait; margin:16mm; }
     body{ margin:0; background:#e5e7eb; font-family: Arial, sans-serif; color:#111; }
     .fecha{ text-align:right; }
-    .noprint{ padding:12px; }
+    .noprint{ padding:12px; position:sticky; top:0; background:#fff; z-index:10; border-bottom:1px solid #ddd; }
     .btn{border:1px solid #111;background:#f2f2f2;padding:8px 12px;border-radius:10px;font-weight:700;cursor:pointer}
-    .sheet{
-      width: min(210mm, 100vw);
-      min-height: 100vh;
-      background:#fff;
-      margin:0 auto;
-      padding: clamp(12px, 3vw, 16mm);
-      box-shadow:0 10px 30px rgba(0,0,0,.15);
-      box-sizing:border-box;
-    }
-    @media (max-width: 900px){
-      body{ background:#fff; }
-      .noprint{ position: sticky; top:0; background:#fff; z-index:10; border-bottom:1px solid #ddd; }
-      .sheet{ width:100vw; min-height:100dvh; margin:0; padding: 14px; box-shadow:none; border-radius:0; }
-    }
-    p, li{ text-align: justify; text-justify: inter-word; hyphens: auto; -webkit-hyphens: auto; -ms-hyphens: auto; overflow-wrap: break-word; }
-    p{ line-height:1.78; margin:0 0 12px 0; font-size:15.8px; }
+    .sheet{ width: min(210mm, 100vw); min-height: 100vh; background:#fff; margin:0 auto; padding: clamp(12px, 3vw, 16mm); box-shadow:0 10px 30px rgba(0,0,0,.15); box-sizing:border-box; }
+    p{ line-height:1.78; margin:0 0 12px 0; font-size:15.8px; text-align:justify; hyphens:auto; overflow-wrap:break-word; }
     h1{ font-size:22px; margin:0; text-align:center; letter-spacing:.2px; }
     h2{ font-size:17px; margin:0 0 10px 0; }
     .small{ font-size:14.2px; color:#333; }
@@ -1004,25 +914,24 @@
     .sign{ flex:1; }
     .line{ border-top:1px solid #000; margin-top:24px; }
     .lbl{ font-size:13.2px; padding-top:6px; }
-    @media print{
-      body{ background:#fff; }
-      .noprint{ display:none; }
-      .sheet{ width:auto; min-height:auto; margin:0; padding:0; box-shadow:none; }
-    }
+    @media print{ body{ background:#fff; } .noprint{ display:none; } .sheet{ width:auto; min-height:auto; margin:0; padding:0; box-shadow:none; } }
   </style>
 </head>
 <body>
   <div class="noprint">
     <button class="btn" onclick="window.print()">Imprimir</button>
   </div>
+
   <div class="sheet">
     ${acuerdo}
     <div class="pageBreak"></div>
+
     <h2>ANEXO PLAN DE PAGOS</h2>
     <p class="small">
       Inmueble: <b>${state.meta.inmueble}</b><br/>
       Escritura Nº <b>${state.meta.escritura_num}</b> – Registro Notarial Nº <b>${state.meta.registro}</b>.
     </p>
+
     <table>
       <thead>
         <tr>
@@ -1079,8 +988,8 @@
       $("btnImport").style.display = "none";
       $("btnReset").style.display = "none";
 
-      $("btnPrintPlan").classList.add("bigPrimary");
-      $("btnPrintPlan").textContent = "VER ACUERDO + PLAN DE PAGOS";
+      // ocultar Recibos emitidos en modo visualizador
+      $("cardRecibos").style.display = "none";
     }
     function setEditorUI(){
       $("btnEmitir").style.display = "";
@@ -1089,8 +998,7 @@
       $("btnImport").style.display = "";
       $("btnReset").style.display = "";
 
-      $("btnPrintPlan").classList.remove("bigPrimary");
-      $("btnPrintPlan").textContent = "Ver Acuerdo + Plan de Pagos";
+      $("cardRecibos").style.display = "";
     }
 
     onAuthStateChanged(auth, (user)=>{
@@ -1158,11 +1066,11 @@
       plan.forEach(p=>{
         const tr = document.createElement("tr");
         tr.innerHTML = `
-          <td data-label="Período">${p.periodo}</td>
-          <td data-label="Concepto">${p.concepto}${p.tipo==="antecedente" ? `<div class="small">Antecedente</div>` : ""}</td>
-          <td data-label="Monto" class="num">${fmt(p.cuota)}</td>
-          <td data-label="Estado">${p.estado}</td>
-          <td data-label="Saldo" class="num">${fmt(p.saldo_proyectado)}</td>
+          <td>${p.periodo}</td>
+          <td class="wrap">${p.concepto}${p.tipo==="antecedente" ? `<div class="small">Antecedente</div>` : ""}</td>
+          <td class="num">${fmt(p.cuota)}</td>
+          <td>${p.estado}</td>
+          <td class="num">${fmt(p.saldo_proyectado)}</td>
         `;
         tbPlan.appendChild(tr);
       });
@@ -1177,11 +1085,11 @@
           const ver = `<a href="#" class="lnkRec" data-id="${r.id}">Ver</a>`;
           const tr = document.createElement("tr");
           tr.innerHTML = `
-            <td data-label="Período">${r.periodo}</td>
-            <td data-label="Concepto">${r.concepto}<div class="small">${(MESES[r.periodo.split("/")[0]]||r.periodo.split("/")[0])} ${r.periodo.split("/")[1]}</div></td>
-            <td data-label="Monto" class="num">${fmt(r.monto)}</td>
-            <td data-label="Recibo">R${r.numero} · ${ver}</td>
-            <td data-label="Estado">${est}</td>
+            <td>${r.periodo}</td>
+            <td class="wrap">${r.concepto}<div class="small">${(MESES[r.periodo.split("/")[0]]||r.periodo.split("/")[0])} ${r.periodo.split("/")[1]}</div></td>
+            <td class="num">${fmt(r.monto)}</td>
+            <td class="wrap">R${r.numero} · ${ver}</td>
+            <td>${est}</td>
           `;
           tbRec.appendChild(tr);
         });
@@ -1199,12 +1107,12 @@
 
         const tr = document.createElement("tr");
         tr.innerHTML = `
-          <td data-label="Período">${m.periodo}</td>
-          <td data-label="Concepto">${m.concepto}${m.recibo_num ? ` <span class="small">(${m.recibo_num})</span>` : ""}${m.obs ? `<div class="small">Obs.: ${m.obs}</div>`:""}</td>
-          <td data-label="Débito" class="num">${m.debito ? fmt(m.debito) : "—"}</td>
-          <td data-label="Crédito" class="num">${m.credito ? fmt(m.credito) : "—"}</td>
-          <td data-label="Saldo" class="num"><b>${fmt(m.saldo)}</b></td>
-          <td data-label="Adjunto">${adj}</td>
+          <td>${m.periodo}</td>
+          <td class="wrap">${m.concepto}${m.recibo_num ? ` <span class="small">(${m.recibo_num})</span>` : ""}${m.obs ? `<div class="small">Obs.: ${m.obs}</div>`:""}</td>
+          <td class="num">${m.debito ? fmt(m.debito) : "—"}</td>
+          <td class="num">${m.credito ? fmt(m.credito) : "—"}</td>
+          <td class="num"><b>${fmt(m.saldo)}</b></td>
+          <td class="wrap">${adj}</td>
         `;
         tbMov.appendChild(tr);
       });
@@ -1409,8 +1317,10 @@
       inp.click();
     };
 
+    // ===== INIT RENDER =====
     render();
   });
 </script>
 </body>
 </html>
+```
