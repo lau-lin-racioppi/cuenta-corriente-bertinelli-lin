@@ -22,7 +22,7 @@
   .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;justify-content:space-between}
   .right{display:flex;gap:8px;flex-wrap:wrap;align-items:center;justify-content:flex-end}
 
-  /* PASTILLA SALDO (destacada) */
+  /* PASTILLA SALDO */
   .saldoPill{
     display:flex;flex-direction:column;gap:6px;
     border:1px solid var(--line);
@@ -42,30 +42,31 @@
   .btn.danger{background:var(--danger);border-color:#991b1b}
   .btn:disabled{opacity:.5;cursor:not-allowed}
 
-  .btn.big{
-    padding:12px 16px;
-    font-size:14px;
-    font-weight:900;
-    border-radius:12px;
-  }
+  .btn.big{padding:12px 16px;font-size:14px;font-weight:900;border-radius:12px}
 
   .muted{color:var(--muted);font-size:12px}
   .small{font-size:12px;color:var(--muted)}
   .err{font-size:12px;color:var(--err)}
 
-  /* TABLAS: sin scroll horizontal, columnas alineadas y wrap correcto */
+  /* TABLAS: no scroll horizontal + concepto NORMAL (no vertical) */
   table{width:100%;border-collapse:collapse;font-size:13px;margin-top:6px;table-layout:fixed}
   th,td{
     border-bottom:1px solid var(--line);
     padding:8px;
     vertical-align:top;
     overflow-wrap:anywhere;
-    word-break:break-word;
+    word-break:normal;        /* clave: evita corte letra-por-letra */
     hyphens:auto;
   }
   th{color:var(--muted);text-align:left;font-weight:650}
   td.num{text-align:right;white-space:nowrap}
-  td.concept{white-space:normal}
+  td.concept{
+    white-space:normal;
+    word-break:normal;        /* clave: no vertical */
+    overflow-wrap:anywhere;   /* corta por palabras largas si hace falta */
+    hyphens:auto;
+  }
+
   a{color:#93c5fd;text-decoration:none}
   a:hover{text-decoration:underline}
 
@@ -93,7 +94,7 @@
   .ck{display:flex;gap:8px;align-items:flex-start}
   .ck input{width:auto;margin-top:3px}
 
-  /* DETAILS (plegables) */
+  /* DETAILS */
   details{border:1px solid var(--line);border-radius:14px;background:rgba(0,0,0,.08);overflow:hidden}
   details > summary{
     list-style:none;
@@ -132,7 +133,8 @@
   .detailBody{padding:12px 14px;border-top:1px solid var(--line)}
   .detailBody .line{margin:6px 0}
 
-  /* Ajustes móvil: sin scroll horizontal, oculto columnas y apilo info en la celda Concepto */
+  /* MOBILE: oculto columnas y muestro un "subline" dentro del concepto SOLO en móvil */
+  .mOnly{display:none}
   @media (max-width:900px){
     .wrap{padding:12px}
     .card{padding:12px}
@@ -143,17 +145,14 @@
 
     th,td{padding:8px 6px}
 
-    /* Plan: oculto "Estado" y "Saldo proyectado" en móvil, lo paso abajo del concepto */
     .planCol-estado, .planCol-saldo{display:none}
-
-    /* Recibos: oculto "Estado" en móvil, lo paso abajo del concepto */
     .recCol-estado{display:none}
-
-    /* Movimientos: oculto Débito en móvil, lo paso abajo del concepto */
     .movCol-debito{display:none}
+
+    .mOnly{display:block;margin-top:4px}
   }
 
-  /* Evitar que la línea horizontal sobresalga del card (problema borde/tabla) */
+  /* Fix borde/tabla dentro de card (sin sobresalir) */
   .card table{display:block;width:100%}
   .card thead, .card tbody, .card tr{display:table;width:100%;table-layout:fixed}
 </style>
@@ -184,7 +183,6 @@
     </div>
   </div>
 
-  <!-- Cabecera (plegable, cerrado por defecto) -->
   <div class="card" style="padding:0">
     <details id="detCabecera">
       <summary>
@@ -205,7 +203,6 @@
     </details>
   </div>
 
-  <!-- Anexo económico (plegable, cerrado por defecto) -->
   <div class="card" style="padding:0">
     <details id="detAnexo">
       <summary>
@@ -228,7 +225,6 @@
     </details>
   </div>
 
-  <!-- Plan de pagos (plegable, cerrado por defecto) -->
   <div class="card" style="padding:0">
     <details id="detPlan">
       <summary>
@@ -266,7 +262,6 @@
     </details>
   </div>
 
-  <!-- Recibos emitidos (NO visible en modo visualizador) -->
   <div class="card" id="cardRecibos">
     <h2>Recibos emitidos</h2>
     <table>
@@ -290,7 +285,6 @@
     </table>
   </div>
 
-  <!-- Libro de movimientos -->
   <div class="card">
     <h2 id="movTitle">Libro de movimientos</h2>
     <div class="small" id="movHint" style="margin-top:-4px;margin-bottom:6px"></div>
@@ -434,7 +428,7 @@
 
     function show(id){ $(id).classList.add("show"); }
     function hide(id){ $(id).classList.remove("show"); }
-    function isPeriodo(x){ return /^\d{2}\/\d{4}$/.test(String(x||"").trim()); }
+    function isPeriodo(x){ return /^\\d{2}\\/\\d{4}$/.test(String(x||"").trim()); }
 
     function makeInitialState(){
       return {
@@ -552,10 +546,9 @@
       });
     }
 
-    // ===== MAILTO (texto) =====
     function abrirMailImputacion({ to, cc, subject, body }) {
       const enc = encodeURIComponent;
-      const normalized = String(body || "").replace(/\n/g, "\r\n");
+      const normalized = String(body || "").replace(/\\n/g, "\\r\\n");
       let url = `mailto:${enc(to)}?subject=${enc(subject)}&body=${enc(normalized)}`;
       if (cc) url += `&cc=${enc(cc)}`;
       window.location.href = url;
@@ -616,11 +609,7 @@
       return { fin: lastNotPagada ? lastNotPagada.periodo : "(—)", cuotasRestantes: cuotas.slice(firstPendingIdx).length };
     }
 
-    // ======================
-    // RECIBO (A5 apaisado) + RESPONSIVE
-    // Desktop: IMPRIMIR
-    // Mobile: COMPARTIR
-    // ======================
+    // Recibo (abre ventana)
     function openReciboPrint(state, rec, modo, saldoLuego){
       const isImputado = (modo === "imputado");
       const [mm,yyyy] = String(rec.periodo).split("/");
@@ -634,7 +623,6 @@
         : ``;
 
       const docTitle = `Recibo R${rec.numero} – ${rec.periodo}`;
-      const fileName = `recibo_R${rec.numero}_${String(rec.periodo).replace("/","-")}.html`;
 
       const html = `
 <!doctype html>
@@ -648,105 +636,37 @@
   :root{ --barH:56px; }
   html,body{ height:100%; }
   body{ margin:0; font-family:system-ui,Segoe UI,Arial; color:#111; background:#fff; }
-
-  .topbar{
-    position: sticky;
-    top:0;
-    z-index:10;
-    height: var(--barH);
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    gap:10px;
-    padding: 10px 12px;
-    background:#fff;
-    border-bottom: 1px solid #e5e7eb;
-  }
-  .topbar .ttl{
-    font-size:14px;
-    font-weight:900;
-    white-space:nowrap;
-    overflow:hidden;
-    text-overflow:ellipsis;
-  }
-  .btn{
-    border:1px solid #111;
-    background:#f2f2f2;
-    padding:8px 12px;
-    border-radius:10px;
-    font-weight:800;
-    cursor:pointer;
-  }
-
-  .sheet{
-    background:#fff;
-    border:1px solid #111;
-    border-radius:10px;
-    box-sizing:border-box;
-
-    width: min(1100px, calc(100vw - 24px));
-    margin: 12px auto;
-    padding: 14px;
-    min-height: calc(100dvh - var(--barH) - 24px);
-  }
-
-  p, li{
-    text-align: justify;
-    text-justify: inter-word;
-    hyphens: auto;
-    -webkit-hyphens: auto;
-    -ms-hyphens: auto;
-    overflow-wrap: break-word;
-  }
-
+  .topbar{ position:sticky; top:0; z-index:10; height:var(--barH); display:flex; align-items:center; justify-content:space-between; gap:10px; padding:10px 12px; background:#fff; border-bottom:1px solid #e5e7eb; }
+  .ttl{ font-size:14px; font-weight:900; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .btn{ border:1px solid #111; background:#f2f2f2; padding:8px 12px; border-radius:10px; font-weight:800; cursor:pointer; }
+  .sheet{ background:#fff; border:1px solid #111; border-radius:10px; width:min(1100px, calc(100vw - 24px)); margin:12px auto; padding:14px; min-height:calc(100dvh - var(--barH) - 24px); box-sizing:border-box; }
+  p{ text-align:justify; hyphens:auto; overflow-wrap:break-word; }
   .h1{font-size:20px;font-weight:900;margin:0 0 4px 0}
   .sub{font-size:14px;color:#333;margin:0 0 10px 0}
   .txt{font-size:15.5px;line-height:1.65;margin:0 0 10px 0}
   .b{font-weight:900}
   .upper{font-weight:900;text-transform:uppercase}
-
   .kv{margin:8px 0;font-size:15px}
   .k{color:#222}
-
   .vbox{ display:flex; flex-direction:column; min-height:100%; }
   .grow{ flex:1; }
-
   .sigGrid{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:12px}
   .lineLabel{font-size:12.5px;color:#333;margin-top:6px}
   .line{border-top:1px solid #111;margin-top:18px}
-
   @media (max-width: 900px){
-    .sheet{
-      width:100vw;
-      margin:0;
-      border-radius:0;
-      border-left:none;
-      border-right:none;
-      min-height: calc(100dvh - var(--barH));
-      padding: 16px;
-    }
+    .sheet{ width:100vw; margin:0; border-radius:0; border-left:none; border-right:none; min-height:calc(100dvh - var(--barH)); padding:16px; }
   }
-
   @media print{
     .topbar{ display:none; }
-    .sheet{
-      border:1px solid #111;
-      border-radius:10px;
-      width:100%;
-      margin:0;
-      padding:10mm;
-      min-height:148mm;
-    }
+    .sheet{ border:1px solid #111; border-radius:10px; width:100%; margin:0; padding:10mm; min-height:148mm; }
   }
 </style>
 </head>
 <body>
-
 <div class="topbar">
   <div class="ttl">${docTitle}</div>
-  <button class="btn" id="btnCta">Imprimir</button>
+  <button class="btn" onclick="window.print()">Imprimir</button>
 </div>
-
 <div class="sheet">
   <div class="vbox">
     <div>
@@ -763,7 +683,6 @@
 
       <div class="kv"><span class="k">Concepto:</span> <span class="b">${rec.concepto}</span></div>
       <div class="kv"><span class="k">Período imputado:</span> <span class="b">${rec.periodo}</span></div>
-
       ${saldoBlock}
     </div>
 
@@ -773,7 +692,6 @@
       <div>
         <div class="line"></div>
         <div class="lineLabel">Firma comprador</div>
-
         <div class="line"></div>
         <div class="lineLabel">${state.meta.comprador} / ${state.meta.dni_comprador}</div>
       </div>
@@ -781,18 +699,12 @@
       <div>
         <div class="line"></div>
         <div class="lineLabel">Firma vendedor</div>
-
         <div class="line"></div>
         <div class="lineLabel">${state.meta.vendedor} / ${state.meta.dni_vendedor}</div>
       </div>
     </div>
   </div>
 </div>
-
-<script>
-  document.getElementById("btnCta").onclick = ()=> window.print();
-<\/script>
-
 </body>
 </html>`;
 
@@ -802,9 +714,6 @@
       w.document.close();
     }
 
-    // ======================
-    // ADJUNTO
-    // ======================
     function abrirAdjunto(adjunto){
       const w = window.open("", "_blank");
       if(!adjunto?.dataUrl){
@@ -812,7 +721,6 @@
         w.document.close();
         return;
       }
-
       const safeName = (adjunto.name || "adjunto").replaceAll("<","").replaceAll(">","");
       const isPdf = (adjunto.type||"").includes("pdf");
       const title = `Adjunto – ${safeName}`;
@@ -828,81 +736,33 @@
   :root{ --barH:56px; }
   html,body{ height:100%; }
   body{ margin:0; font-family:system-ui,Segoe UI,Arial; background:#fff; color:#111; }
-  .topbar{
-    position: sticky;
-    top:0;
-    z-index:10;
-    height: var(--barH);
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    gap:10px;
-    padding: 10px 12px;
-    background:#fff;
-    border-bottom: 1px solid #e5e7eb;
-  }
-  .ttl{
-    font-size:14px;
-    font-weight:900;
-    white-space:nowrap;
-    overflow:hidden;
-    text-overflow:ellipsis;
-  }
-  .btn{
-    border:1px solid #111;
-    background:#f2f2f2;
-    padding:8px 12px;
-    border-radius:10px;
-    font-weight:800;
-    cursor:pointer;
-  }
-  .viewer{
-    height: calc(100dvh - var(--barH));
-    width: 100vw;
-    overflow:auto;
-    background:#fff;
-  }
-  .imgWrap{ display:flex; justify-content:center; padding: 12px; }
-  img{ max-width: 100%; height: auto; border:1px solid #ddd; border-radius:10px; }
+  .topbar{ position:sticky; top:0; z-index:10; height:var(--barH); display:flex; align-items:center; justify-content:space-between; gap:10px; padding:10px 12px; background:#fff; border-bottom:1px solid #e5e7eb; }
+  .ttl{ font-size:14px; font-weight:900; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .btn{ border:1px solid #111; background:#f2f2f2; padding:8px 12px; border-radius:10px; font-weight:800; cursor:pointer; }
+  .viewer{ height:calc(100dvh - var(--barH)); width:100vw; overflow:auto; background:#fff; }
+  .imgWrap{ display:flex; justify-content:center; padding:12px; }
+  img{ max-width:100%; height:auto; border:1px solid #ddd; border-radius:10px; }
   embed{ width:100%; height:100%; border:none; }
-  @media print{
-    .topbar{ display:none; }
-    .viewer{ height:auto; }
-  }
+  @media print{ .topbar{display:none} .viewer{height:auto} }
 </style>
 </head>
 <body>
-
 <div class="topbar">
   <div class="ttl">${title}</div>
-  <button class="btn" id="btnCta">Imprimir</button>
+  <button class="btn" onclick="window.print()">Imprimir</button>
 </div>
-
 <div class="viewer">
-  ${isPdf
-    ? `<embed src="${adjunto.dataUrl}" type="application/pdf" />`
-    : `<div class="imgWrap"><img src="${adjunto.dataUrl}" alt="Adjunto"/></div>`
-  }
+  ${isPdf ? `<embed src="${adjunto.dataUrl}" type="application/pdf" />` : `<div class="imgWrap"><img src="${adjunto.dataUrl}" alt="Adjunto"/></div>`}
 </div>
-
-<script>
-  document.getElementById("btnCta").onclick = ()=> window.print();
-<\/script>
-
 </body>
 </html>`;
-
       w.document.open();
       w.document.write(html);
       w.document.close();
     }
 
-    // ==========================
-    // ACUERDO + ANEXO
-    // ==========================
     function printPlanYAcuerdo(state){
       const plan = aplicarPagosAlPlan(generarPlanBase(state), state);
-
       const filas = plan.map(p=>`
         <tr>
           <td>${p.periodo}</td>
@@ -1021,22 +881,14 @@
         border-radius:0;
       }
     }
-    p, li{
-      text-align: justify;
-      text-justify: inter-word;
-      hyphens: auto;
-      -webkit-hyphens: auto;
-      -ms-hyphens: auto;
-      overflow-wrap: break-word;
-    }
-    p{ line-height:1.78; margin:0 0 12px 0; font-size:15.8px; }
+    p{ text-align: justify; hyphens:auto; overflow-wrap:break-word; line-height:1.78; margin:0 0 12px 0; font-size:15.8px; }
     h1{ font-size:22px; margin:0; text-align:center; letter-spacing:.2px; }
     h2{ font-size:17px; margin:0 0 10px 0; }
     .small{ font-size:14.2px; color:#333; }
     .titleGap{ height:14mm; }
     .dateGap{ height:10mm; }
     table{ width:100%; border-collapse: collapse; margin:12px 0; font-size:13.8px; table-layout:fixed; }
-    th,td{ border:1px solid #000; padding:6px; vertical-align:top; overflow-wrap:anywhere; word-break:break-word; }
+    th,td{ border:1px solid #000; padding:6px; vertical-align:top; overflow-wrap:anywhere; word-break:normal; }
     th{ background:#eee; text-align:left; }
     td.num{ text-align:right; white-space:nowrap; }
     .pageBreak{ break-before: page; page-break-before: always; }
@@ -1089,7 +941,7 @@
       try { w.document.title = docTitle; } catch(e) {}
     }
 
-    // ========== AUTH UI ==========
+    // AUTH UI
     const authBar = $("authBar");
     authBar.innerHTML = `
       <span id="authStatus">Modo visualizador</span>
@@ -1123,9 +975,7 @@
       $("btnExport").style.display = "none";
       $("btnImport").style.display = "none";
       $("btnReset").style.display = "none";
-      // Recibos emitidos NO debe verse en visualizador
       $("cardRecibos").style.display = "none";
-      // Botón acuerdo más visible en visualizador
       $("btnPrintPlan").classList.add("big");
       $("movTitle").textContent = "Movimientos (vista simplificada)";
       $("movHint").textContent = "Se muestra una lectura simplificada para visualización. El cálculo contable se mantiene (débito/crédito).";
@@ -1158,7 +1008,7 @@
       }
     });
 
-    // ========== STATE ==========
+    // STATE
     let state = await pullRemoteOrInit(makeInitialState);
     localStorage.setItem(KEY, JSON.stringify(state));
 
@@ -1187,7 +1037,6 @@
       applyingRemote = false;
     });
 
-    // ========== RENDER ==========
     function renderMovHead(){
       const head = $("movHeadRow");
       if(canWrite){
@@ -1200,7 +1049,6 @@
           <th style="width:190px">Adjunto</th>
         `;
       } else {
-        // Vista simplificada para visualizador (mantiene contabilidad internamente)
         head.innerHTML = `
           <th style="width:110px">Período</th>
           <th>Movimiento</th>
@@ -1234,28 +1082,17 @@
         <div class="sub">Saldo restante (sobre saldo inicial): U$S ${fmt(saldoRestante)}</div>
       `;
 
-      // PLAN
+      // PLAN: en desktop NO duplico (subline solo móvil con .mOnly)
       const tbPlan = $("tbodyPlan");
       tbPlan.innerHTML = "";
       plan.forEach(p=>{
-        const extraMobile = `
-          <div class="small" style="margin-top:4px">
-            <span class="planCol-estado" style="display:none"></span>
-          </div>
-        `;
         const tr = document.createElement("tr");
-
-        // En móvil ocultamos Estado + Saldo proyectado como columnas, pero NO perdemos info: la inyectamos en el concepto.
-        const conceptoMobile = `
-          <div>${p.concepto}${p.tipo==="antecedente" ? `<div class="small">Antecedente</div>` : ""}</div>
-          <div class="small" style="margin-top:4px">
-            <span><b>Estado:</b> ${p.estado}</span> · <span><b>Saldo:</b> ${fmt(p.saldo_proyectado)}</span>
-          </div>
-        `;
-
         tr.innerHTML = `
           <td>${p.periodo}</td>
-          <td class="concept">${conceptoMobile}</td>
+          <td class="concept">
+            <div>${p.concepto}${p.tipo==="antecedente" ? `<div class="small">Antecedente</div>` : ""}</div>
+            <div class="small mOnly"><b>Estado:</b> ${p.estado} · <b>Saldo:</b> ${fmt(p.saldo_proyectado)}</div>
+          </td>
           <td class="num">${fmt(p.cuota)}</td>
           <td class="planCol-estado">${p.estado}</td>
           <td class="num planCol-saldo">${fmt(p.saldo_proyectado)}</td>
@@ -1263,7 +1100,7 @@
         tbPlan.appendChild(tr);
       });
 
-      // RECIBOS (solo en editor)
+      // RECIBOS (solo editor): subline solo móvil
       const tbRec = $("tbodyRec");
       tbRec.innerHTML = "";
       if(state.recibos.length === 0){
@@ -1273,15 +1110,13 @@
           const est = (r.estado==="pendiente" ? "Pendiente" : "Imputado");
           const ver = `<a href="#" class="lnkRec" data-id="${r.id}">Ver</a>`;
 
-          const conceptoMobile = `
-            <div>${r.concepto}<div class="small">${(MESES[r.periodo.split("/")[0]]||r.periodo.split("/")[0])} ${r.periodo.split("/")[1]}</div></div>
-            <div class="small" style="margin-top:4px"><b>Estado:</b> ${est}</div>
-          `;
-
           const tr = document.createElement("tr");
           tr.innerHTML = `
             <td>${r.periodo}</td>
-            <td class="concept">${conceptoMobile}</td>
+            <td class="concept">
+              <div>${r.concepto}<div class="small">${(MESES[r.periodo.split("/")[0]]||r.periodo.split("/")[0])} ${r.periodo.split("/")[1]}</div></div>
+              <div class="small mOnly"><b>Estado:</b> ${est}</div>
+            </td>
             <td class="num">${fmt(r.monto)}</td>
             <td>R${r.numero} · ${ver}</td>
             <td class="recCol-estado">${est}</td>
@@ -1290,7 +1125,7 @@
         });
       }
 
-      // MOVIMIENTOS
+      // MOVIMIENTOS: concepto NO vertical + subline solo móvil
       const tbMov = $("tbodyMov");
       tbMov.innerHTML = "";
 
@@ -1303,19 +1138,17 @@
                   : `Falta adjunto`)
               : "—";
 
-          // Móvil: como ocultamos Débito, lo mostramos dentro del concepto cuando corresponda
-          const conceptoMobile = `
-            <div>${m.concepto}${m.recibo_num ? ` <span class="small">(${m.recibo_num})</span>` : ""}${m.obs ? `<div class="small">Obs.: ${m.obs}</div>`:""}</div>
-            <div class="small" style="margin-top:4px">
-              ${m.debito ? `<span><b>Débito:</b> ${fmt(m.debito)}</span> · ` : ``}
-              ${m.credito ? `<span><b>Crédito:</b> ${fmt(m.credito)}</span>` : `<span><b>Crédito:</b> —</span>`}
-            </div>
-          `;
-
           const tr = document.createElement("tr");
           tr.innerHTML = `
             <td>${m.periodo}</td>
-            <td class="concept">${conceptoMobile}</td>
+            <td class="concept">
+              <div>${m.concepto}${m.recibo_num ? ` <span class="small">(${m.recibo_num})</span>` : ""}</div>
+              ${m.obs ? `<div class="small">Obs.: ${m.obs}</div>`:""}
+              <div class="small mOnly">
+                ${m.debito ? `<b>Débito:</b> ${fmt(m.debito)} · ` : ``}
+                <b>Crédito:</b> ${m.credito ? fmt(m.credito) : "—"}
+              </div>
+            </td>
             <td class="num movCol-debito">${m.debito ? fmt(m.debito) : "—"}</td>
             <td class="num">${m.credito ? fmt(m.credito) : "—"}</td>
             <td class="num"><b>${fmt(m.saldo)}</b></td>
@@ -1324,7 +1157,7 @@
           tbMov.appendChild(tr);
         });
       } else {
-        // Visualizador: vista simplificada
+        // Visualizador: sin duplicar en desktop, subline solo si hay obs (y en móvil se ve bien)
         movs.forEach(m=>{
           const adj =
             m.recibo_num
@@ -1333,18 +1166,15 @@
                   : `Falta adjunto`)
               : "—";
 
-          // En visualizador mostramos el "Pago / Crédito" (si es 0, mostramos —)
           const pago = Number(m.credito||0) > 0 ? fmt(m.credito) : "—";
-
-          const conceptoSimple = `
-            <div>${m.concepto}${m.recibo_num ? ` <span class="small">(${m.recibo_num})</span>` : ""}</div>
-            ${m.obs ? `<div class="small" style="margin-top:4px">Obs.: ${m.obs}</div>` : ``}
-          `;
 
           const tr = document.createElement("tr");
           tr.innerHTML = `
             <td>${m.periodo}</td>
-            <td class="concept">${conceptoSimple}</td>
+            <td class="concept">
+              <div>${m.concepto}${m.recibo_num ? ` <span class="small">(${m.recibo_num})</span>` : ""}</div>
+              ${m.obs ? `<div class="small">${m.obs}</div>` : ``}
+            </td>
             <td class="num">${pago}</td>
             <td class="num"><b>${fmt(m.saldo)}</b></td>
             <td>${adj}</td>
@@ -1395,7 +1225,7 @@
       });
     }
 
-    // ========== UI EVENTS ==========
+    // UI EVENTS
     $("btnEmitir").onclick = ()=>{
       $("e_periodo").value = "01/2026";
       $("e_monto").value = "";
@@ -1512,7 +1342,7 @@
         `Obs.: ${obs || ""}`,
         "",
         "Cuenta: Bertinelli / Lin Racioppi"
-      ].join("\n");
+      ].join("\\n");
 
       abrirMailImputacion({ to, cc, subject, body });
     };
@@ -1557,7 +1387,6 @@
 
     $("btnReset").onclick = ()=> hardReset();
 
-    // Primera render
     render();
   });
 </script>
