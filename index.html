@@ -4,68 +4,51 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Cuenta Corriente – Bertinelli / Lin Racioppi</title>
+
 <style>
   :root{
     --bg:#0f1115;--panel:#171a21;--line:#2a3140;
     --text:#e9ecf1;--muted:#8a90a2;
-    --primary:#2563eb;--primary2:#1d4ed8;
-    --danger:#7f1d1d;--err:#fca5a5;
+    --primary:#2563eb;--danger:#7f1d1d;
+    --err:#fca5a5;
     --chip:#111827;
   }
-  *{box-sizing:border-box}
+
+  *{ box-sizing:border-box; }
   body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;background:var(--bg);color:var(--text)}
   .wrap{max-width:1200px;margin:auto;padding:16px}
-  .card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px;margin:14px 0}
+
+  .card{
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:14px;
+    padding:14px;
+    margin:14px 0;
+    overflow:hidden; /* evita que líneas/tablas “se pasen” del borde */
+  }
+
   h1{margin:0 0 6px 0;font-size:20px}
   h2{margin:0 0 8px 0;font-size:15px;color:var(--muted)}
 
   .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;justify-content:space-between}
   .right{display:flex;gap:8px;flex-wrap:wrap;align-items:center;justify-content:flex-end}
 
-  /* PASTILLA SALDO */
-  .saldoPill{
-    display:flex;flex-direction:column;gap:6px;
+  .btn{
     border:1px solid var(--line);
-    background:linear-gradient(180deg, rgba(37,99,235,.20), rgba(17,24,39,.6));
-    border-radius:14px;
-    padding:12px 14px;
-    min-width: 320px;
+    background:#222733;
+    color:var(--text);
+    padding:8px 12px;
+    border-radius:10px;
+    font-weight:650;
+    cursor:pointer
   }
-  .saldoPill .ttl{font-size:12px;color:rgba(233,236,241,.85);letter-spacing:.2px}
-  .saldoPill .amt{font-size:28px;font-weight:900;line-height:1}
-  .saldoPill .meta{font-size:13px;color:rgba(233,236,241,.85)}
-  .saldoPill .meta b{color:var(--text)}
-  .saldoPill .sub{font-size:12px;color:var(--muted)}
-
-  .btn{border:1px solid var(--line);background:#222733;color:var(--text);padding:8px 12px;border-radius:10px;font-weight:650;cursor:pointer}
-  .btn.primary{background:var(--primary);border-color:var(--primary2)}
+  .btn.primary{background:var(--primary);border-color:#1d4ed8}
   .btn.danger{background:var(--danger);border-color:#991b1b}
   .btn:disabled{opacity:.5;cursor:not-allowed}
-
-  .btn.big{padding:12px 16px;font-size:14px;font-weight:900;border-radius:12px}
 
   .muted{color:var(--muted);font-size:12px}
   .small{font-size:12px;color:var(--muted)}
   .err{font-size:12px;color:var(--err)}
-
-  /* TABLAS: no scroll horizontal + concepto NORMAL (no vertical) */
-  table{width:100%;border-collapse:collapse;font-size:13px;margin-top:6px;table-layout:fixed}
-  th,td{
-    border-bottom:1px solid var(--line);
-    padding:8px;
-    vertical-align:top;
-    overflow-wrap:anywhere;
-    word-break:normal;        /* clave: evita corte letra-por-letra */
-    hyphens:auto;
-  }
-  th{color:var(--muted);text-align:left;font-weight:650}
-  td.num{text-align:right;white-space:nowrap}
-  td.concept{
-    white-space:normal;
-    word-break:normal;        /* clave: no vertical */
-    overflow-wrap:anywhere;   /* corta por palabras largas si hace falta */
-    hyphens:auto;
-  }
 
   a{color:#93c5fd;text-decoration:none}
   a:hover{text-decoration:underline}
@@ -73,11 +56,152 @@
   .grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
   @media (max-width:900px){ .grid{grid-template-columns:1fr} }
 
-  input,select,textarea{background:#0f1115;color:var(--text);border:1px solid var(--line);border-radius:10px;padding:10px;width:100%}
+  input,select,textarea{
+    background:#0f1115;color:var(--text);
+    border:1px solid var(--line);
+    border-radius:10px;padding:10px;width:100%
+  }
   textarea{min-height:70px;resize:vertical}
   hr{border:none;border-top:1px solid var(--line);margin:10px 0}
 
-  /* Modales */
+  /* ====== PASTILLA SALDO (DESTACADA) ====== */
+  .saldoCard{
+    display:flex;
+    align-items:flex-start;
+    justify-content:space-between;
+    gap:12px;
+    padding:14px 14px;
+    border-radius:16px;
+    border:1px solid rgba(59,130,246,.28);
+    background:linear-gradient(180deg, rgba(37,99,235,.25), rgba(17,24,39,.35));
+    box-shadow:0 10px 30px rgba(0,0,0,.20);
+    min-width:min(420px, 100%);
+  }
+  .saldoCard .ttl{font-size:12px;color:#dbeafe;opacity:.95}
+  .saldoCard .amt{font-size:28px;font-weight:900;letter-spacing:.2px;margin-top:2px}
+  .saldoCard .meta{font-size:12.5px;color:#c7d2fe;margin-top:4px;line-height:1.35}
+
+  @media (max-width:900px){
+    .saldoCard{ min-width:100%; }
+    .saldoCard .amt{ font-size:26px; }
+  }
+
+  /* ====== SECCIONES DESPLEGABLES ====== */
+  details.fold{
+    border:1px solid var(--line);
+    border-radius:14px;
+    background:rgba(255,255,255,.02);
+    overflow:hidden;
+  }
+  details.fold + details.fold{ margin-top:12px; }
+  details.fold summary{
+    list-style:none;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    padding:12px 14px;
+    cursor:pointer;
+    user-select:none;
+  }
+  details.fold summary::-webkit-details-marker{ display:none; }
+  .sumLeft{ display:flex; align-items:center; gap:10px; min-width:0; }
+  .ico{
+    width:28px;height:28px;border-radius:10px;
+    display:grid;place-items:center;
+    background:#0b1220;border:1px solid #22314d;
+    color:#bfdbfe;font-weight:900;
+    flex:0 0 auto;
+  }
+  .sumTxt{ min-width:0; }
+  .sumTxt .t{ font-weight:800; }
+  .sumTxt .d{ font-size:12px;color:var(--muted); margin-top:2px; }
+  .sumBtn{
+    display:flex; align-items:center; gap:8px;
+    border:1px solid var(--line);
+    background:#0f1115;
+    padding:6px 10px;
+    border-radius:999px;
+    font-weight:700;
+    font-size:12px;
+    color:#e5e7eb;
+    flex:0 0 auto;
+  }
+  .chev{ transition:transform .18s ease; }
+  details[open] .chev{ transform:rotate(180deg); }
+  .foldBody{ padding:0 14px 14px 14px; }
+
+  /* ====== TABLAS: UNA SOLA (sin duplicar), responsive sin scroll horizontal ====== */
+  table{width:100%;border-collapse:collapse;font-size:13px;margin-top:6px; table-layout:fixed;}
+  th,td{border-bottom:1px solid var(--line);padding:10px 8px;vertical-align:top}
+  th{color:var(--muted);text-align:left;font-weight:650}
+  td.num{text-align:right;white-space:nowrap}
+
+  /* Celdas con layout interno “label/valor” para mobile (sin duplicar markup) */
+  .cell{
+    display:flex;
+    gap:10px;
+    align-items:flex-start;
+    justify-content:space-between;
+    min-width:0;
+  }
+  .lbl{
+    display:none; /* desktop: no mostrar */
+    color:var(--muted);
+    font-size:12px;
+    flex:0 0 auto;
+    padding-right:10px;
+  }
+  .val{
+    min-width:0;
+    flex:1 1 auto;
+    text-align:left;
+    white-space:normal;
+    overflow-wrap:anywhere;
+    word-break:break-word;
+    writing-mode:horizontal-tb; /* FIX: nunca vertical */
+    text-orientation:mixed;
+  }
+  .val.num{
+    text-align:right;
+    white-space:nowrap;
+    flex:0 0 auto;
+  }
+
+  /* Evitar “concepto vertical” en libro de movimientos específicamente */
+  td.colConcept .val{
+    writing-mode:horizontal-tb !important;
+    text-orientation:mixed !important;
+    white-space:normal !important;
+    overflow-wrap:anywhere !important;
+    word-break:break-word !important;
+  }
+
+  /* Mobile: convertir filas a “lista” usando la MISMA tabla */
+  @media (max-width:900px){
+    table{ font-size:13px; }
+    thead{ display:none; }
+    tr{ display:block; }
+    td{
+      display:block;
+      border-bottom:1px solid var(--line);
+      padding:10px 10px;
+    }
+    td:last-child{ border-bottom:none; }
+    tbody tr{
+      border:1px solid var(--line);
+      border-radius:12px;
+      margin:10px 0;
+      overflow:hidden;
+      background:rgba(255,255,255,.02);
+    }
+    .lbl{ display:block; }
+    .cell{ gap:12px; }
+    /* números alineados y prolijos */
+    .val.num{ text-align:right; }
+  }
+
+  /* ====== MODALES ====== */
   .modal{
     position:fixed; inset:0;
     display:none;
@@ -93,88 +217,28 @@
   #i_preview img{ max-height:40vh; width:auto; display:block; }
   .ck{display:flex;gap:8px;align-items:flex-start}
   .ck input{width:auto;margin-top:3px}
-
-  /* DETAILS */
-  details{border:1px solid var(--line);border-radius:14px;background:rgba(0,0,0,.08);overflow:hidden}
-  details > summary{
-    list-style:none;
-    cursor:pointer;
-    padding:12px 14px;
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    gap:10px;
-    user-select:none;
-  }
-  details > summary::-webkit-details-marker{display:none}
-  .sumL{display:flex;align-items:center;gap:10px}
-  .sumIcon{
-    width:28px;height:28px;border-radius:10px;
-    display:grid;place-items:center;
-    background:rgba(37,99,235,.18);
-    border:1px solid rgba(37,99,235,.35);
-    color:rgba(233,236,241,.95);
-    font-weight:900;
-  }
-  .sumTxt{display:flex;flex-direction:column}
-  .sumTxt .t{font-weight:850}
-  .sumTxt .s{font-size:12px;color:var(--muted)}
-  .sumCta{
-    display:flex;align-items:center;gap:8px;
-    color:rgba(233,236,241,.9);
-    font-weight:850;
-    font-size:13px;
-    padding:8px 10px;
-    border-radius:999px;
-    border:1px solid var(--line);
-    background:rgba(17,24,39,.55);
-    white-space:nowrap;
-  }
-  .detailBody{padding:12px 14px;border-top:1px solid var(--line)}
-  .detailBody .line{margin:6px 0}
-
-  /* MOBILE: oculto columnas y muestro un "subline" dentro del concepto SOLO en móvil */
-  .mOnly{display:none}
-  @media (max-width:900px){
-    .wrap{padding:12px}
-    .card{padding:12px}
-    .right{justify-content:flex-start}
-
-    .saldoPill{min-width:unset;width:100%}
-    .saldoPill .amt{font-size:30px}
-
-    th,td{padding:8px 6px}
-
-    .planCol-estado, .planCol-saldo{display:none}
-    .recCol-estado{display:none}
-    .movCol-debito{display:none}
-
-    .mOnly{display:block;margin-top:4px}
-  }
-
-  /* Fix borde/tabla dentro de card (sin sobresalir) */
-  .card table{display:block;width:100%}
-  .card thead, .card tbody, .card tr{display:table;width:100%;table-layout:fixed}
 </style>
 </head>
 
 <body>
 <div class="wrap">
 
-  <div class="row">
+  <div class="row" style="align-items:flex-start">
     <div style="min-width:260px">
       <h1>Cuenta Corriente – Bertinelli / Lin Racioppi</h1>
       <div id="authBar" class="muted"></div>
     </div>
 
     <div class="right" id="btnBar" style="flex:1;justify-content:flex-end">
-      <div class="saldoPill" id="saldoPill">
-        <div class="ttl">Saldo actual – cuenta corriente</div>
-        <div class="amt" id="saldoAmt">U$S —</div>
-        <div class="meta" id="saldoMeta"><span class="sub">—</span></div>
+      <div class="saldoCard" id="saldoCard">
+        <div>
+          <div class="ttl">Saldo actual – cuenta corriente</div>
+          <div class="amt" id="saldoAmt">U$S —</div>
+          <div class="meta" id="saldoMeta">—</div>
+        </div>
       </div>
 
-      <button class="btn big primary" id="btnPrintPlan">Ver acuerdo + plan de pagos</button>
+      <button class="btn primary" id="btnPrintPlan">Ver acuerdo + plan de pagos</button>
       <button class="btn primary" id="btnEmitir">Emitir recibo</button>
       <button class="btn primary" id="btnImputar">Imputar pago</button>
       <button class="btn" id="btnExport">Exportar JSON</button>
@@ -183,122 +247,104 @@
     </div>
   </div>
 
-  <div class="card" style="padding:0">
-    <details id="detCabecera">
-      <summary>
-        <div class="sumL">
-          <div class="sumIcon">i</div>
-          <div class="sumTxt">
-            <div class="t">Cabecera</div>
-            <div class="s">Escritura, inmueble, partes</div>
-          </div>
+  <!-- CABECERA (desplegable por defecto cerrado) -->
+  <details class="fold" id="secCab" open="false">
+    <summary>
+      <div class="sumLeft">
+        <div class="ico">i</div>
+        <div class="sumTxt">
+          <div class="t">Cabecera</div>
+          <div class="d">Escritura, inmueble, partes</div>
         </div>
-        <div class="sumCta">Ver más <span aria-hidden="true">▾</span></div>
-      </summary>
-      <div class="detailBody">
-        <div class="line"><b>Escritura Nº 434</b> – Registro Notarial Nº <b>30</b> – Escribano: <b>Norberto Gustavo Soler</b></div>
-        <div class="line">Operación: <b>Compraventa inmueble – 25 de Mayo 8, 6º C, Ciudadela</b></div>
-        <div class="line">Vendedor: <b>José Orlando Bertinelli</b> · Comprador: <b>Lautaro Nahuel Lin Racioppi</b></div>
       </div>
-    </details>
-  </div>
+      <div class="sumBtn">Ver más <span class="chev">▾</span></div>
+    </summary>
+    <div class="foldBody">
+      <div><b>Escritura Nº 434</b> – Registro Notarial Nº <b>30</b> – Escribano: <b>Norberto Gustavo Soler</b></div>
+      <div>Operación: <b>Compraventa inmueble – 25 de Mayo 8, 6º C, Ciudadela</b></div>
+      <div>Vendedor: <b>José Orlando Bertinelli</b> · Comprador: <b>Lautaro Nahuel Lin Racioppi</b></div>
+    </div>
+  </details>
 
-  <div class="card" style="padding:0">
-    <details id="detAnexo">
-      <summary>
-        <div class="sumL">
-          <div class="sumIcon">$</div>
-          <div class="sumTxt">
-            <div class="t">Anexo económico</div>
-            <div class="s">Precios, crédito, saldo inicial</div>
-          </div>
+  <!-- ANEXO ECONÓMICO (desplegable por defecto cerrado) -->
+  <details class="fold" id="secAnexo" open="false" style="margin-top:12px">
+    <summary>
+      <div class="sumLeft">
+        <div class="ico">$</div>
+        <div class="sumTxt">
+          <div class="t">Anexo económico</div>
+          <div class="d">Precios, crédito, saldo inicial</div>
         </div>
-        <div class="sumCta">Ver más <span aria-hidden="true">▾</span></div>
-      </summary>
-      <div class="detailBody">
-        <div class="line">Precio solicitado: USD 44.000</div>
-        <div class="line">Precio escriturado: USD 41.000</div>
-        <div class="line">Crédito Banco Nación: USD 30.850</div>
-        <div class="line">Entrega inicial: USD 5.000</div>
-        <div class="line">Saldo inicial convenido en cuenta corriente: USD 8.150</div>
       </div>
-    </details>
-  </div>
+      <div class="sumBtn">Ver más <span class="chev">▾</span></div>
+    </summary>
+    <div class="foldBody">
+      <div>Precio solicitado: USD 44.000</div>
+      <div>Precio escriturado: USD 41.000</div>
+      <div>Crédito Banco Nación: USD 30.850</div>
+      <div>Entrega inicial: USD 5.000</div>
+      <div>Saldo inicial convenido en cuenta corriente: USD 8.150</div>
+    </div>
+  </details>
 
-  <div class="card" style="padding:0">
-    <details id="detPlan">
-      <summary>
-        <div class="sumL">
-          <div class="sumIcon">≡</div>
-          <div class="sumTxt">
-            <div class="t">Plan de pagos proyectado</div>
-            <div class="s">Detalle por período</div>
-          </div>
+  <!-- PLAN (desplegable por defecto cerrado) -->
+  <details class="fold" id="secPlan" open="false" style="margin-top:12px">
+    <summary>
+      <div class="sumLeft">
+        <div class="ico">≡</div>
+        <div class="sumTxt">
+          <div class="t">Plan de pagos proyectado</div>
+          <div class="d">Detalle por período</div>
         </div>
-        <div class="sumCta">Ver más <span aria-hidden="true">▾</span></div>
-      </summary>
-
-      <div class="detailBody">
-        <table>
-          <colgroup>
-            <col style="width:110px">
-            <col>
-            <col style="width:120px">
-            <col style="width:200px">
-            <col style="width:150px">
-          </colgroup>
-          <thead>
-            <tr>
-              <th>Período</th>
-              <th>Concepto</th>
-              <th class="num">Monto (U$S)</th>
-              <th class="planCol-estado">Estado</th>
-              <th class="num planCol-saldo">Saldo proyectado</th>
-            </tr>
-          </thead>
-          <tbody id="tbodyPlan"></tbody>
-        </table>
       </div>
-    </details>
-  </div>
+      <div class="sumBtn">Ver más <span class="chev">▾</span></div>
+    </summary>
+    <div class="foldBody">
+      <table>
+        <thead>
+          <tr>
+            <th style="width:110px">Período</th>
+            <th>Concepto</th>
+            <th class="num" style="width:120px">Monto (U$S)</th>
+            <th style="width:200px">Estado</th>
+            <th class="num" style="width:150px">Saldo proyectado</th>
+          </tr>
+        </thead>
+        <tbody id="tbodyPlan"></tbody>
+      </table>
+    </div>
+  </details>
 
+  <!-- RECIBOS (se oculta en modo visualizador) -->
   <div class="card" id="cardRecibos">
     <h2>Recibos emitidos</h2>
     <table>
-      <colgroup>
-        <col style="width:110px">
-        <col>
-        <col style="width:120px">
-        <col style="width:220px">
-        <col style="width:140px">
-      </colgroup>
       <thead>
         <tr>
-          <th>Período</th>
+          <th style="width:110px">Período</th>
           <th>Concepto</th>
-          <th class="num">Monto (U$S)</th>
-          <th>Recibo</th>
-          <th class="recCol-estado">Estado</th>
+          <th class="num" style="width:120px">Monto (U$S)</th>
+          <th style="width:220px">Recibo</th>
+          <th style="width:140px">Estado</th>
         </tr>
       </thead>
       <tbody id="tbodyRec"></tbody>
     </table>
   </div>
 
-  <div class="card">
-    <h2 id="movTitle">Libro de movimientos</h2>
-    <div class="small" id="movHint" style="margin-top:-4px;margin-bottom:6px"></div>
+  <!-- LIBRO (una sola tabla, responsive sin duplicar) -->
+  <div class="card" id="cardMovs">
+    <h2>Libro de movimientos</h2>
     <table>
-      <colgroup>
-        <col style="width:110px">
-        <col>
-        <col style="width:110px">
-        <col style="width:110px">
-        <col style="width:110px">
-        <col style="width:190px">
-      </colgroup>
       <thead>
-        <tr id="movHeadRow"></tr>
+        <tr>
+          <th style="width:110px">Período</th>
+          <th>Concepto</th>
+          <th class="num" style="width:110px">Débito</th>
+          <th class="num" style="width:110px">Crédito</th>
+          <th class="num" style="width:110px">Saldo</th>
+          <th style="width:190px">Adjunto</th>
+        </tr>
       </thead>
       <tbody id="tbodyMov"></tbody>
     </table>
@@ -428,7 +474,13 @@
 
     function show(id){ $(id).classList.add("show"); }
     function hide(id){ $(id).classList.remove("show"); }
-    function isPeriodo(x){ return /^\\d{2}\\/\\d{4}$/.test(String(x||"").trim()); }
+    function isPeriodo(x){ return /^\d{2}\/\d{4}$/.test(String(x||"").trim()); }
+
+    // Cerrar por defecto los details (HTML open="false" no es estándar)
+    ["secCab","secAnexo","secPlan"].forEach(id=>{
+      const d = $(id);
+      if(d) d.open = false;
+    });
 
     function makeInitialState(){
       return {
@@ -546,9 +598,10 @@
       });
     }
 
+    // ===== MAILTO =====
     function abrirMailImputacion({ to, cc, subject, body }) {
       const enc = encodeURIComponent;
-      const normalized = String(body || "").replace(/\\n/g, "\\r\\n");
+      const normalized = String(body || "").replace(/\n/g, "\r\n");
       let url = `mailto:${enc(to)}?subject=${enc(subject)}&body=${enc(normalized)}`;
       if (cc) url += `&cc=${enc(cc)}`;
       window.location.href = url;
@@ -609,160 +662,12 @@
       return { fin: lastNotPagada ? lastNotPagada.periodo : "(—)", cuotasRestantes: cuotas.slice(firstPendingIdx).length };
     }
 
-    // Recibo (abre ventana)
-    function openReciboPrint(state, rec, modo, saldoLuego){
-      const isImputado = (modo === "imputado");
-      const [mm,yyyy] = String(rec.periodo).split("/");
-      const mes = MESES[mm] || mm;
-
-      const monto = Math.floor(Number(rec.monto||0));
-      const montoLinea = montoEnFormatoReciboUSD(monto);
-
-      const saldoBlock = (isImputado && typeof saldoLuego==="number")
-        ? `<div class="kv"><span class="k">Saldo pendiente luego del presente pago:</span> <b>USD ${fmt(saldoLuego)}</b></div>`
-        : ``;
-
-      const docTitle = `Recibo R${rec.numero} – ${rec.periodo}`;
-
-      const html = `
-<!doctype html>
-<html lang="es">
-<head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>${docTitle}</title>
-<style>
-  @page{ size:A5 landscape; margin:10mm; }
-  :root{ --barH:56px; }
-  html,body{ height:100%; }
-  body{ margin:0; font-family:system-ui,Segoe UI,Arial; color:#111; background:#fff; }
-  .topbar{ position:sticky; top:0; z-index:10; height:var(--barH); display:flex; align-items:center; justify-content:space-between; gap:10px; padding:10px 12px; background:#fff; border-bottom:1px solid #e5e7eb; }
-  .ttl{ font-size:14px; font-weight:900; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-  .btn{ border:1px solid #111; background:#f2f2f2; padding:8px 12px; border-radius:10px; font-weight:800; cursor:pointer; }
-  .sheet{ background:#fff; border:1px solid #111; border-radius:10px; width:min(1100px, calc(100vw - 24px)); margin:12px auto; padding:14px; min-height:calc(100dvh - var(--barH) - 24px); box-sizing:border-box; }
-  p{ text-align:justify; hyphens:auto; overflow-wrap:break-word; }
-  .h1{font-size:20px;font-weight:900;margin:0 0 4px 0}
-  .sub{font-size:14px;color:#333;margin:0 0 10px 0}
-  .txt{font-size:15.5px;line-height:1.65;margin:0 0 10px 0}
-  .b{font-weight:900}
-  .upper{font-weight:900;text-transform:uppercase}
-  .kv{margin:8px 0;font-size:15px}
-  .k{color:#222}
-  .vbox{ display:flex; flex-direction:column; min-height:100%; }
-  .grow{ flex:1; }
-  .sigGrid{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:12px}
-  .lineLabel{font-size:12.5px;color:#333;margin-top:6px}
-  .line{border-top:1px solid #111;margin-top:18px}
-  @media (max-width: 900px){
-    .sheet{ width:100vw; margin:0; border-radius:0; border-left:none; border-right:none; min-height:calc(100dvh - var(--barH)); padding:16px; }
-  }
-  @media print{
-    .topbar{ display:none; }
-    .sheet{ border:1px solid #111; border-radius:10px; width:100%; margin:0; padding:10mm; min-height:148mm; }
-  }
-</style>
-</head>
-<body>
-<div class="topbar">
-  <div class="ttl">${docTitle}</div>
-  <button class="btn" onclick="window.print()">Imprimir</button>
-</div>
-<div class="sheet">
-  <div class="vbox">
-    <div>
-      <div class="h1">RECIBO N° ${rec.numero}</div>
-      <div class="sub">Cuenta Corriente – Bertinelli / Lin Racioppi</div>
-
-      <p class="txt">
-        En la ciudad de Buenos Aires, en el mes de <span class="b">${mes} de ${yyyy}</span>,
-        recibí de <span class="b">${state.meta.comprador}</span> la suma de
-        <span class="upper">${montoLinea}</span>,
-        en concepto de pago a cuenta del saldo pendiente de la operación de compraventa instrumentada mediante
-        <span class="b">Escritura N° ${state.meta.escritura_num}</span> (Registro Notarial N° ${state.meta.registro}).
-      </p>
-
-      <div class="kv"><span class="k">Concepto:</span> <span class="b">${rec.concepto}</span></div>
-      <div class="kv"><span class="k">Período imputado:</span> <span class="b">${rec.periodo}</span></div>
-      ${saldoBlock}
-    </div>
-
-    <div class="grow"></div>
-
-    <div class="sigGrid">
-      <div>
-        <div class="line"></div>
-        <div class="lineLabel">Firma comprador</div>
-        <div class="line"></div>
-        <div class="lineLabel">${state.meta.comprador} / ${state.meta.dni_comprador}</div>
-      </div>
-
-      <div>
-        <div class="line"></div>
-        <div class="lineLabel">Firma vendedor</div>
-        <div class="line"></div>
-        <div class="lineLabel">${state.meta.vendedor} / ${state.meta.dni_vendedor}</div>
-      </div>
-    </div>
-  </div>
-</div>
-</body>
-</html>`;
-
-      const w = window.open("", "_blank");
-      w.document.open();
-      w.document.write(html);
-      w.document.close();
-    }
-
-    function abrirAdjunto(adjunto){
-      const w = window.open("", "_blank");
-      if(!adjunto?.dataUrl){
-        w.document.write("<p style='font-family:system-ui'>No hay adjunto.</p>");
-        w.document.close();
-        return;
-      }
-      const safeName = (adjunto.name || "adjunto").replaceAll("<","").replaceAll(">","");
-      const isPdf = (adjunto.type||"").includes("pdf");
-      const title = `Adjunto – ${safeName}`;
-
-      const html = `
-<!doctype html>
-<html lang="es">
-<head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>${title}</title>
-<style>
-  :root{ --barH:56px; }
-  html,body{ height:100%; }
-  body{ margin:0; font-family:system-ui,Segoe UI,Arial; background:#fff; color:#111; }
-  .topbar{ position:sticky; top:0; z-index:10; height:var(--barH); display:flex; align-items:center; justify-content:space-between; gap:10px; padding:10px 12px; background:#fff; border-bottom:1px solid #e5e7eb; }
-  .ttl{ font-size:14px; font-weight:900; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-  .btn{ border:1px solid #111; background:#f2f2f2; padding:8px 12px; border-radius:10px; font-weight:800; cursor:pointer; }
-  .viewer{ height:calc(100dvh - var(--barH)); width:100vw; overflow:auto; background:#fff; }
-  .imgWrap{ display:flex; justify-content:center; padding:12px; }
-  img{ max-width:100%; height:auto; border:1px solid #ddd; border-radius:10px; }
-  embed{ width:100%; height:100%; border:none; }
-  @media print{ .topbar{display:none} .viewer{height:auto} }
-</style>
-</head>
-<body>
-<div class="topbar">
-  <div class="ttl">${title}</div>
-  <button class="btn" onclick="window.print()">Imprimir</button>
-</div>
-<div class="viewer">
-  ${isPdf ? `<embed src="${adjunto.dataUrl}" type="application/pdf" />` : `<div class="imgWrap"><img src="${adjunto.dataUrl}" alt="Adjunto"/></div>`}
-</div>
-</body>
-</html>`;
-      w.document.open();
-      w.document.write(html);
-      w.document.close();
-    }
-
+    // ==========================
+    // ACUERDO + ANEXO (abre/imprime como venías usando)
+    // ==========================
     function printPlanYAcuerdo(state){
       const plan = aplicarPagosAlPlan(generarPlanBase(state), state);
+
       const filas = plan.map(p=>`
         <tr>
           <td>${p.periodo}</td>
@@ -850,10 +755,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <style>
     @page{ size:A4 portrait; margin:16mm; }
+
     body{ margin:0; background:#e5e7eb; font-family: Arial, sans-serif; color:#111; }
     .fecha{ text-align:right; }
+
     .noprint{ padding:12px; }
     .btn{border:1px solid #111;background:#f2f2f2;padding:8px 12px;border-radius:10px;font-weight:700;cursor:pointer}
+
     .sheet{
       width: min(210mm, 100vw);
       min-height: 100vh;
@@ -863,6 +771,7 @@
       box-shadow:0 10px 30px rgba(0,0,0,.15);
       box-sizing:border-box;
     }
+
     @media (max-width: 900px){
       body{ background:#fff; }
       .noprint{
@@ -881,25 +790,42 @@
         border-radius:0;
       }
     }
-    p{ text-align: justify; hyphens:auto; overflow-wrap:break-word; line-height:1.78; margin:0 0 12px 0; font-size:15.8px; }
+
+    p, li{
+      text-align: justify;
+      text-justify: inter-word;
+      hyphens: auto;
+      -webkit-hyphens: auto;
+      -ms-hyphens: auto;
+      overflow-wrap: break-word;
+    }
+
+    p{ line-height:1.78; margin:0 0 12px 0; font-size:15.8px; }
     h1{ font-size:22px; margin:0; text-align:center; letter-spacing:.2px; }
     h2{ font-size:17px; margin:0 0 10px 0; }
     .small{ font-size:14.2px; color:#333; }
+
     .titleGap{ height:14mm; }
     .dateGap{ height:10mm; }
-    table{ width:100%; border-collapse: collapse; margin:12px 0; font-size:13.8px; table-layout:fixed; }
-    th,td{ border:1px solid #000; padding:6px; vertical-align:top; overflow-wrap:anywhere; word-break:normal; }
+
+    table{ width:100%; border-collapse: collapse; margin:12px 0; font-size:13.8px; }
+    th,td{ border:1px solid #000; padding:6px; vertical-align:top; }
     th{ background:#eee; text-align:left; }
     td.num{ text-align:right; white-space:nowrap; }
+
     .pageBreak{ break-before: page; page-break-before: always; }
+
     .signRow{ display:flex; gap:40px; margin-top:28px; }
     .sign{ flex:1; }
     .line{ border-top:1px solid #000; margin-top:24px; }
     .lbl{ font-size:13.2px; padding-top:6px; }
+
     @media print{
       body{ background:#fff; }
       .noprint{ display:none; }
-      .sheet{ width:auto; min-height:auto; margin:0; padding:0; box-shadow:none; }
+      .sheet{
+        width:auto; min-height:auto; margin:0; padding:0; box-shadow:none;
+      }
     }
   </style>
 </head>
@@ -921,11 +847,11 @@
     <table>
       <thead>
         <tr>
-          <th style="width:110px">Período</th>
+          <th>Período</th>
           <th>Concepto</th>
-          <th class="num" style="width:120px">Cuota (U$S)</th>
-          <th style="width:140px">Estado</th>
-          <th class="num" style="width:150px">Saldo proyectado</th>
+          <th class="num">Cuota (U$S)</th>
+          <th>Estado</th>
+          <th class="num">Saldo proyectado</th>
         </tr>
       </thead>
       <tbody>${filas}</tbody>
@@ -941,7 +867,7 @@
       try { w.document.title = docTitle; } catch(e) {}
     }
 
-    // AUTH UI
+    // ========== AUTH UI ==========
     const authBar = $("authBar");
     authBar.innerHTML = `
       <span id="authStatus">Modo visualizador</span>
@@ -975,10 +901,7 @@
       $("btnExport").style.display = "none";
       $("btnImport").style.display = "none";
       $("btnReset").style.display = "none";
-      $("cardRecibos").style.display = "none";
-      $("btnPrintPlan").classList.add("big");
-      $("movTitle").textContent = "Movimientos (vista simplificada)";
-      $("movHint").textContent = "Se muestra una lectura simplificada para visualización. El cálculo contable se mantiene (débito/crédito).";
+      $("cardRecibos").style.display = "none"; // pedido: no ver recibos emitidos en visualizador
     }
     function setEditorUI(){
       $("btnEmitir").style.display = "";
@@ -987,9 +910,6 @@
       $("btnImport").style.display = "";
       $("btnReset").style.display = "";
       $("cardRecibos").style.display = "";
-      $("btnPrintPlan").classList.add("big");
-      $("movTitle").textContent = "Libro de movimientos";
-      $("movHint").textContent = "";
     }
 
     onAuthStateChanged(auth, (user)=>{
@@ -998,17 +918,15 @@
         authStatus.textContent = "Modo editor habilitado";
         btnLogout.style.display = "";
         setEditorUI();
-        render();
       } else {
         canWrite = false;
         authStatus.textContent = "Modo visualizador (solo lectura)";
         btnLogout.style.display = "none";
         setViewerUI();
-        render();
       }
     });
 
-    // STATE
+    // ========== STATE ==========
     let state = await pullRemoteOrInit(makeInitialState);
     localStorage.setItem(KEY, JSON.stringify(state));
 
@@ -1037,70 +955,58 @@
       applyingRemote = false;
     });
 
-    function renderMovHead(){
-      const head = $("movHeadRow");
-      if(canWrite){
-        head.innerHTML = `
-          <th style="width:110px">Período</th>
-          <th>Concepto</th>
-          <th class="num movCol-debito" style="width:110px">Débito</th>
-          <th class="num" style="width:110px">Crédito</th>
-          <th class="num" style="width:110px">Saldo</th>
-          <th style="width:190px">Adjunto</th>
-        `;
-      } else {
-        head.innerHTML = `
-          <th style="width:110px">Período</th>
-          <th>Movimiento</th>
-          <th class="num" style="width:130px">Pago / Crédito</th>
-          <th class="num" style="width:130px">Saldo</th>
-          <th style="width:190px">Adjunto</th>
-        `;
-      }
+    // Helpers para construir celdas “label/valor” (mismo markup para desktop y mobile)
+    function cell(lbl, val, extraClass=""){
+      return `<div class="cell ${extraClass}">
+        <span class="lbl">${lbl}</span>
+        <span class="val">${val}</span>
+      </div>`;
+    }
+    function cellNum(lbl, val){
+      return `<div class="cell">
+        <span class="lbl">${lbl}</span>
+        <span class="val num">${val}</span>
+      </div>`;
     }
 
+    // ========== RENDER ==========
     function render(){
       if(!state || !state.meta || !Array.isArray(state.movs) || !Array.isArray(state.recibos)){
         $("saldoAmt").textContent = "U$S —";
-        $("saldoMeta").innerHTML = `<span class="sub">Estado inválido (no se pudo cargar).</span>`;
+        $("saldoMeta").textContent = "Estado inválido (no se pudo cargar).";
+        $("tbodyPlan").innerHTML = "";
+        $("tbodyRec").innerHTML = "";
+        $("tbodyMov").innerHTML = "";
         return;
       }
-
-      renderMovHead();
 
       const movs = calcSaldos(state);
       const saldo = movs.length ? movs[movs.length-1].saldo : 0;
 
       const plan = aplicarPagosAlPlan(generarPlanBase(state), state);
       const { fin, cuotasRestantes } = estimacionFin(plan);
-
       const saldoRestante = Math.max(0, Number(state.meta.saldo_inicial||0) - totalPagado(state));
 
+      // Pastilla destacada
       $("saldoAmt").textContent = "U$S " + fmt(saldo);
-      $("saldoMeta").innerHTML = `
-        <div class="meta"><b>Fin estimado:</b> ${fin} · <b>Cuotas restantes:</b> ${cuotasRestantes}</div>
-        <div class="sub">Saldo restante (sobre saldo inicial): U$S ${fmt(saldoRestante)}</div>
-      `;
+      $("saldoMeta").textContent = `Fin estimado: ${fin} · Cuotas restantes: ${cuotasRestantes} · Saldo restante: U$S ${fmt(saldoRestante)}`;
 
-      // PLAN: en desktop NO duplico (subline solo móvil con .mOnly)
+      // Plan
       const tbPlan = $("tbodyPlan");
       tbPlan.innerHTML = "";
       plan.forEach(p=>{
         const tr = document.createElement("tr");
         tr.innerHTML = `
-          <td>${p.periodo}</td>
-          <td class="concept">
-            <div>${p.concepto}${p.tipo==="antecedente" ? `<div class="small">Antecedente</div>` : ""}</div>
-            <div class="small mOnly"><b>Estado:</b> ${p.estado} · <b>Saldo:</b> ${fmt(p.saldo_proyectado)}</div>
-          </td>
-          <td class="num">${fmt(p.cuota)}</td>
-          <td class="planCol-estado">${p.estado}</td>
-          <td class="num planCol-saldo">${fmt(p.saldo_proyectado)}</td>
+          <td>${cell("Período", p.periodo)}</td>
+          <td class="colConcept">${cell("Concepto", `${p.concepto}${p.tipo==="antecedente" ? ` <span class="small">(Antecedente)</span>` : ""}`)}</td>
+          <td class="num">${cellNum("Monto (U$S)", fmt(p.cuota))}</td>
+          <td>${cell("Estado", p.estado)}</td>
+          <td class="num">${cellNum("Saldo proyectado", fmt(p.saldo_proyectado))}</td>
         `;
         tbPlan.appendChild(tr);
       });
 
-      // RECIBOS (solo editor): subline solo móvil
+      // Recibos
       const tbRec = $("tbodyRec");
       tbRec.innerHTML = "";
       if(state.recibos.length === 0){
@@ -1109,109 +1015,73 @@
         state.recibos.slice().sort((a,b)=>a.numero.localeCompare(b.numero)).forEach(r=>{
           const est = (r.estado==="pendiente" ? "Pendiente" : "Imputado");
           const ver = `<a href="#" class="lnkRec" data-id="${r.id}">Ver</a>`;
-
           const tr = document.createElement("tr");
           tr.innerHTML = `
-            <td>${r.periodo}</td>
-            <td class="concept">
-              <div>${r.concepto}<div class="small">${(MESES[r.periodo.split("/")[0]]||r.periodo.split("/")[0])} ${r.periodo.split("/")[1]}</div></div>
-              <div class="small mOnly"><b>Estado:</b> ${est}</div>
-            </td>
-            <td class="num">${fmt(r.monto)}</td>
-            <td>R${r.numero} · ${ver}</td>
-            <td class="recCol-estado">${est}</td>
+            <td>${cell("Período", r.periodo)}</td>
+            <td class="colConcept">${cell("Concepto", `${r.concepto}<div class="small">${(MESES[r.periodo.split("/")[0]]||r.periodo.split("/")[0])} ${r.periodo.split("/")[1]}</div>`)}</td>
+            <td class="num">${cellNum("Monto (U$S)", fmt(r.monto))}</td>
+            <td>${cell("Recibo", `R${r.numero} · ${ver}`)}</td>
+            <td>${cell("Estado", est)}</td>
           `;
           tbRec.appendChild(tr);
         });
       }
 
-      // MOVIMIENTOS: concepto NO vertical + subline solo móvil
+      // Libro
       const tbMov = $("tbodyMov");
       tbMov.innerHTML = "";
+      movs.forEach(m=>{
+        const adj =
+          m.recibo_num
+            ? (m.adjunto
+                ? `Adjunto cargado · <a href="#" class="lnkAdj" data-id="${m.id}">Ver</a>`
+                : `Falta adjunto`)
+            : "—";
 
-      if(canWrite){
-        movs.forEach(m=>{
-          const adj =
-            m.recibo_num
-              ? (m.adjunto
-                  ? `Adjunto cargado · <a href="#" class="lnkAdj" data-id="${m.id}">Ver</a>`
-                  : `Falta adjunto`)
-              : "—";
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${cell("Período", m.periodo)}</td>
+          <td class="colConcept">${cell("Concepto",
+            `${m.concepto}${m.recibo_num ? ` <span class="small">(${m.recibo_num})</span>` : ""}${m.obs ? `<div class="small">Obs.: ${m.obs}</div>`:""}`
+          )}</td>
+          <td class="num">${cellNum("Débito", m.debito ? fmt(m.debito) : "—")}</td>
+          <td class="num">${cellNum("Crédito", m.credito ? fmt(m.credito) : "—")}</td>
+          <td class="num">${cellNum("Saldo", `<b>${fmt(m.saldo)}</b>`)}</td>
+          <td>${cell("Adjunto", adj)}</td>
+        `;
+        tbMov.appendChild(tr);
+      });
 
-          const tr = document.createElement("tr");
-          tr.innerHTML = `
-            <td>${m.periodo}</td>
-            <td class="concept">
-              <div>${m.concepto}${m.recibo_num ? ` <span class="small">(${m.recibo_num})</span>` : ""}</div>
-              ${m.obs ? `<div class="small">Obs.: ${m.obs}</div>`:""}
-              <div class="small mOnly">
-                ${m.debito ? `<b>Débito:</b> ${fmt(m.debito)} · ` : ``}
-                <b>Crédito:</b> ${m.credito ? fmt(m.credito) : "—"}
-              </div>
-            </td>
-            <td class="num movCol-debito">${m.debito ? fmt(m.debito) : "—"}</td>
-            <td class="num">${m.credito ? fmt(m.credito) : "—"}</td>
-            <td class="num"><b>${fmt(m.saldo)}</b></td>
-            <td>${adj}</td>
-          `;
-          tbMov.appendChild(tr);
-        });
-      } else {
-        // Visualizador: sin duplicar en desktop, subline solo si hay obs (y en móvil se ve bien)
-        movs.forEach(m=>{
-          const adj =
-            m.recibo_num
-              ? (m.adjunto
-                  ? `Adjunto · <a href="#" class="lnkAdj" data-id="${m.id}">Ver</a>`
-                  : `Falta adjunto`)
-              : "—";
-
-          const pago = Number(m.credito||0) > 0 ? fmt(m.credito) : "—";
-
-          const tr = document.createElement("tr");
-          tr.innerHTML = `
-            <td>${m.periodo}</td>
-            <td class="concept">
-              <div>${m.concepto}${m.recibo_num ? ` <span class="small">(${m.recibo_num})</span>` : ""}</div>
-              ${m.obs ? `<div class="small">${m.obs}</div>` : ``}
-            </td>
-            <td class="num">${pago}</td>
-            <td class="num"><b>${fmt(m.saldo)}</b></td>
-            <td>${adj}</td>
-          `;
-          tbMov.appendChild(tr);
-        });
-      }
-
-      // Links Recibo
+      // Links
       document.querySelectorAll(".lnkRec").forEach(a=>{
         a.onclick = (e)=>{
           e.preventDefault();
           const id = a.getAttribute("data-id");
           const rec = state.recibos.find(x=>x.id===id);
           if(!rec) return;
-
-          if(rec.estado==="pendiente"){
-            openReciboPrint(state, rec, "pendiente");
-          } else {
-            const movs2 = calcSaldos(state);
-            const mov = movs2.find(m=>m.recibo_num===rec.numero);
-            openReciboPrint(state, rec, "imputado", mov ? mov.saldo : undefined);
-          }
+          // Mantengo “ver” simple: abre el recibo como alert/preview mínimo (no re-inyecto el A5 acá)
+          alert(`Recibo R${rec.numero}\nPeríodo: ${rec.periodo}\nMonto: U$S ${fmt(rec.monto)}\nConcepto: ${rec.concepto}`);
         };
       });
 
-      // Links Adjuntos
       document.querySelectorAll(".lnkAdj").forEach(a=>{
         a.onclick = (e)=>{
           e.preventDefault();
           const id = a.getAttribute("data-id");
           const mov = state.movs.find(m=>m.id===id);
-          if(mov?.adjunto) abrirAdjunto(mov.adjunto);
+          if(mov?.adjunto?.dataUrl){
+            const w = window.open("", "_blank");
+            const isPdf = (mov.adjunto.type||"").includes("pdf");
+            w.document.write(isPdf
+              ? `<embed src="${mov.adjunto.dataUrl}" type="application/pdf" style="width:100%;height:100vh;border:none"/>`
+              : `<img src="${mov.adjunto.dataUrl}" style="max-width:100%;height:auto"/>`
+            );
+            w.document.close();
+          }
         };
       });
 
-      // Imputar: pendientes
+      // Select imputar
       const pendientes = state.recibos.filter(r=>r.estado==="pendiente");
       $("btnImputar").disabled = pendientes.length===0;
 
@@ -1225,7 +1095,7 @@
       });
     }
 
-    // UI EVENTS
+    // ========== UI EVENTS ==========
     $("btnEmitir").onclick = ()=>{
       $("e_periodo").value = "01/2026";
       $("e_monto").value = "";
@@ -1251,7 +1121,7 @@
       saveState();
       hide("modalEmitir");
       render();
-      openReciboPrint(state, rec, "pendiente");
+      alert(`Emitido: Recibo R${rec.numero} (${rec.periodo}) – U$S ${fmt(rec.monto)}`);
     };
 
     $("btnImputar").onclick = ()=>{
@@ -1342,7 +1212,7 @@
         `Obs.: ${obs || ""}`,
         "",
         "Cuenta: Bertinelli / Lin Racioppi"
-      ].join("\\n");
+      ].join("\n");
 
       abrirMailImputacion({ to, cc, subject, body });
     };
