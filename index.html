@@ -4,45 +4,285 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Cuenta Corriente – Bertinelli / Lin Racioppi</title>
+
 <style>
   :root{
-    --bg:#0f1115;--panel:#171a21;--line:#2a3140;
-    --text:#e9ecf1;--muted:#8a90a2;
-    --primary:#2563eb;--danger:#7f1d1d;
-    --err:#fca5a5;
-    --chip:#111827;
+    --bg:#0b0d12;
+    --panel:#121622;
+    --panel2:#0f1320;
+    --line:#233049;
+    --line2:#1b253a;
+    --text:#e9ecf1;
+    --muted:#93a1b6;
+    --primary:#2563eb;
+    --primary2:#1d4ed8;
+    --danger:#7f1d1d;
+    --chip:#0e1426;
+    --ok:#16a34a;
+    --warn:#f59e0b;
   }
-  body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;background:var(--bg);color:var(--text)}
-  .wrap{max-width:1200px;margin:auto;padding:16px}
-  .card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px;margin:14px 0}
-  h1{margin:0 0 6px 0;font-size:20px}
-  h2{margin:0 0 8px 0;font-size:15px;color:var(--muted)}
-  .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;justify-content:space-between}
-  .right{display:flex;gap:8px;flex-wrap:wrap;align-items:center;justify-content:flex-end}
-  .badge{border:1px solid var(--line);padding:6px 12px;border-radius:999px;background:var(--chip)}
-  .btn{border:1px solid var(--line);background:#222733;color:var(--text);padding:8px 12px;border-radius:10px;font-weight:650;cursor:pointer}
-  .btn.primary{background:var(--primary);border-color:#1d4ed8}
-  .btn.danger{background:var(--danger);border-color:#991b1b}
+
+  *{box-sizing:border-box}
+  body{
+    margin:0;
+    font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;
+    background: radial-gradient(1200px 600px at 20% -10%, #1a2440 0%, rgba(26,36,64,0) 55%),
+                radial-gradient(1000px 600px at 80% 0%, #132457 0%, rgba(19,36,87,0) 60%),
+                var(--bg);
+    color:var(--text);
+  }
+  .wrap{max-width:1200px;margin:auto;padding:18px}
+
+  .card{
+    background: linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.01));
+    border:1px solid var(--line2);
+    border-radius:18px;
+    padding:14px;
+    margin:14px 0;
+    box-shadow: 0 10px 30px rgba(0,0,0,.25);
+  }
+
+  /* ===== TOP LAYOUT ===== */
+  .top{
+    display:grid;
+    grid-template-columns: 1.2fr .8fr;
+    gap:14px;
+    align-items:start;
+  }
+  @media (max-width: 980px){
+    .top{grid-template-columns:1fr}
+  }
+
+  h1{
+    margin:0;
+    font-size:22px;
+    letter-spacing:.2px;
+  }
+  .subhead{color:var(--muted);font-size:12.5px;margin-top:6px}
+
+  .auth{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+    align-items:center;
+    justify-content:flex-end;
+    padding:10px 12px;
+    border:1px solid var(--line2);
+    border-radius:16px;
+    background: rgba(0,0,0,.18);
+  }
+  @media (max-width: 980px){
+    .auth{justify-content:flex-start}
+  }
+
+  .auth .status{color:var(--muted);font-size:12px}
+  .auth input{
+    background: rgba(0,0,0,.22);
+    color: var(--text);
+    border:1px solid var(--line2);
+    border-radius:12px;
+    padding:10px 12px;
+    outline:none;
+    width: min(240px, 100%);
+  }
+  .auth input::placeholder{color: rgba(233,236,241,.55)}
+  .auth .btn{
+    border:1px solid var(--line2);
+    background: rgba(255,255,255,.06);
+    color: var(--text);
+    padding:10px 12px;
+    border-radius:12px;
+    font-weight:750;
+    cursor:pointer;
+  }
+  /* Entrar SIN color (pedido) */
+  .auth .btn.primary{
+    background: rgba(255,255,255,.06);
+    border-color: var(--line2);
+  }
+  .auth .btn:disabled{opacity:.55;cursor:not-allowed}
+
+  /* ===== CTA + SALDO ===== */
+  .heroRow{
+    display:grid;
+    grid-template-columns: 1fr auto;
+    gap:14px;
+    align-items:stretch;
+    margin-top:14px;
+  }
+  @media (max-width: 980px){
+    .heroRow{grid-template-columns:1fr}
+  }
+
+  .saldoPill{
+    border:1px solid var(--line);
+    background: linear-gradient(180deg, rgba(37,99,235,.18), rgba(37,99,235,.06));
+    border-radius:18px;
+    padding:14px 16px;
+    min-height:92px;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+  }
+  .saldoPill .ttl{font-size:12px;color:#cfe0ff;letter-spacing:.2px}
+  .saldoPill .amt{
+    font-size:34px;
+    font-weight:900;
+    margin:4px 0 2px 0;
+    line-height:1.05;
+  }
+  .saldoPill .extra{
+    color: rgba(233,236,241,.82);
+    font-size:12.5px;
+  }
+
+  .ctaCol{
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+    justify-content:stretch;
+    min-width: 340px;
+  }
+  @media (max-width: 980px){
+    .ctaCol{min-width:unset}
+  }
+
+  .btnRow{display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end}
+  @media (max-width: 980px){
+    .btnRow{justify-content:flex-start}
+  }
+
+  .btn{
+    border:1px solid var(--line2);
+    background: rgba(255,255,255,.06);
+    color: var(--text);
+    padding:10px 12px;
+    border-radius:12px;
+    font-weight:800;
+    cursor:pointer;
+    display:inline-flex;
+    gap:10px;
+    align-items:center;
+    line-height:1;
+  }
+  .btn.primary{
+    background: linear-gradient(180deg, rgba(37,99,235,.95), rgba(29,78,216,.95));
+    border-color: rgba(29,78,216,.9);
+  }
+  .btn.danger{
+    background: linear-gradient(180deg, rgba(127,29,29,.92), rgba(153,27,27,.92));
+    border-color: rgba(153,27,27,.9);
+  }
   .btn:disabled{opacity:.5;cursor:not-allowed}
-  .muted{color:var(--muted);font-size:12px}
-  .small{font-size:12px;color:var(--muted)}
-  .err{font-size:12px;color:var(--err)}
+
+  /* CTA “Ver acuerdo + plan” (llamativo, NO protagonista) */
+  .btn.agreement{
+    background: linear-gradient(180deg, rgba(255,255,255,.09), rgba(255,255,255,.06));
+    border-color: rgba(147,197,253,.35);
+    box-shadow: 0 10px 30px rgba(0,0,0,.25);
+  }
+  .btn.agreement:hover{border-color: rgba(147,197,253,.6)}
+  .btn svg{width:18px;height:18px;opacity:.95}
+
+  /* ===== SECCIONES DESPLEGABLES ===== */
+  details.section{
+    border:1px solid var(--line2);
+    border-radius:16px;
+    background: rgba(0,0,0,.16);
+    overflow:hidden;
+  }
+  details.section > summary{
+    list-style:none;
+    cursor:pointer;
+    padding:12px 12px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+  }
+  details.section > summary::-webkit-details-marker{display:none}
+  .sumLeft{display:flex;gap:10px;align-items:center}
+  .ico{
+    width:28px;height:28px;border-radius:10px;
+    display:grid;place-items:center;
+    background: rgba(37,99,235,.18);
+    border:1px solid rgba(37,99,235,.25);
+  }
+  .sumTitle{font-weight:850}
+  .sumDesc{font-size:12px;color:var(--muted);margin-top:2px}
+  .sumText{display:flex;flex-direction:column}
+  .sumRight{
+    display:inline-flex;align-items:center;gap:10px;
+    color: rgba(233,236,241,.9);
+    font-weight:850;
+    font-size:12.5px;
+    padding:8px 10px;
+    border-radius:999px;
+    border:1px solid var(--line2);
+    background: rgba(255,255,255,.05);
+  }
+  .sumRight svg{width:16px;height:16px}
+  details.section[open] .sumRight svg{transform: rotate(180deg)}
+  .sectionBody{padding:0 12px 12px 12px}
+
+  /* ===== TABLAS RESPONSIVE SIN SCROLL HORIZONTAL ===== */
   table{width:100%;border-collapse:collapse;font-size:13px;margin-top:6px}
-  th,td{border-bottom:1px solid var(--line);padding:8px;vertical-align:top}
-  th{color:var(--muted);text-align:left;font-weight:650}
+  th,td{border-bottom:1px solid var(--line2);padding:10px 8px;vertical-align:top}
+  th{color:var(--muted);text-align:left;font-weight:800}
   td.num{text-align:right;white-space:nowrap}
   a{color:#93c5fd;text-decoration:none}
   a:hover{text-decoration:underline}
-  .grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-  @media (max-width:900px){ .grid{grid-template-columns:1fr} }
-  input,select,textarea{background:#0f1115;color:var(--text);border:1px solid var(--line);border-radius:10px;padding:10px;width:100%}
-  textarea{min-height:70px;resize:vertical}
-  hr{border:none;border-top:1px solid var(--line);margin:10px 0}
+
+  /* IMPORTANTÍSIMO: evitar “vertical” en concepto */
+  td.conceptCell{
+    writing-mode: horizontal-tb !important;
+    text-orientation: mixed !important;
+    white-space: normal !important;
+    word-break: break-word;
+    overflow-wrap:anywhere;
+    hyphens:auto;
+    line-height:1.25;
+  }
+
+  /* “lista” mobile */
+  @media (max-width: 900px){
+    table, thead, tbody, th, tr{display:block}
+    thead{display:none}
+    tbody{display:block}
+    tr{
+      border:1px solid var(--line2);
+      border-radius:14px;
+      margin:10px 0;
+      background: rgba(255,255,255,.03);
+      overflow:hidden;
+    }
+    td{
+      display:flex;
+      gap:12px;
+      justify-content:space-between;
+      align-items:flex-start;
+      border-bottom:1px solid rgba(35,48,73,.55);
+      padding:10px 12px;
+    }
+    td::before{
+      content: attr(data-label);
+      color: var(--muted);
+      font-weight:800;
+      min-width: 120px;
+      max-width: 45%;
+    }
+    td.num{justify-content:space-between}
+    td.num::before{white-space:nowrap}
+  }
+
+  .muted{color:var(--muted);font-size:12px}
+  .small{font-size:12px;color:var(--muted)}
+  .err{font-size:12px;color:#fca5a5}
 
   .modal{
     position:fixed; inset:0;
     display:none;
-    background:rgba(0,0,0,.6);
+    background:rgba(0,0,0,.62);
     padding:14px;
     overflow:auto;
     -webkit-overflow-scrolling: touch;
@@ -50,71 +290,180 @@
     justify-content:center;
   }
   .modal.show{display:flex}
-  .modal .card{ max-width:920px; width:100%; margin:auto; }
+  .modal .card{max-width:920px;width:100%;margin:auto}
 
-  #i_preview img{ max-height:40vh; width:auto; display:block; }
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  @media (max-width:900px){ .grid{grid-template-columns:1fr} }
 
-  .ck{display:flex;gap:8px;align-items:flex-start}
+  select, textarea, input[type="text"], input[type="number"], input[type="password"], input[type="email"]{
+    background: rgba(0,0,0,.22);
+    color: var(--text);
+    border:1px solid var(--line2);
+    border-radius:12px;
+    padding:10px 12px;
+    width:100%;
+    outline:none;
+  }
+  textarea{min-height:80px;resize:vertical}
+
+  #i_preview img{max-height:40vh;width:auto;display:block;border-radius:12px;border:1px solid var(--line2)}
+  .ck{display:flex;gap:10px;align-items:flex-start}
   .ck input{width:auto;margin-top:3px}
+
+  /* util */
+  .hide{display:none !important}
 </style>
 </head>
 
 <body>
 <div class="wrap">
 
-  <div class="row">
+  <div class="top">
     <div>
       <h1>Cuenta Corriente – Bertinelli / Lin Racioppi</h1>
-      <div id="authBar" class="muted"></div>
+      <div class="subhead">Control contable + recibos firmados + acuerdo y anexo imprimibles.</div>
     </div>
-    <div class="right" id="btnBar">
-      <span class="badge" id="saldoBadge">Saldo: —</span>
-      <button class="btn primary" id="btnEmitir">Emitir recibo</button>
-      <button class="btn primary" id="btnImputar">Imputar pago</button>
-      <button class="btn" id="btnPrintPlan"> Ver Acuerdo + Plan de Pagos </button>
-      <button class="btn" id="btnExport">Exportar JSON</button>
-      <button class="btn" id="btnImport">Importar JSON</button>
-      <button class="btn danger" id="btnReset">Reset TOTAL</button>
+
+    <div class="auth" id="authBar"></div>
+  </div>
+
+  <div class="heroRow">
+    <div class="saldoPill">
+      <div class="ttl">Saldo actual – cuenta corriente</div>
+      <div class="amt" id="saldoGrande">U$S —</div>
+      <div class="extra" id="saldoExtra">—</div>
+    </div>
+
+    <div class="ctaCol">
+      <div class="btnRow" id="btnBar">
+        <button class="btn agreement" id="btnPrintPlan" title="Abrir acuerdo + anexo">
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M7 3h7l3 3v15a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2Z" stroke="currentColor" stroke-width="2"/>
+            <path d="M14 3v4h4" stroke="currentColor" stroke-width="2"/>
+            <path d="M8 12h8M8 16h8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+          Ver acuerdo + plan de pagos
+        </button>
+
+        <button class="btn primary" id="btnEmitir">
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+          Emitir recibo
+        </button>
+
+        <button class="btn primary" id="btnImputar">
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M4 12l5 5L20 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          Imputar pago
+        </button>
+
+        <button class="btn" id="btnExport">Exportar JSON</button>
+        <button class="btn" id="btnImport">Importar JSON</button>
+        <button class="btn danger" id="btnReset">Reset TOTAL</button>
+      </div>
     </div>
   </div>
 
-  <div class="card">
-    <h2>Cabecera</h2>
-    <div><b>Escritura Nº 434</b> – Registro Notarial Nº <b>30</b> – Escribano: <b>Norberto Gustavo Soler</b></div>
-    <div>Operación: <b>Compraventa inmueble – 25 de Mayo 8, 6º C, Ciudadela</b></div>
-    <div>Vendedor: <b>José Orlando Bertinelli</b> · Comprador: <b>Lautaro Nahuel Lin Racioppi</b></div>
-  </div>
-
-  <div class="card">
-    <h2>Anexo económico</h2>
-    <div>Precio solicitado: USD 44.000</div>
-    <div>Precio escriturado: USD 41.000</div>
-    <div>Crédito Banco Nación: USD 30.850</div>
-    <div>Entrega inicial: USD 5.000</div>
-    <div>Saldo inicial convenido en cuenta corriente: USD 8.150</div>
-  </div>
-
-  <div class="card">
-    <div class="row" style="align-items:flex-end">
-      <h2 style="margin:0">Plan de pagos proyectado</h2>
-      <div class="muted" id="planResumen">—</div>
+  <!-- CABECERA / ANEXO / PLAN como secciones -->
+  <details class="section" id="secCabecera">
+    <summary>
+      <div class="sumLeft">
+        <div class="ico">
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" style="width:18px;height:18px">
+            <path d="M4 7h16M4 12h16M4 17h10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="sumText">
+          <div class="sumTitle">Cabecera</div>
+          <div class="sumDesc">Escritura, inmueble, partes</div>
+        </div>
+      </div>
+      <div class="sumRight">
+        Ver más
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      </div>
+    </summary>
+    <div class="sectionBody">
+      <div><b>Escritura Nº 434</b> – Registro Notarial Nº <b>30</b> – Escribano: <b>Norberto Gustavo Soler</b></div>
+      <div>Operación: <b>Compraventa inmueble – 25 de Mayo 8, 6º C, Ciudadela</b></div>
+      <div>Vendedor: <b>José Orlando Bertinelli</b> · Comprador: <b>Lautaro Nahuel Lin Racioppi</b></div>
     </div>
-    <table>
-      <thead>
-        <tr>
-          <th style="width:110px">Período</th>
-          <th>Concepto</th>
-          <th class="num" style="width:120px">Monto (U$S)</th>
-          <th style="width:200px">Estado</th>
-          <th class="num" style="width:150px">Saldo proyectado</th>
-        </tr>
-      </thead>
-      <tbody id="tbodyPlan"></tbody>
-    </table>
-  </div>
+  </details>
 
-  <div class="card">
-    <h2>Recibos emitidos</h2>
+  <details class="section" id="secAnexo" style="margin-top:12px">
+    <summary>
+      <div class="sumLeft">
+        <div class="ico" style="background: rgba(22,163,74,.16); border-color: rgba(22,163,74,.22)">
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" style="width:18px;height:18px">
+            <path d="M12 2v20M17 7H9a3 3 0 0 0 0 6h6a3 3 0 0 1 0 6H7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="sumText">
+          <div class="sumTitle">Anexo económico</div>
+          <div class="sumDesc">Precios, crédito, saldo inicial</div>
+        </div>
+      </div>
+      <div class="sumRight">
+        Ver más
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      </div>
+    </summary>
+    <div class="sectionBody">
+      <div>Precio solicitado: USD 44.000</div>
+      <div>Precio escriturado: USD 41.000</div>
+      <div>Crédito Banco Nación: USD 30.850</div>
+      <div>Entrega inicial: USD 5.000</div>
+      <div>Saldo inicial convenido en cuenta corriente: USD 8.150</div>
+    </div>
+  </details>
+
+  <details class="section" id="secPlan" style="margin-top:12px">
+    <summary>
+      <div class="sumLeft">
+        <div class="ico" style="background: rgba(245,158,11,.16); border-color: rgba(245,158,11,.22)">
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" style="width:18px;height:18px">
+            <path d="M4 19V5a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            <path d="M8 7h8M8 11h8M8 15h6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="sumText">
+          <div class="sumTitle">Plan de pagos proyectado</div>
+          <div class="sumDesc">Detalle por período</div>
+        </div>
+      </div>
+      <div class="sumRight">
+        Ver más
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      </div>
+    </summary>
+    <div class="sectionBody">
+      <div class="muted" id="planResumenInline" style="margin-bottom:10px">—</div>
+      <table>
+        <thead>
+          <tr>
+            <th style="width:110px">Período</th>
+            <th>Concepto</th>
+            <th class="num" style="width:120px">Monto (U$S)</th>
+            <th style="width:200px">Estado</th>
+            <th class="num" style="width:150px">Saldo proyectado</th>
+          </tr>
+        </thead>
+        <tbody id="tbodyPlan"></tbody>
+      </table>
+    </div>
+  </details>
+
+  <!-- Recibos (se oculta en modo visualizador) -->
+  <div class="card" id="cardRecibos">
+    <h2 style="margin:0 0 8px 0;color:var(--muted)">Recibos emitidos</h2>
     <table>
       <thead>
         <tr>
@@ -129,8 +478,8 @@
     </table>
   </div>
 
-  <div class="card">
-    <h2>Libro de movimientos</h2>
+  <div class="card" id="cardMovs">
+    <h2 style="margin:0 0 8px 0;color:var(--muted)">Libro de movimientos</h2>
     <table>
       <thead>
         <tr>
@@ -151,7 +500,7 @@
 <!-- Modal Emitir -->
 <div class="modal" id="modalEmitir">
   <div class="card">
-    <h2>Emitir recibo</h2>
+    <h2 style="margin:0 0 10px 0;color:var(--muted)">Emitir recibo</h2>
     <div class="grid">
       <div>
         <div class="small">Período (MM/AAAA)</div>
@@ -166,7 +515,7 @@
         <input id="e_concepto" value="Pago mensual" />
       </div>
     </div>
-    <div class="row" style="justify-content:flex-end;margin-top:10px">
+    <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:12px">
       <button class="btn" id="e_cancel">Cancelar</button>
       <button class="btn primary" id="e_save">Emitir</button>
     </div>
@@ -176,9 +525,9 @@
 <!-- Modal Imputar -->
 <div class="modal" id="modalImputar">
   <div class="card">
-    <h2>Imputar pago (obligatorio adjuntar recibo firmado)</h2>
+    <h2 style="margin:0 0 6px 0;color:var(--muted)">Imputar pago (obligatorio adjuntar recibo firmado)</h2>
     <div class="muted">El archivo adjunto debe ser una imagen o PDF del recibo firmado por ambas partes.</div>
-    <hr>
+    <hr style="border:none;border-top:1px solid var(--line2);margin:12px 0">
     <div class="grid">
       <div>
         <div class="small">Recibo pendiente</div>
@@ -187,8 +536,8 @@
       <div>
         <div class="small">Adjuntar recibo firmado (foto/scan/PDF)</div>
         <input id="i_file" type="file" accept="image/*,application/pdf" />
-        <div class="small" id="i_file_info" style="margin-top:6px"></div>
-        <div class="err" id="i_file_err" style="margin-top:4px"></div>
+        <div class="small" id="i_file_info" style="margin-top:8px"></div>
+        <div class="err" id="i_file_err" style="margin-top:6px"></div>
         <div id="i_preview" style="margin-top:10px"></div>
       </div>
       <div style="grid-column:1/-1">
@@ -197,12 +546,12 @@
       </div>
     </div>
 
-    <div class="ck" style="margin-top:10px">
+    <div class="ck" style="margin-top:12px">
       <input type="checkbox" id="i_declaro" />
       <div class="small">Declaro que el adjunto corresponde al recibo seleccionado y que se encuentra firmado por ambas partes.</div>
     </div>
 
-    <div class="row" style="justify-content:flex-end;margin-top:10px">
+    <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:12px">
       <button class="btn" id="i_cancel">Cancelar</button>
       <button class="btn primary" id="i_confirm">Imputar</button>
     </div>
@@ -237,6 +586,15 @@
   let lastLocalRev = 0;
   let canWrite = false;
 
+  const KEY = "cc_bertinelli_lin_full_v4";
+  const $ = (id) => document.getElementById(id);
+  const fmt = (n) => Number(n || 0).toLocaleString("es-AR", { maximumFractionDigits: 0 });
+  const MESES = {"01":"Enero","02":"Febrero","03":"Marzo","04":"Abril","05":"Mayo","06":"Junio","07":"Julio","08":"Agosto","09":"Septiembre","10":"Octubre","11":"Noviembre","12":"Diciembre"};
+
+  function show(id){ $(id).classList.add("show"); }
+  function hide(id){ $(id).classList.remove("show"); }
+  function isPeriodo(x){ return /^\d{2}\/\d{4}$/.test(String(x||"").trim()); }
+
   async function pushRemote(state) {
     if (!canWrite) return;
     if (applyingRemote) return;
@@ -250,7 +608,31 @@
     await setDoc(CC_REF, { state }, { merge: true });
   }
 
-  async function pullRemoteOrInit(makeInitialState) {
+  function makeInitialState(){
+    return {
+      meta:{
+        escritura_num:"434",
+        registro:"30",
+        escribano:"Norberto Gustavo Soler",
+        vendedor:"José Orlando BERTINELLI",
+        comprador:"Lautaro Nahuel LIN RACIOPPI",
+        dni_vendedor:"11.824.116",
+        dni_comprador:"41.757.592",
+        inmueble:"25 de Mayo 8, 6º C, Ciudadela",
+        saldo_inicial:8150,
+        entrega_inicial:5000,
+        entrega_inicial_label:"Entrega inicial ya efectuada",
+        ref_mes:"diciembre 2025"
+      },
+      recibo_seq:0,
+      recibos:[],
+      movs:[
+        { id: crypto.randomUUID(), periodo:"12/2025", concepto:"Apertura de cuenta corriente (saldo convenido)", debito:8150, credito:0, recibo_num:null, adjunto:null, obs:null }
+      ]
+    };
+  }
+
+  async function pullRemoteOrInit() {
     const snap = await getDoc(CC_REF);
     if (snap.exists()) {
       const data = snap.data();
@@ -262,217 +644,179 @@
     return initial;
   }
 
-  document.addEventListener("DOMContentLoaded", async () => {
-    const KEY = "cc_bertinelli_lin_full_v3";
-    const $ = (id) => document.getElementById(id);
-    const fmt = (n) => Number(n || 0).toLocaleString("es-AR", { maximumFractionDigits: 0 });
-    const MESES = {"01":"Enero","02":"Febrero","03":"Marzo","04":"Abril","05":"Mayo","06":"Junio","07":"Julio","08":"Agosto","09":"Septiembre","10":"Octubre","11":"Noviembre","12":"Diciembre"};
+  async function hardReset(stateRef){
+    if(!confirm("Reset TOTAL: borra local y Firebase. ¿Seguro?")) return stateRef;
 
-    function show(id){ $(id).classList.add("show"); }
-    function hide(id){ $(id).classList.remove("show"); }
-    function isPeriodo(x){ return /^\d{2}\/\d{4}$/.test(String(x||"").trim()); }
+    localStorage.removeItem(KEY);
 
-    function makeInitialState(){
-      return {
-        meta:{
-          escritura_num:"434",
-          registro:"30",
-          escribano:"Norberto Gustavo Soler",
-          vendedor:"José Orlando BERTINELLI",
-          comprador:"Lautaro Nahuel LIN RACIOPPI",
-          dni_vendedor:"11.824.116",
-          dni_comprador:"41.757.592",
-          inmueble:"25 de Mayo 8, 6º C, Ciudadela",
-          saldo_inicial:8150,
-          entrega_inicial:5000,
-          entrega_inicial_label:"Entrega inicial ya efectuada",
-          ref_mes:"diciembre 2025"
-        },
-        recibo_seq:0,
-        recibos:[],
-        movs:[
-          { id: crypto.randomUUID(), periodo:"12/2025", concepto:"Apertura de cuenta corriente (saldo convenido)", debito:8150, credito:0, recibo_num:null, adjunto:null, obs:null }
-        ]
-      };
+    const fresh = makeInitialState();
+    fresh._meta = { rev: 1, updatedAt: Date.now(), updatedBy: clientId };
+
+    applyingRemote = true;
+    await setDoc(CC_REF, { state: fresh }, { merge: true });
+    applyingRemote = false;
+
+    alert("Listo: reseteado local + Firebase.");
+    return fresh;
+  }
+
+  function calcSaldos(state){
+    let saldo = 0;
+    return state.movs.map(m=>{
+      saldo = saldo + Number(m.debito||0) - Number(m.credito||0);
+      return { ...m, saldo };
+    });
+  }
+  function totalPagado(state){
+    return state.movs.reduce((acc,m)=> acc + Number(m.credito||0), 0);
+  }
+
+  function unidades(n){ return ["CERO","UNO","DOS","TRES","CUATRO","CINCO","SEIS","SIETE","OCHO","NUEVE"][n] || ""; }
+  function decenas(n){
+    const esp = {
+      10:"DIEZ",11:"ONCE",12:"DOCE",13:"TRECE",14:"CATORCE",15:"QUINCE",
+      16:"DIECISEIS",17:"DIECISIETE",18:"DIECIOCHO",19:"DIECINUEVE",
+      20:"VEINTE",21:"VEINTIUNO",22:"VEINTIDOS",23:"VEINTITRES",24:"VEINTICUATRO",
+      25:"VEINTICINCO",26:"VEINTISEIS",27:"VEINTISIETE",28:"VEINTIOCHO",29:"VEINTINUEVE"
+    };
+    if(esp[n]) return esp[n];
+    const tens = ["","", "VEINTE","TREINTA","CUARENTA","CINCUENTA","SESENTA","SETENTA","OCHENTA","NOVENTA"];
+    const d = Math.floor(n/10), u = n%10;
+    if(d<3) return esp[n] || "";
+    return u===0 ? tens[d] : `${tens[d]} Y ${unidades(u)}`;
+  }
+  function centenas(n){
+    const c = Math.floor(n/100);
+    const rest = n%100;
+    const map = {1:"CIENTO",2:"DOSCIENTOS",3:"TRESCIENTOS",4:"CUATROCIENTOS",5:"QUINIENTOS",6:"SEISCIENTOS",7:"SETECIENTOS",8:"OCHOCIENTOS",9:"NOVECIENTOS"};
+    if(n===100) return "CIEN";
+    let out = c>0 ? map[c] : "";
+    if(rest>0){ out = out ? (out+" "+numeroEnLetras(rest)) : numeroEnLetras(rest); }
+    return out || "CERO";
+  }
+  function miles(n){
+    if(n<1000) return centenas(n);
+    const m = Math.floor(n/1000);
+    const rest = n%1000;
+    let out = (m===1) ? "MIL" : `${numeroEnLetras(m)} MIL`;
+    if(rest>0) out += " " + centenas(rest);
+    return out;
+  }
+  function numeroEnLetras(n){
+    n = Math.floor(Number(n||0));
+    if(n<0) return "MENOS " + numeroEnLetras(-n);
+    if(n<10) return unidades(n);
+    if(n<100) return decenas(n);
+    if(n<1000) return centenas(n);
+    if(n<1000000) return miles(n);
+    const mill = Math.floor(n/1000000);
+    const rest = n%1000000;
+    let out = (mill===1) ? "UN MILLON" : `${numeroEnLetras(mill)} MILLONES`;
+    if(rest>0) out += " " + miles(rest);
+    return out;
+  }
+  function montoEnFormatoReciboUSD(monto){
+    const m = Math.floor(Number(monto||0));
+    const letras = numeroEnLetras(m);
+    return `DOLARES BILLETES ESTADOUNIDENSES ${letras} (U$D ${m})`;
+  }
+
+  function nextReciboNum2(state){
+    state.recibo_seq = (state.recibo_seq || 0) + 1;
+    return String(state.recibo_seq).padStart(2,"0");
+  }
+
+  function fileToDataUrl(file){
+    return new Promise((resolve, reject) => {
+      const r = new FileReader();
+      r.onload = () => resolve(String(r.result||""));
+      r.onerror = reject;
+      r.readAsDataURL(file);
+    });
+  }
+
+  function abrirMailImputacion({ to, cc, subject, body }) {
+    const enc = encodeURIComponent;
+    const normalized = String(body || "").replace(/\n/g, "\r\n");
+    let url = `mailto:${enc(to)}?subject=${enc(subject)}&body=${enc(normalized)}`;
+    if (cc) url += `&cc=${enc(cc)}`;
+    window.location.href = url;
+  }
+
+  function generarPlanBase(state){
+    const plan = [];
+
+    plan.push({
+      periodo: "12/2025",
+      concepto: state.meta.entrega_inicial_label || "Entrega inicial ya efectuada",
+      cuota: Number(state.meta.entrega_inicial || 0),
+      saldo_proyectado: Number(state.meta.saldo_inicial || 0),
+      estado: "Pagado",
+      tipo: "antecedente"
+    });
+
+    let saldo = Number(state.meta.saldo_inicial || 0);
+    let mes = 1, anio = 2026;
+
+    function push(monto, concepto="Pago mensual"){
+      const periodo = String(mes).padStart(2,"0") + "/" + anio;
+      saldo = Math.max(0, saldo - monto);
+      plan.push({ periodo, concepto, cuota: monto, saldo_proyectado: saldo, estado: "Pendiente", tipo:"cuota" });
+      mes++;
+      if(mes===13){ mes=1; anio++; }
     }
 
-    async function hardReset(){
-      if(!confirm("Reset TOTAL: borra local y Firebase. ¿Seguro?")) return;
+    if(saldo>0) push(Math.min(150, saldo), "Pago mensual (enero)");
+    while(saldo>0) push(Math.min(500, saldo), "Pago mensual");
 
-      localStorage.removeItem(KEY);
+    return plan;
+  }
 
-      const fresh = makeInitialState();
-      fresh._meta = { rev: 1, updatedAt: Date.now(), updatedBy: clientId };
+  function aplicarPagosAlPlan(plan, state){
+    let pagado = totalPagado(state);
 
-      applyingRemote = true;
-      state = fresh;
-      await setDoc(CC_REF, { state: fresh }, { merge: true });
-      applyingRemote = false;
+    for(const fila of plan){
+      if(fila.tipo === "antecedente") continue;
+      if(pagado <= 0) break;
 
-      render();
-      alert("Listo: reseteado local + Firebase.");
-    }
-
-    function calcSaldos(state){
-      let saldo = 0;
-      return state.movs.map(m=>{
-        saldo = saldo + Number(m.debito||0) - Number(m.credito||0);
-        return { ...m, saldo };
-      });
-    }
-    function totalPagado(state){
-      return state.movs.reduce((acc,m)=> acc + Number(m.credito||0), 0);
-    }
-
-    function unidades(n){ return ["CERO","UNO","DOS","TRES","CUATRO","CINCO","SEIS","SIETE","OCHO","NUEVE"][n] || ""; }
-    function decenas(n){
-      const esp = {
-        10:"DIEZ",11:"ONCE",12:"DOCE",13:"TRECE",14:"CATORCE",15:"QUINCE",
-        16:"DIECISEIS",17:"DIECISIETE",18:"DIECIOCHO",19:"DIECINUEVE",
-        20:"VEINTE",21:"VEINTIUNO",22:"VEINTIDOS",23:"VEINTITRES",24:"VEINTICUATRO",
-        25:"VEINTICINCO",26:"VEINTISEIS",27:"VEINTISIETE",28:"VEINTIOCHO",29:"VEINTINUEVE"
-      };
-      if(esp[n]) return esp[n];
-      const tens = ["","", "VEINTE","TREINTA","CUARENTA","CINCUENTA","SESENTA","SETENTA","OCHENTA","NOVENTA"];
-      const d = Math.floor(n/10), u = n%10;
-      if(d<3) return esp[n] || "";
-      return u===0 ? tens[d] : `${tens[d]} Y ${unidades(u)}`;
-    }
-    function centenas(n){
-      const c = Math.floor(n/100);
-      const rest = n%100;
-      const map = {1:"CIENTO",2:"DOSCIENTOS",3:"TRESCIENTOS",4:"CUATROCIENTOS",5:"QUINIENTOS",6:"SEISCIENTOS",7:"SETECIENTOS",8:"OCHOCIENTOS",9:"NOVECIENTOS"};
-      if(n===100) return "CIEN";
-      let out = c>0 ? map[c] : "";
-      if(rest>0){ out = out ? (out+" "+numeroEnLetras(rest)) : numeroEnLetras(rest); }
-      return out || "CERO";
-    }
-    function miles(n){
-      if(n<1000) return centenas(n);
-      const m = Math.floor(n/1000);
-      const rest = n%1000;
-      let out = (m===1) ? "MIL" : `${numeroEnLetras(m)} MIL`;
-      if(rest>0) out += " " + centenas(rest);
-      return out;
-    }
-    function numeroEnLetras(n){
-      n = Math.floor(Number(n||0));
-      if(n<0) return "MENOS " + numeroEnLetras(-n);
-      if(n<10) return unidades(n);
-      if(n<100) return decenas(n);
-      if(n<1000) return centenas(n);
-      if(n<1000000) return miles(n);
-      const mill = Math.floor(n/1000000);
-      const rest = n%1000000;
-      let out = (mill===1) ? "UN MILLON" : `${numeroEnLetras(mill)} MILLONES`;
-      if(rest>0) out += " " + miles(rest);
-      return out;
-    }
-    function montoEnFormatoReciboUSD(monto){
-      const m = Math.floor(Number(monto||0));
-      const letras = numeroEnLetras(m);
-      return `DOLARES BILLETES ESTADOUNIDENSES ${letras} (U$D ${m})`;
-    }
-
-    function nextReciboNum2(state){
-      state.recibo_seq = (state.recibo_seq || 0) + 1;
-      return String(state.recibo_seq).padStart(2,"0");
-    }
-
-    function fileToDataUrl(file){
-      return new Promise((resolve, reject) => {
-        const r = new FileReader();
-        r.onload = () => resolve(String(r.result||""));
-        r.onerror = reject;
-        r.readAsDataURL(file);
-      });
-    }
-
-    // ===== MAILTO (Spark-friendly) =====
-    function abrirMailImputacion({ to, cc, subject, body }) {
-      const enc = encodeURIComponent;
-      const normalized = String(body || "").replace(/\n/g, "\r\n");
-      let url = `mailto:${enc(to)}?subject=${enc(subject)}&body=${enc(normalized)}`;
-      if (cc) url += `&cc=${enc(cc)}`;
-      window.location.href = url;
-    }
-
-    function generarPlanBase(state){
-      const plan = [];
-
-      plan.push({
-        periodo: "12/2025",
-        concepto: state.meta.entrega_inicial_label || "Entrega inicial ya efectuada",
-        cuota: Number(state.meta.entrega_inicial || 0),
-        saldo_proyectado: Number(state.meta.saldo_inicial || 0),
-        estado: "Pagado",
-        tipo: "antecedente"
-      });
-
-      let saldo = Number(state.meta.saldo_inicial || 0);
-      let mes = 1, anio = 2026;
-
-      function push(monto, concepto="Pago mensual"){
-        const periodo = String(mes).padStart(2,"0") + "/" + anio;
-        saldo = Math.max(0, saldo - monto);
-        plan.push({ periodo, concepto, cuota: monto, saldo_proyectado: saldo, estado: "Pendiente", tipo:"cuota" });
-        mes++;
-        if(mes===13){ mes=1; anio++; }
+      if(pagado >= fila.cuota){
+        fila.estado = "Pagado";
+        pagado -= fila.cuota;
+      } else {
+        fila.estado = "Parcial";
+        pagado = 0;
       }
-
-      if(saldo>0) push(Math.min(150, saldo), "Pago mensual (enero)");
-      while(saldo>0) push(Math.min(500, saldo), "Pago mensual");
-
-      return plan;
     }
+    return plan;
+  }
 
-    function aplicarPagosAlPlan(plan, state){
-      let pagado = totalPagado(state);
+  function estimacionFin(plan){
+    const cuotas = plan.filter(p=>p.tipo==="cuota");
+    const firstPendingIdx = cuotas.findIndex(p => p.estado !== "Pagado");
+    if(firstPendingIdx === -1) return { fin:"(cancelado)", cuotasRestantes:0 };
+    const lastNotPagada = cuotas.slice(firstPendingIdx).pop();
+    return { fin: lastNotPagada ? lastNotPagada.periodo : "(—)", cuotasRestantes: cuotas.slice(firstPendingIdx).length };
+  }
 
-      for(const fila of plan){
-        if(fila.tipo === "antecedente") continue;
-        if(pagado <= 0) break;
+  // ==================================================
+  // RECIBO A5 apaisado – 1 sola hoja + borde (pedido)
+  // ==================================================
+  function openReciboPrint(state, rec, modo, saldoLuego){
+    const isImputado = (modo === "imputado");
+    const [mm,yyyy] = String(rec.periodo).split("/");
+    const mes = MESES[mm] || mm;
 
-        if(pagado >= fila.cuota){
-          fila.estado = "Pagado";
-          pagado -= fila.cuota;
-        } else {
-          fila.estado = "Parcial";
-          pagado = 0;
-        }
-      }
-      return plan;
-    }
+    const monto = Math.floor(Number(rec.monto||0));
+    const montoLinea = montoEnFormatoReciboUSD(monto);
 
-    function estimacionFin(plan){
-      const cuotas = plan.filter(p=>p.tipo==="cuota");
-      const firstPendingIdx = cuotas.findIndex(p => p.estado !== "Pagado");
-      if(firstPendingIdx === -1) return { fin:"(cancelado)", cuotasRestantes:0 };
-      const lastNotPagada = cuotas.slice(firstPendingIdx).pop();
-      return { fin: lastNotPagada ? lastNotPagada.periodo : "(—)", cuotasRestantes: cuotas.slice(firstPendingIdx).length };
-    }
+    const saldoBlock = (isImputado && typeof saldoLuego==="number")
+      ? `<div class="kv"><span class="k">Saldo pendiente luego del presente pago:</span> <b>USD ${fmt(saldoLuego)}</b></div>`
+      : ``;
 
-    // ======================
-    // RECIBO (A5 apaisado) + RESPONSIVE
-    // Desktop: IMPRIMIR
-    // Mobile: COMPARTIR
-    // ======================
-    function openReciboPrint(state, rec, modo, saldoLuego){
-      const isImputado = (modo === "imputado");
-      const [mm,yyyy] = String(rec.periodo).split("/");
-      const mes = MESES[mm] || mm;
+    const docTitle = `Recibo R${rec.numero} – ${rec.periodo}`;
+    const fileName = `recibo_R${rec.numero}_${String(rec.periodo).replace("/","-")}.html`;
 
-      const monto = Math.floor(Number(rec.monto||0));
-      const montoLinea = montoEnFormatoReciboUSD(monto);
-
-      const saldoBlock = (isImputado && typeof saldoLuego==="number")
-        ? `<div class="kv"><span class="k">Saldo pendiente luego del presente pago:</span> <b>USD ${fmt(saldoLuego)}</b></div>`
-        : ``;
-
-      const docTitle = `Recibo R${rec.numero} – ${rec.periodo}`;
-      const fileName = `recibo_R${rec.numero}_${String(rec.periodo).replace("/","-")}.html`;
-
-      const html = `
+    const html = `
 <!doctype html>
 <html lang="es">
 <head>
@@ -481,9 +825,9 @@
 <title>${docTitle}</title>
 <style>
   @page{ size:A5 landscape; margin:10mm; }
-  :root{ --barH:56px; }
   html,body{ height:100%; }
   body{ margin:0; font-family:system-ui,Segoe UI,Arial; color:#111; background:#fff; }
+  :root{ --barH:56px; }
 
   .topbar{
     position: sticky;
@@ -514,24 +858,22 @@
     cursor:pointer;
   }
 
+  /* Hoja: siempre con borde y en una sola hoja al imprimir */
   .sheet{
     background:#fff;
     border:1px solid #111;
     border-radius:10px;
     box-sizing:border-box;
-
     width: min(1100px, calc(100vw - 24px));
     margin: 12px auto;
     padding: 14px;
-    min-height: calc(100dvh - var(--barH) - 24px);
   }
 
-  p, li{
+  p{
     text-align: justify;
     text-justify: inter-word;
     hyphens: auto;
     -webkit-hyphens: auto;
-    -ms-hyphens: auto;
     overflow-wrap: break-word;
   }
 
@@ -544,7 +886,7 @@
   .kv{margin:8px 0;font-size:15px}
   .k{color:#222}
 
-  .vbox{ display:flex; flex-direction:column; min-height:100%; }
+  .vbox{ display:flex; flex-direction:column; height: 100%; }
   .grow{ flex:1; }
 
   .sigGrid{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:12px}
@@ -558,20 +900,23 @@
       border-radius:0;
       border-left:none;
       border-right:none;
-      min-height: calc(100dvh - var(--barH));
       padding: 16px;
+      min-height: calc(100dvh - var(--barH));
     }
   }
 
   @media print{
     .topbar{ display:none; }
+    html,body{ height:auto; }
     .sheet{
-      border:1px solid #111;
-      border-radius:10px;
-      width:100%;
+      width: 100%;
       margin:0;
       padding:10mm;
-      min-height:148mm;
+      border:1px solid #111;
+      border-radius:10px;
+      /* Evitar cortes */
+      break-inside: avoid;
+      page-break-inside: avoid;
     }
   }
 </style>
@@ -594,12 +939,12 @@
         recibí de <span class="b">${state.meta.comprador}</span> la suma de
         <span class="upper">${montoLinea}</span>,
         en concepto de pago a cuenta del saldo pendiente de la operación de compraventa instrumentada mediante
-        <span class="b">Escritura N° ${state.meta.escritura_num}</span> (Registro Notarial N° ${state.meta.registro}).
+        <span class="b">Escritura Pública Nº ${state.meta.escritura_num}</span> (Registro Notarial Nº ${state.meta.registro}),
+        referida al mes de <span class="b">${state.meta.ref_mes}</span>.
       </p>
 
       <div class="kv"><span class="k">Concepto:</span> <span class="b">${rec.concepto}</span></div>
       <div class="kv"><span class="k">Período imputado:</span> <span class="b">${rec.periodo}</span></div>
-
       ${saldoBlock}
     </div>
 
@@ -608,16 +953,14 @@
     <div class="sigGrid">
       <div>
         <div class="line"></div>
-        <div class="lineLabel">Firma comprador</div>
-
+        <div class="lineLabel">Firma EL COMPRADOR</div>
         <div class="line"></div>
         <div class="lineLabel">${state.meta.comprador} / ${state.meta.dni_comprador}</div>
       </div>
 
       <div>
         <div class="line"></div>
-        <div class="lineLabel">Firma vendedor</div>
-
+        <div class="lineLabel">Firma EL VENDEDOR</div>
         <div class="line"></div>
         <div class="lineLabel">${state.meta.vendedor} / ${state.meta.dni_vendedor}</div>
       </div>
@@ -631,11 +974,7 @@
     const file = new File([html], ${JSON.stringify(fileName)}, { type:"text/html" });
 
     if(navigator.share && navigator.canShare && navigator.canShare({ files:[file] })){
-      await navigator.share({
-        title: ${JSON.stringify(docTitle)},
-        text: ${JSON.stringify(docTitle)},
-        files: [file]
-      });
+      await navigator.share({ title:${JSON.stringify(docTitle)}, text:${JSON.stringify(docTitle)}, files:[file] });
       return true;
     }
 
@@ -676,30 +1015,25 @@
 </body>
 </html>`;
 
-      const w = window.open("", "_blank");
-      w.document.open();
-      w.document.write(html);
+    const w = window.open("", "_blank");
+    w.document.open();
+    w.document.write(html);
+    w.document.close();
+  }
+
+  function abrirAdjunto(adjunto){
+    const w = window.open("", "_blank");
+    if(!adjunto?.dataUrl){
+      w.document.write("<p style='font-family:system-ui'>No hay adjunto.</p>");
       w.document.close();
+      return;
     }
 
-    // ======================
-    // ADJUNTO: RESPONSIVE
-    // Desktop: IMPRIMIR
-    // Mobile: COMPARTIR
-    // ======================
-    function abrirAdjunto(adjunto){
-      const w = window.open("", "_blank");
-      if(!adjunto?.dataUrl){
-        w.document.write("<p style='font-family:system-ui'>No hay adjunto.</p>");
-        w.document.close();
-        return;
-      }
+    const safeName = (adjunto.name || "adjunto").replaceAll("<","").replaceAll(">","");
+    const isPdf = (adjunto.type||"").includes("pdf");
+    const title = `Adjunto – ${safeName}`;
 
-      const safeName = (adjunto.name || "adjunto").replaceAll("<","").replaceAll(">","");
-      const isPdf = (adjunto.type||"").includes("pdf");
-      const title = `Adjunto – ${safeName}`;
-
-      const html = `
+    const html = `
 <!doctype html>
 <html lang="es">
 <head>
@@ -788,11 +1122,7 @@
     const file = new File([blob], ${JSON.stringify(safeName)}, { type: ${JSON.stringify(adjunto.type || "application/octet-stream")} });
 
     if(navigator.share && navigator.canShare && navigator.canShare({ files:[file] })){
-      await navigator.share({
-        title: ${JSON.stringify(title)},
-        text: ${JSON.stringify(title)},
-        files: [file]
-      });
+      await navigator.share({ title:${JSON.stringify(title)}, text:${JSON.stringify(title)}, files:[file] });
       return true;
     }
 
@@ -832,91 +1162,80 @@
 </body>
 </html>`;
 
-      w.document.open();
-      w.document.write(html);
-      w.document.close();
-    }
+    w.document.open();
+    w.document.write(html);
+    w.document.close();
+  }
 
-    // ==========================
-    // ACUERDO + ANEXO (TEXTO REAL)
-    // Desktop: IMPRIMIR
-    // Mobile: COMPARTIR
-    // ==========================
-    function printPlanYAcuerdo(state){
-      const plan = aplicarPagosAlPlan(generarPlanBase(state), state);
+  // ==========================
+  // ACUERDO + ANEXO (ACUERDO REAL COMPLETO)
+  // ==========================
+  function printPlanYAcuerdo(state){
+    const plan = aplicarPagosAlPlan(generarPlanBase(state), state);
 
-      const filas = plan.map(p=>`
-        <tr>
-          <td>${p.periodo}</td>
-          <td>${p.concepto}</td>
-          <td class="num">${fmt(p.cuota)}</td>
-          <td>${p.estado}</td>
-          <td class="num">${fmt(p.saldo_proyectado)}</td>
-        </tr>
-      `).join("");
+    const filas = plan.map(p=>`
+      <tr>
+        <td>${p.periodo}</td>
+        <td>${p.concepto}</td>
+        <td class="num">${fmt(p.cuota)}</td>
+        <td>${p.estado}</td>
+        <td class="num">${fmt(p.saldo_proyectado)}</td>
+      </tr>
+    `).join("");
 
-      const docTitle = "Acuerdo y Anexo – Cuenta Corriente";
+    const docTitle = "Acuerdo y Anexo – Cuenta Corriente";
 
-      const fechaObj = new Date(Date.now());
-      const meses = ["enero","febrero","marzo","abril","mayo","junio","julio","agosto","septiembre","octubre","noviembre","diciembre"];
-      const fecha = `${fechaObj.getDate()} de ${meses[fechaObj.getMonth()]} de ${fechaObj.getFullYear()}`;
+    const fechaObj = new Date(Date.now());
+    const meses = ["enero","febrero","marzo","abril","mayo","junio","julio","agosto","septiembre","octubre","noviembre","diciembre"];
+    const fecha = `${fechaObj.getDate()} de ${meses[fechaObj.getMonth()]} de ${fechaObj.getFullYear()}`;
 
-      // === ACUERDO REAL (RESPETADO) ===
-      const acuerdo = `
-        <h1>ACUERDO PRIVADO DE CANCELACIÓN DE SALDO</h1>
-        <p class="fecha">Buenos Aires, ${fecha}</p>
+    // === TEXTO REAL (tal cual lo pasaste, integrado en HTML) ===
+    const acuerdo = `
+      <h1>ACUERDO PRIVADO DE CANCELACIÓN DE SALDO</h1>
+      <p class="fecha">Buenos Aires, ${fecha}</p>
 
-        <p>
-          Entre el Sr. <b>${state.meta.vendedor}</b>, DNI <b>${state.meta.dni_vendedor}</b>, en adelante <b>EL VENDEDOR</b>, y el Sr.
-          <b>${state.meta.comprador}</b>, DNI <b>${state.meta.dni_comprador}</b>, en adelante <b>EL COMPRADOR</b>, se celebra el presente
-          acuerdo, sujeto a las siguientes cláusulas:
-        </p>
+      <p>
+        Entre el Sr. <b>${state.meta.vendedor}</b>, DNI <b>${state.meta.dni_vendedor}</b>, en adelante <b>EL VENDEDOR</b>, y el Sr.
+        <b>${state.meta.comprador}</b>, DNI <b>${state.meta.dni_comprador}</b>, en adelante <b>EL COMPRADOR</b>, se celebra el presente acuerdo,
+        sujeto a las siguientes cláusulas:
+      </p>
 
-        <p><b>PRIMERA – Antecedentes.</b> Las partes manifiestan que celebraron la compraventa del inmueble sito en
-          <b>${state.meta.inmueble}</b>, instrumentada mediante <b>Escritura Pública Nº ${state.meta.escritura_num}</b>, pasada ante el
-          <b>Registro Notarial Nº ${state.meta.registro}</b>, referida al mes de <b>${state.meta.ref_mes}</b>.
-        </p>
+      <p><b>PRIMERA – Antecedentes.</b> Las partes manifiestan que celebraron la compraventa del inmueble sito en
+        <b>${state.meta.inmueble}</b>, instrumentada mediante <b>Escritura Pública Nº ${state.meta.escritura_num}</b>, pasada ante el
+        <b>Registro Notarial Nº ${state.meta.registro}</b>, referida al mes de <b>${state.meta.ref_mes}</b>.
+      </p>
 
-        <p><b>SEGUNDA – Entrega inicial ya efectuada.</b> Las partes dejan constancia de que el COMPRADOR entregó en concepto de entrega
-          inicial la suma de <b>U$S ${fmt(state.meta.entrega_inicial)}</b>, quedando el saldo convenido en cuenta corriente determinado
-          en función de dicha entrega.
-        </p>
+      <p><b>SEGUNDA – Entrega inicial ya efectuada.</b> Las partes dejan constancia de que el COMPRADOR entregó en concepto de entrega inicial la suma de
+        <b>U$S ${fmt(state.meta.entrega_inicial)}</b>, quedando el saldo convenido en cuenta corriente determinado en función de dicha entrega.
+      </p>
 
-        <p><b>TERCERA – Saldo pendiente.</b> Las partes reconocen un saldo pendiente a cargo del COMPRADOR por
-          <b>U$S ${fmt(state.meta.saldo_inicial)}</b>.
-        </p>
+      <p><b>TERCERA – Saldo pendiente.</b> Las partes reconocen un saldo pendiente a cargo del COMPRADOR por <b>U$S ${fmt(state.meta.saldo_inicial)}</b>.</p>
 
-        <p><b>CUARTA – Forma de pago.</b> El saldo será cancelado conforme esquema: a) enero 2026: U$S 150; b) desde el período siguiente:
-          pagos mensuales de referencia de U$S 500 hasta cancelar el saldo.
-        </p>
+      <p><b>CUARTA – Forma de pago.</b> El saldo será cancelado conforme esquema: a) enero 2026: U$S 150; b) desde el período siguiente: pagos mensuales de referencia de U$S 500 hasta cancelar el saldo.</p>
 
-        <p><b>QUINTA – Adelantos.</b> El COMPRADOR podrá efectuar pagos adelantados o superiores sin penalidad. Dichos adelantos se imputarán
-          al saldo y acortarán la duración total del plan.
-        </p>
+      <p><b>QUINTA – Adelantos.</b> El COMPRADOR podrá efectuar pagos adelantados o superiores sin penalidad. Dichos adelantos se imputarán al saldo y acortarán la duración total del plan.</p>
 
-        <p><b>SEXTA – Carácter.</b> El plan se recalcula por adelantos, manteniéndose la obligación de cancelar el saldo hasta cero.</p>
+      <p><b>SEXTA – Carácter.</b> El plan se recalcula por adelantos, manteniéndose la obligación de cancelar el saldo hasta cero.</p>
 
-        <p><b>SÉPTIMA – Recibos.</b> Cada pago se documentará mediante recibo firmado por ambas partes.</p>
+      <p><b>SÉPTIMA – Recibos.</b> Cada pago se documentará mediante recibo firmado por ambas partes.</p>
 
-        <p><b>OCTAVA – Naturaleza.</b> El presente acuerdo es complementario de la escritura referida y regula exclusivamente la modalidad de
-          cancelación del saldo pendiente.
-        </p>
+      <p><b>OCTAVA – Naturaleza.</b> El presente acuerdo es complementario de la escritura referida y regula exclusivamente la modalidad de cancelación del saldo pendiente.</p>
 
-        <p>En prueba de conformidad, se firman dos ejemplares de un mismo tenor, en la ciudad de Buenos Aires, en la fecha indicada al inicio.</p>
+      <p>En prueba de conformidad, se firman dos ejemplares de un mismo tenor, en la ciudad de Buenos Aires, en la fecha indicada al inicio.</p>
 
-        <div class="signRow">
-          <div class="sign">
-            <div class="line"></div>
-            <div class="lbl">Firma EL VENDEDOR</div>
-          </div>
-          <div class="sign">
-            <div class="line"></div>
-            <div class="lbl">Firma EL COMPRADOR</div>
-          </div>
+      <div class="signRow">
+        <div class="sign">
+          <div class="line"></div>
+          <div class="lbl">Firma EL VENDEDOR</div>
         </div>
-      `;
+        <div class="sign">
+          <div class="line"></div>
+          <div class="lbl">Firma EL COMPRADOR</div>
+        </div>
+      </div>
+    `;
 
-      const html = `
+    const html = `
 <!doctype html>
 <html lang="es">
 <head>
@@ -925,9 +1244,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <style>
     @page{ size:A4 portrait; margin:16mm; }
-
     body{ margin:0; background:#e5e7eb; font-family: Arial, sans-serif; color:#111; }
-    .fecha{ text-align:right; }
+    .fecha{ text-align:right; margin:0 0 12px 0; }
 
     .noprint{
       padding:12px;
@@ -952,24 +1270,19 @@
 
     @media (max-width: 900px){
       body{ background:#fff; }
-      .sheet{
-        width:100vw;
-        margin:0;
-        padding: 14px;
-        box-shadow:none;
-      }
+      .sheet{ width:100vw; margin:0; padding: 14px; box-shadow:none; }
     }
 
-    p, li{
+    p{
       text-align: justify;
       text-justify: inter-word;
       hyphens: auto;
       -webkit-hyphens: auto;
-      -ms-hyphens: auto;
       overflow-wrap: break-word;
+      line-height:1.78;
+      margin:0 0 12px 0;
+      font-size:15.8px;
     }
-
-    p{ line-height:1.78; margin:0 0 12px 0; font-size:15.8px; }
     h1{ font-size:22px; margin:0 0 10px 0; text-align:center; letter-spacing:.2px; }
     h2{ font-size:17px; margin:0 0 10px 0; }
     .small{ font-size:14.2px; color:#333; }
@@ -989,9 +1302,7 @@
     @media print{
       body{ background:#fff; }
       .noprint{ display:none; }
-      .sheet{
-        width:auto; margin:0; padding:0; box-shadow:none;
-      }
+      .sheet{ width:auto; margin:0; padding:0; box-shadow:none; }
     }
   </style>
 </head>
@@ -1007,7 +1318,7 @@
     <h2>ANEXO PLAN DE PAGOS</h2>
     <p class="small">
       Inmueble: <b>${state.meta.inmueble}</b><br/>
-      Escritura Nº <b>${state.meta.escritura_num}</b> – Registro Notarial Nº <b>${state.meta.registro}</b>.
+      Escritura Pública Nº <b>${state.meta.escritura_num}</b> – Registro Notarial Nº <b>${state.meta.registro}</b>.
     </p>
 
     <table>
@@ -1072,20 +1383,20 @@
 </body>
 </html>`;
 
-      const w = window.open("", "acuerdo_anexo");
-      w.document.open();
-      w.document.write(html);
-      w.document.close();
-      try { w.document.title = docTitle; } catch(e) {}
-    }
+    const w = window.open("", "acuerdo_anexo");
+    w.document.open();
+    w.document.write(html);
+    w.document.close();
+    try { w.document.title = docTitle; } catch(e) {}
+  }
 
-    // ========== AUTH UI ==========
+  // ========== AUTH UI ==========
+  function mountAuthUI(){
     const authBar = $("authBar");
     authBar.innerHTML = `
-      <span id="authStatus">Modo visualizador</span>
-      <span style="opacity:.7"> · </span>
-      <input id="loginEmail" placeholder="Email editor" style="max-width:220px" />
-      <input id="loginPass" placeholder="Contraseña" type="password" style="max-width:160px" />
+      <span class="status" id="authStatus">Modo visualizador (solo lectura)</span>
+      <input id="loginEmail" type="email" placeholder="Email editor" />
+      <input id="loginPass" type="password" placeholder="Contraseña" />
       <button id="btnLogin" class="btn primary">Entrar</button>
       <button id="btnLogout" class="btn" style="display:none">Salir</button>
     `;
@@ -1094,7 +1405,6 @@
     const loginPass = $("loginPass");
     const btnLogin = $("btnLogin");
     const btnLogout = $("btnLogout");
-    const authStatus = $("authStatus");
 
     btnLogin.onclick = async ()=>{
       try{
@@ -1106,45 +1416,35 @@
       }
     };
     btnLogout.onclick = async ()=> { await signOut(auth); };
+  }
 
-    function setViewerUI(){
-      $("btnEmitir").style.display = "none";
-      $("btnImputar").style.display = "none";
-      $("btnExport").style.display = "none";
-      $("btnImport").style.display = "none";
-      $("btnReset").style.display = "none";
-    }
-    function setEditorUI(){
-      $("btnEmitir").style.display = "";
-      $("btnImputar").style.display = "";
-      $("btnExport").style.display = "";
-      $("btnImport").style.display = "";
-      $("btnReset").style.display = "";
-    }
+  function setViewerUI(){
+    $("btnEmitir").classList.add("hide");
+    $("btnImputar").classList.add("hide");
+    $("btnExport").classList.add("hide");
+    $("btnImport").classList.add("hide");
+    $("btnReset").classList.add("hide");
+    $("cardRecibos").classList.add("hide"); // pedido: no ver recibos emitidos en visualizador
+  }
+  function setEditorUI(){
+    $("btnEmitir").classList.remove("hide");
+    $("btnImputar").classList.remove("hide");
+    $("btnExport").classList.remove("hide");
+    $("btnImport").classList.remove("hide");
+    $("btnReset").classList.remove("hide");
+    $("cardRecibos").classList.remove("hide");
+  }
 
-    onAuthStateChanged(auth, (user)=>{
-      if(user){
-        canWrite = true;
-        authStatus.textContent = "Modo editor habilitado";
-        btnLogout.style.display = "";
-        setEditorUI();
-      } else {
-        canWrite = false;
-        authStatus.textContent = "Modo visualizador (solo lectura)";
-        btnLogout.style.display = "none";
-        setViewerUI();
-      }
-    });
+  // ========== STATE ==========
+  let state = await pullRemoteOrInit();
+  localStorage.setItem(KEY, JSON.stringify(state));
 
-    // ========== STATE ==========
-    let state = await pullRemoteOrInit(makeInitialState);
+  function saveState(){
     localStorage.setItem(KEY, JSON.stringify(state));
+    pushRemote(state).catch(err => console.error("pushRemote error", err));
+  }
 
-    function saveState(){
-      localStorage.setItem(KEY, JSON.stringify(state));
-      pushRemote(state).catch(err => console.error("pushRemote error", err));
-    }
-
+  function bindRealtime(){
     onSnapshot(CC_REF, (snap)=>{
       if (!snap.exists()) return;
       const data = snap.data();
@@ -1164,120 +1464,134 @@
       render();
       applyingRemote = false;
     });
+  }
 
-    // ========== RENDER ==========
-    function render(){
-      if(!state || !state.meta || !Array.isArray(state.movs) || !Array.isArray(state.recibos)){
-        $("saldoBadge").textContent = "Saldo: —";
-        $("planResumen").textContent = "Estado inválido (no se pudo cargar).";
-        return;
-      }
+  // ========== RENDER ==========
+  function render(){
+    if(!state || !state.meta || !Array.isArray(state.movs) || !Array.isArray(state.recibos)){
+      $("saldoGrande").textContent = "U$S —";
+      $("saldoExtra").textContent = "Estado inválido (no se pudo cargar).";
+      $("planResumenInline").textContent = "—";
+      return;
+    }
 
-      const movs = calcSaldos(state);
-      const saldo = movs.length ? movs[movs.length-1].saldo : 0;
-      $("saldoBadge").textContent = "Saldo: U$S " + fmt(saldo);
+    const movs = calcSaldos(state);
+    const saldo = movs.length ? movs[movs.length-1].saldo : 0;
 
-      const plan = aplicarPagosAlPlan(generarPlanBase(state), state);
-      const { fin, cuotasRestantes } = estimacionFin(plan);
-      const saldoRestante = Math.max(0, Number(state.meta.saldo_inicial||0) - totalPagado(state));
-      $("planResumen").textContent = `Saldo restante: U$S ${fmt(saldoRestante)} · Fin estimado: ${fin} · Cuotas restantes: ${cuotasRestantes}`;
+    const plan = aplicarPagosAlPlan(generarPlanBase(state), state);
+    const { fin, cuotasRestantes } = estimacionFin(plan);
+    const saldoRestante = Math.max(0, Number(state.meta.saldo_inicial||0) - totalPagado(state));
 
-      const tbPlan = $("tbodyPlan");
-      tbPlan.innerHTML = "";
-      plan.forEach(p=>{
+    $("saldoGrande").textContent = "U$S " + fmt(saldo);
+    $("saldoExtra").textContent = `Saldo restante: U$S ${fmt(saldoRestante)} · Fin estimado: ${fin} · Cuotas restantes: ${cuotasRestantes}`;
+    $("planResumenInline").textContent = `Saldo restante: U$S ${fmt(saldoRestante)} · Fin estimado: ${fin} · Cuotas restantes: ${cuotasRestantes}`;
+
+    // Plan
+    const tbPlan = $("tbodyPlan");
+    tbPlan.innerHTML = "";
+    plan.forEach(p=>{
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td data-label="Período">${p.periodo}</td>
+        <td class="conceptCell" data-label="Concepto">${p.concepto}${p.tipo==="antecedente" ? `<div class="small">Antecedente</div>` : ""}</td>
+        <td class="num" data-label="Monto (U$S)">${fmt(p.cuota)}</td>
+        <td data-label="Estado">${p.estado}</td>
+        <td class="num" data-label="Saldo proyectado">${fmt(p.saldo_proyectado)}</td>
+      `;
+      tbPlan.appendChild(tr);
+    });
+
+    // Recibos
+    const tbRec = $("tbodyRec");
+    tbRec.innerHTML = "";
+    if(state.recibos.length === 0){
+      tbRec.innerHTML = `<tr><td data-label="Info" colspan="5" class="muted">Todavía no hay recibos emitidos.</td></tr>`;
+    } else {
+      state.recibos.slice().sort((a,b)=>a.numero.localeCompare(b.numero)).forEach(r=>{
+        const est = (r.estado==="pendiente" ? "Pendiente" : "Imputado");
+        const ver = `<a href="#" class="lnkRec" data-id="${r.id}">Ver</a>`;
         const tr = document.createElement("tr");
         tr.innerHTML = `
-          <td>${p.periodo}</td>
-          <td>${p.concepto}${p.tipo==="antecedente" ? `<div class="small">Antecedente</div>` : ""}</td>
-          <td class="num">${fmt(p.cuota)}</td>
-          <td>${p.estado}</td>
-          <td class="num">${fmt(p.saldo_proyectado)}</td>
+          <td data-label="Período">${r.periodo}</td>
+          <td class="conceptCell" data-label="Concepto">${r.concepto}<div class="small">${(MESES[r.periodo.split("/")[0]]||r.periodo.split("/")[0])} ${r.periodo.split("/")[1]}</div></td>
+          <td class="num" data-label="Monto (U$S)">${fmt(r.monto)}</td>
+          <td data-label="Recibo">R${r.numero} · ${ver}</td>
+          <td data-label="Estado">${est}</td>
         `;
-        tbPlan.appendChild(tr);
-      });
-
-      const tbRec = $("tbodyRec");
-      tbRec.innerHTML = "";
-      if(state.recibos.length === 0){
-        tbRec.innerHTML = `<tr><td colspan="5" class="muted">Todavía no hay recibos emitidos.</td></tr>`;
-      } else {
-        state.recibos.slice().sort((a,b)=>a.numero.localeCompare(b.numero)).forEach(r=>{
-          const est = (r.estado==="pendiente" ? "Pendiente" : "Imputado");
-          const ver = `<a href="#" class="lnkRec" data-id="${r.id}">Ver</a>`;
-          const tr = document.createElement("tr");
-          tr.innerHTML = `
-            <td>${r.periodo}</td>
-            <td>${r.concepto}<div class="small">${(MESES[r.periodo.split("/")[0]]||r.periodo.split("/")[0])} ${r.periodo.split("/")[1]}</div></td>
-            <td class="num">${fmt(r.monto)}</td>
-            <td>R${r.numero} · ${ver}</td>
-            <td>${est}</td>
-          `;
-          tbRec.appendChild(tr);
-        });
-      }
-
-      const tbMov = $("tbodyMov");
-      tbMov.innerHTML = "";
-      movs.forEach(m=>{
-        const adj =
-          m.recibo_num
-            ? (m.adjunto
-                ? `Adjunto cargado · <a href="#" class="lnkAdj" data-id="${m.id}">Ver</a>`
-                : `Falta adjunto`)
-            : "—";
-
-        const tr = document.createElement("tr");
-        tr.innerHTML = `
-          <td>${m.periodo}</td>
-          <td>${m.concepto}${m.recibo_num ? ` <span class="small">(${m.recibo_num})</span>` : ""}${m.obs ? `<div class="small">Obs.: ${m.obs}</div>`:""}</td>
-          <td class="num">${m.debito ? fmt(m.debito) : "—"}</td>
-          <td class="num">${m.credito ? fmt(m.credito) : "—"}</td>
-          <td class="num"><b>${fmt(m.saldo)}</b></td>
-          <td>${adj}</td>
-        `;
-        tbMov.appendChild(tr);
-      });
-
-      document.querySelectorAll(".lnkRec").forEach(a=>{
-        a.onclick = (e)=>{
-          e.preventDefault();
-          const id = a.getAttribute("data-id");
-          const rec = state.recibos.find(x=>x.id===id);
-          if(!rec) return;
-
-          if(rec.estado==="pendiente"){
-            openReciboPrint(state, rec, "pendiente");
-          } else {
-            const movs2 = calcSaldos(state);
-            const mov = movs2.find(m=>m.recibo_num===rec.numero);
-            openReciboPrint(state, rec, "imputado", mov ? mov.saldo : undefined);
-          }
-        };
-      });
-
-      document.querySelectorAll(".lnkAdj").forEach(a=>{
-        a.onclick = (e)=>{
-          e.preventDefault();
-          const id = a.getAttribute("data-id");
-          const mov = state.movs.find(m=>m.id===id);
-          if(mov?.adjunto) abrirAdjunto(mov.adjunto);
-        };
-      });
-
-      const pendientes = state.recibos.filter(r=>r.estado==="pendiente");
-      $("btnImputar").disabled = pendientes.length===0;
-
-      const sel = $("i_recibo");
-      sel.innerHTML = "";
-      pendientes.sort((a,b)=>a.numero.localeCompare(b.numero)).forEach(r=>{
-        const opt = document.createElement("option");
-        opt.value = r.id;
-        opt.textContent = `R${r.numero} · ${r.periodo} · U$S ${fmt(r.monto)} · ${r.concepto}`;
-        sel.appendChild(opt);
+        tbRec.appendChild(tr);
       });
     }
 
-    // ========== UI EVENTS ==========
+    // Movimientos
+    const tbMov = $("tbodyMov");
+    tbMov.innerHTML = "";
+    movs.forEach(m=>{
+      const adj =
+        m.recibo_num
+          ? (m.adjunto
+              ? `Adjunto cargado · <a href="#" class="lnkAdj" data-id="${m.id}">Ver</a>`
+              : `Falta adjunto`)
+          : "—";
+
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td data-label="Período">${m.periodo}</td>
+        <td class="conceptCell" data-label="Concepto">
+          ${m.concepto}
+          ${m.recibo_num ? ` <span class="small">(R${m.recibo_num})</span>` : ""}
+          ${m.obs ? `<div class="small">Obs.: ${m.obs}</div>`:""}
+        </td>
+        <td class="num" data-label="Débito">${m.debito ? fmt(m.debito) : "—"}</td>
+        <td class="num" data-label="Crédito">${m.credito ? fmt(m.credito) : "—"}</td>
+        <td class="num" data-label="Saldo"><b>${fmt(m.saldo)}</b></td>
+        <td data-label="Adjunto">${adj}</td>
+      `;
+      tbMov.appendChild(tr);
+    });
+
+    // links
+    document.querySelectorAll(".lnkRec").forEach(a=>{
+      a.onclick = (e)=>{
+        e.preventDefault();
+        const id = a.getAttribute("data-id");
+        const rec = state.recibos.find(x=>x.id===id);
+        if(!rec) return;
+
+        if(rec.estado==="pendiente"){
+          openReciboPrint(state, rec, "pendiente");
+        } else {
+          const movs2 = calcSaldos(state);
+          const mov = movs2.find(mm=>mm.recibo_num===rec.numero);
+          openReciboPrint(state, rec, "imputado", mov ? mov.saldo : undefined);
+        }
+      };
+    });
+
+    document.querySelectorAll(".lnkAdj").forEach(a=>{
+      a.onclick = (e)=>{
+        e.preventDefault();
+        const id = a.getAttribute("data-id");
+        const mov = state.movs.find(m=>m.id===id);
+        if(mov?.adjunto) abrirAdjunto(mov.adjunto);
+      };
+    });
+
+    // imputar habilitación
+    const pendientes = state.recibos.filter(r=>r.estado==="pendiente");
+    $("btnImputar").disabled = pendientes.length===0;
+
+    const sel = $("i_recibo");
+    sel.innerHTML = "";
+    pendientes.sort((a,b)=>a.numero.localeCompare(b.numero)).forEach(r=>{
+      const opt = document.createElement("option");
+      opt.value = r.id;
+      opt.textContent = `R${r.numero} · ${r.periodo} · U$S ${fmt(r.monto)} · ${r.concepto}`;
+      sel.appendChild(opt);
+    });
+  }
+
+  // ========== UI EVENTS ==========
+  function bindUI(){
     $("btnEmitir").onclick = ()=>{
       $("e_periodo").value = "01/2026";
       $("e_monto").value = "";
@@ -1336,10 +1650,7 @@
       if(f.type.startsWith("image/")){
         const reader = new FileReader();
         reader.onload = (e)=>{
-          $("i_preview").innerHTML = `
-            <img src="${e.target.result}"
-                 style="max-width:100%;border:1px solid #2a3140;border-radius:10px" />
-          `;
+          $("i_preview").innerHTML = `<img src="${e.target.result}" alt="preview" />`;
         };
         reader.readAsDataURL(f);
       } else {
@@ -1394,7 +1705,7 @@
         `Obs.: ${obs || ""}`,
         "",
         "Cuenta: Bertinelli / Lin Racioppi"
-      ].join("\n");
+      ].join("\\n");
 
       abrirMailImputacion({ to, cc, subject, body });
     };
@@ -1437,10 +1748,36 @@
       inp.click();
     };
 
-    $("btnReset").onclick = ()=> hardReset();
+    $("btnReset").onclick = async ()=>{
+      state = await hardReset(state);
+      saveState();
+      render();
+    };
+  }
 
-    render();
+  // ========== INIT ==========
+  mountAuthUI();
+  bindUI();
+  bindRealtime();
+
+  onAuthStateChanged(auth, (user)=>{
+    const authStatus = $("authStatus");
+    const btnLogout = $("btnLogout");
+
+    if(user){
+      canWrite = true;
+      authStatus.textContent = "Modo editor habilitado";
+      btnLogout.style.display = "";
+      setEditorUI();
+    } else {
+      canWrite = false;
+      authStatus.textContent = "Modo visualizador (solo lectura)";
+      btnLogout.style.display = "none";
+      setViewerUI();
+    }
   });
+
+  render();
 </script>
 </body>
 </html>
