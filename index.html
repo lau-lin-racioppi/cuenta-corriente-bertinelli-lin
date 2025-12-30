@@ -20,6 +20,9 @@
     --chip:#0e1426;
     --ok:#16a34a;
     --warn:#f59e0b;
+
+    /* NUEVO: opacidad del backdrop de modal */
+    --modalBackdrop: rgba(0,0,0,.72);
   }
 
   *{box-sizing:border-box}
@@ -53,59 +56,59 @@
     .top{grid-template-columns:1fr}
   }
 
-  h1{margin:0;font-size:22px;letter-spacing:.2px}
+  h1{
+    margin:0;
+    font-size:22px;
+    letter-spacing:.2px;
+  }
   .subhead{color:var(--muted);font-size:12.5px;margin-top:6px}
 
-  /* ===== AUTH (ahora plegable y “discreto” en visualizador) ===== */
-  .authShell{
-    display:flex;
-    justify-content:flex-end;
-  }
-  @media (max-width: 980px){
-    .authShell{justify-content:flex-start}
-  }
+  /* ===== LOGIN COLLAPSIBLE (NUEVO) ===== */
   details.authDetails{
-    width: min(520px, 100%);
+    border:1px solid var(--line2);
+    border-radius:16px;
+    background: rgba(0,0,0,.16);
+    overflow:hidden;
   }
   details.authDetails > summary{
     list-style:none;
     cursor:pointer;
-    display:flex;
-    justify-content:flex-end;
-    align-items:center;
-    gap:10px;
     padding:10px 12px;
-    border:1px solid var(--line2);
-    border-radius:16px;
-    background: rgba(0,0,0,.12);
-    color: rgba(233,236,241,.9);
-    font-weight:850;
-    font-size:12.5px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
     user-select:none;
   }
   details.authDetails > summary::-webkit-details-marker{display:none}
-  details.authDetails > summary .dot{
-    width:8px;height:8px;border-radius:99px;background:rgba(147,161,182,.7);
-    box-shadow:0 0 0 4px rgba(147,161,182,.12);
+  .authSummary{
+    display:flex;align-items:center;gap:10px;
+    font-weight:850;
+    color: rgba(233,236,241,.92);
   }
-  details.authDetails[open] > summary .chev{transform:rotate(180deg)}
+  .authSummary .dot{
+    width:10px;height:10px;border-radius:999px;
+    background: rgba(147,161,182,.35);
+    border:1px solid rgba(147,161,182,.35);
+  }
+  .authSummary .txt{font-size:12.5px}
+  .authSummary svg{width:16px;height:16px;opacity:.9}
+  details.authDetails[open] .authSummary svg{transform: rotate(180deg)}
   .auth{
-    margin-top:10px;
     display:flex;
     gap:10px;
     flex-wrap:wrap;
     align-items:center;
     justify-content:flex-end;
-    padding:10px 12px;
-    border:1px solid var(--line2);
-    border-radius:16px;
-    background: rgba(0,0,0,.18);
+    padding:10px 12px 12px 12px;
+    background: rgba(0,0,0,.10);
+    border-top:1px solid var(--line2);
   }
   @media (max-width: 980px){
     .auth{justify-content:flex-start}
-    details.authDetails > summary{justify-content:flex-start}
   }
-  .auth .status{color:var(--muted);font-size:12px;flex-basis:100%}
+
+  .auth .status{color:var(--muted);font-size:12px}
   .auth input{
     background: rgba(0,0,0,.22);
     color: var(--text);
@@ -125,7 +128,7 @@
     font-weight:750;
     cursor:pointer;
   }
-  /* Entrar SIN color (pedido previo) */
+  /* Entrar SIN color */
   .auth .btn.primary{
     background: rgba(255,255,255,.06);
     border-color: var(--line2);
@@ -138,7 +141,8 @@
     grid-template-columns: 1fr auto;
     gap:14px;
     align-items:stretch;
-    margin-top:18px; /* (pedido) un poco más de aire con lo de abajo */
+    margin-top:14px;
+    margin-bottom: 14px; /* NUEVO: separa la pastilla de botones del bloque Cabecera */
   }
   @media (max-width: 980px){
     .heroRow{grid-template-columns:1fr}
@@ -155,8 +159,16 @@
     justify-content:center;
   }
   .saldoPill .ttl{font-size:12px;color:#cfe0ff;letter-spacing:.2px}
-  .saldoPill .amt{font-size:34px;font-weight:900;margin:4px 0 2px 0;line-height:1.05}
-  .saldoPill .extra{color: rgba(233,236,241,.82);font-size:12.5px}
+  .saldoPill .amt{
+    font-size:34px;
+    font-weight:900;
+    margin:4px 0 2px 0;
+    line-height:1.05;
+  }
+  .saldoPill .extra{
+    color: rgba(233,236,241,.82);
+    font-size:12.5px;
+  }
 
   .ctaCol{
     display:flex;
@@ -247,9 +259,6 @@
   details.section[open] .sumRight svg{transform: rotate(180deg)}
   .sectionBody{padding:0 12px 12px 12px}
 
-  /* (pedido) separación extra entre heroRow y primera sección */
-  .afterHeroSpacer{height:8px}
-
   /* ===== TABLAS RESPONSIVE SIN SCROLL HORIZONTAL ===== */
   table{width:100%;border-collapse:collapse;font-size:13px;margin-top:6px}
   th,td{border-bottom:1px solid var(--line2);padding:10px 8px;vertical-align:top}
@@ -258,7 +267,7 @@
   a{color:#93c5fd;text-decoration:none}
   a:hover{text-decoration:underline}
 
-  /* evitar “vertical” en concepto */
+  /* no vertical */
   td.conceptCell{
     writing-mode: horizontal-tb !important;
     text-orientation: mixed !important;
@@ -304,24 +313,23 @@
   .small{font-size:12px;color:var(--muted)}
   .err{font-size:12px;color:#fca5a5}
 
-  /* ===== MODALES: más opacos y legibles (pedido) ===== */
+  /* ===== MODAL (AJUSTE: menos transparente + panel más sólido) ===== */
   .modal{
     position:fixed; inset:0;
     display:none;
-    background:rgba(0,0,0,.78); /* más oscuro */
+    background: var(--modalBackdrop); /* antes era muy transparente */
     padding:14px;
     overflow:auto;
     -webkit-overflow-scrolling: touch;
-    align-items:center;
+    align-items:stretch;
     justify-content:center;
+    backdrop-filter: blur(6px);
   }
   .modal.show{display:flex}
   .modal .card{
-    max-width:920px;width:100%;
-    margin:auto;
-    background: linear-gradient(180deg, rgba(18,22,34,.98), rgba(18,22,34,.92));
-    border:1px solid rgba(35,48,73,.9);
-    box-shadow: 0 20px 60px rgba(0,0,0,.55);
+    max-width:920px;width:100%;margin:auto;
+    background: linear-gradient(180deg, rgba(18,22,34,.98), rgba(15,19,32,.96)); /* más sólido */
+    border-color: rgba(147,197,253,.18);
   }
 
   .grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
@@ -342,6 +350,7 @@
   .ck{display:flex;gap:10px;align-items:flex-start}
   .ck input{width:auto;margin-top:3px}
 
+  /* util */
   .hide{display:none !important}
 </style>
 </head>
@@ -355,8 +364,19 @@
       <div class="subhead">Control contable + recibos firmados + acuerdo y anexo imprimibles.</div>
     </div>
 
-    <!-- Auth plegable -->
-    <div class="authShell" id="authShell"></div>
+    <!-- NUEVO: login colapsable -->
+    <details class="authDetails" id="authDetails">
+      <summary>
+        <div class="authSummary">
+          <span class="dot" id="authDot"></span>
+          <span class="txt" id="authSummaryTxt">Acceso</span>
+        </div>
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      </summary>
+      <div class="auth" id="authBar"></div>
+    </details>
   </div>
 
   <div class="heroRow">
@@ -398,8 +418,7 @@
     </div>
   </div>
 
-  <div class="afterHeroSpacer"></div>
-
+  <!-- CABECERA / ANEXO / PLAN como secciones -->
   <details class="section" id="secCabecera">
     <summary>
       <div class="sumLeft">
@@ -494,6 +513,7 @@
     </div>
   </details>
 
+  <!-- Recibos (se oculta en modo visualizador) -->
   <div class="card" id="cardRecibos">
     <h2 style="margin:0 0 8px 0;color:var(--muted)">Recibos emitidos</h2>
     <table>
@@ -627,10 +647,11 @@
   function hide(id){ $(id).classList.remove("show"); }
   function isPeriodo(x){ return /^\d{2}\/\d{4}$/.test(String(x||"").trim()); }
 
-  function periodoActualMMYYYY(){
+  /* NUEVO: periodo actual MM/AAAA según fecha local */
+  function periodoActual(){
     const d = new Date();
     const mm = String(d.getMonth()+1).padStart(2,"0");
-    const yyyy = String(d.getFullYear());
+    const yyyy = d.getFullYear();
     return `${mm}/${yyyy}`;
   }
 
@@ -776,7 +797,7 @@
 
   function abrirMailImputacion({ to, cc, subject, body }) {
     const enc = encodeURIComponent;
-    const normalized = String(body || "").replace(/\n/g, "\r\n");
+    const normalized = String(body || "").replace(/\\n/g, "\\r\\n");
     let url = `mailto:${enc(to)}?subject=${enc(subject)}&body=${enc(normalized)}`;
     if (cc) url += `&cc=${enc(cc)}`;
     window.location.href = url;
@@ -1204,6 +1225,9 @@
     w.document.close();
   }
 
+  // ==========================
+  // ACUERDO + ANEXO (ACUERDO REAL COMPLETO)
+  // ==========================
   function printPlanYAcuerdo(state){
     const plan = aplicarPagosAlPlan(generarPlanBase(state), state);
 
@@ -1425,26 +1449,13 @@
 
   // ========== AUTH UI ==========
   function mountAuthUI(){
-    const authShell = $("authShell");
-
-    authShell.innerHTML = `
-      <details class="authDetails" id="authDetails">
-        <summary>
-          <span class="dot" aria-hidden="true"></span>
-          <span id="authSummaryText">Acceso</span>
-          <svg class="chev" viewBox="0 0 24 24" fill="none" aria-hidden="true" style="width:16px;height:16px;opacity:.9">
-            <path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-          </svg>
-        </summary>
-
-        <div class="auth" id="authBar">
-          <span class="status" id="authStatus">Modo visualizador (solo lectura)</span>
-          <input id="loginEmail" type="email" placeholder="Email editor" />
-          <input id="loginPass" type="password" placeholder="Contraseña" />
-          <button id="btnLogin" class="btn primary">Entrar</button>
-          <button id="btnLogout" class="btn" style="display:none">Salir</button>
-        </div>
-      </details>
+    const authBar = $("authBar");
+    authBar.innerHTML = `
+      <span class="status" id="authStatus">Modo visualizador (solo lectura)</span>
+      <input id="loginEmail" type="email" placeholder="Email editor" />
+      <input id="loginPass" type="password" placeholder="Contraseña" />
+      <button id="btnLogin" class="btn primary">Entrar</button>
+      <button id="btnLogout" class="btn" style="display:none">Salir</button>
     `;
 
     const loginEmail = $("loginEmail");
@@ -1479,6 +1490,23 @@
     $("btnImport").classList.remove("hide");
     $("btnReset").classList.remove("hide");
     $("cardRecibos").classList.remove("hide");
+  }
+
+  /* NUEVO: actualizar resumen del desplegable de auth sin cambiar tu lógica */
+  function syncAuthSummary(isEditor){
+    const dot = $("authDot");
+    const txt = $("authSummaryTxt");
+    if(isEditor){
+      dot.style.background = "rgba(34,197,94,.55)";
+      dot.style.borderColor = "rgba(34,197,94,.55)";
+      txt.textContent = "Modo editor";
+      $("authDetails").open = true; // si ya está logeado, lo muestro
+    } else {
+      dot.style.background = "rgba(147,161,182,.35)";
+      dot.style.borderColor = "rgba(147,161,182,.35)";
+      txt.textContent = "Acceso";
+      $("authDetails").open = false; // en visualizador queda oculto
+    }
   }
 
   // ========== STATE ==========
@@ -1532,6 +1560,7 @@
     $("saldoExtra").textContent = `Saldo restante: U$S ${fmt(saldoRestante)} · Fin estimado: ${fin} · Cuotas restantes: ${cuotasRestantes}`;
     $("planResumenInline").textContent = `Saldo restante: U$S ${fmt(saldoRestante)} · Fin estimado: ${fin} · Cuotas restantes: ${cuotasRestantes}`;
 
+    // Plan
     const tbPlan = $("tbodyPlan");
     tbPlan.innerHTML = "";
     plan.forEach(p=>{
@@ -1546,6 +1575,7 @@
       tbPlan.appendChild(tr);
     });
 
+    // Recibos
     const tbRec = $("tbodyRec");
     tbRec.innerHTML = "";
     if(state.recibos.length === 0){
@@ -1566,6 +1596,7 @@
       });
     }
 
+    // Movimientos
     const tbMov = $("tbodyMov");
     tbMov.innerHTML = "";
     movs.forEach(m=>{
@@ -1592,6 +1623,7 @@
       tbMov.appendChild(tr);
     });
 
+    // links
     document.querySelectorAll(".lnkRec").forEach(a=>{
       a.onclick = (e)=>{
         e.preventDefault();
@@ -1618,6 +1650,7 @@
       };
     });
 
+    // imputar habilitación
     const pendientes = state.recibos.filter(r=>r.estado==="pendiente");
     $("btnImputar").disabled = pendientes.length===0;
 
@@ -1634,8 +1667,8 @@
   // ========== UI EVENTS ==========
   function bindUI(){
     $("btnEmitir").onclick = ()=>{
-      // (pedido) autocompletar período con mes actual, editable
-      $("e_periodo").value = periodoActualMMYYYY();
+      /* AJUSTE: periodo auto = mes en curso (editable igual) */
+      $("e_periodo").value = periodoActual();
       $("e_monto").value = "";
       $("e_concepto").value = "Pago mensual";
       show("modalEmitir");
@@ -1797,98 +1830,10 @@
     };
   }
 
-  // ========== AUTH UI ==========
-  function setViewerUI(){
-    $("btnEmitir").classList.add("hide");
-    $("btnImputar").classList.add("hide");
-    $("btnExport").classList.add("hide");
-    $("btnImport").classList.add("hide");
-    $("btnReset").classList.add("hide");
-    $("cardRecibos").classList.add("hide");
-
-    // en visualizador: mantener el login plegado
-    const det = $("authDetails");
-    if(det) det.open = false;
-    const sumTxt = $("authSummaryText");
-    if(sumTxt) sumTxt.textContent = "Acceso (editor)";
-  }
-  function setEditorUI(){
-    $("btnEmitir").classList.remove("hide");
-    $("btnImputar").classList.remove("hide");
-    $("btnExport").classList.remove("hide");
-    $("btnImport").classList.remove("hide");
-    $("btnReset").classList.remove("hide");
-    $("cardRecibos").classList.remove("hide");
-
-    // en editor: abrir el bloque y que quede más claro
-    const det = $("authDetails");
-    if(det) det.open = true;
-    const sumTxt = $("authSummaryText");
-    if(sumTxt) sumTxt.textContent = "Acceso (editor habilitado)";
-  }
-
-  function mountAuthUI(){
-    const authShell = $("authShell");
-    authShell.innerHTML = `
-      <details class="authDetails" id="authDetails">
-        <summary>
-          <span class="dot" aria-hidden="true"></span>
-          <span id="authSummaryText">Acceso (editor)</span>
-          <svg class="chev" viewBox="0 0 24 24" fill="none" aria-hidden="true" style="width:16px;height:16px;opacity:.9">
-            <path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-          </svg>
-        </summary>
-
-        <div class="auth" id="authBar">
-          <span class="status" id="authStatus">Modo visualizador (solo lectura)</span>
-          <input id="loginEmail" type="email" placeholder="Email editor" />
-          <input id="loginPass" type="password" placeholder="Contraseña" />
-          <button id="btnLogin" class="btn primary">Entrar</button>
-          <button id="btnLogout" class="btn" style="display:none">Salir</button>
-        </div>
-      </details>
-    `;
-
-    const loginEmail = $("loginEmail");
-    const loginPass = $("loginPass");
-    const btnLogin = $("btnLogin");
-    const btnLogout = $("btnLogout");
-
-    btnLogin.onclick = async ()=>{
-      try{
-        await signInWithEmailAndPassword(auth, loginEmail.value.trim(), loginPass.value);
-        loginPass.value = "";
-      }catch(e){
-        alert("No pude iniciar sesión. Revisá email/contraseña.");
-        console.error(e);
-      }
-    };
-    btnLogout.onclick = async ()=> { await signOut(auth); };
-  }
-
   // ========== INIT ==========
   mountAuthUI();
   bindUI();
-
-  onSnapshot(CC_REF, (snap)=>{
-    if (!snap.exists()) return;
-    const data = snap.data();
-    if (!data?.state) return;
-
-    const remoteState = data.state;
-    const rrev = remoteState?._meta?.rev || 0;
-
-    if (rrev === lastLocalRev && remoteState?._meta?.updatedBy === clientId) return;
-
-    const cur = state?._meta?.rev || 0;
-    if (rrev <= cur) return;
-
-    applyingRemote = true;
-    state = remoteState;
-    localStorage.setItem(KEY, JSON.stringify(state));
-    render();
-    applyingRemote = false;
-  });
+  bindRealtime();
 
   onAuthStateChanged(auth, (user)=>{
     const authStatus = $("authStatus");
@@ -1899,11 +1844,13 @@
       authStatus.textContent = "Modo editor habilitado";
       btnLogout.style.display = "";
       setEditorUI();
+      syncAuthSummary(true);
     } else {
       canWrite = false;
       authStatus.textContent = "Modo visualizador (solo lectura)";
       btnLogout.style.display = "none";
       setViewerUI();
+      syncAuthSummary(false);
     }
   });
 
