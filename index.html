@@ -21,7 +21,7 @@
     --ok:#16a34a;
     --warn:#f59e0b;
 
-    /* NUEVO: opacidad del backdrop de modal */
+    /* modal backdrop */
     --modalBackdrop: rgba(0,0,0,.72);
   }
 
@@ -56,44 +56,86 @@
     .top{grid-template-columns:1fr}
   }
 
-  h1{
-    margin:0;
-    font-size:22px;
-    letter-spacing:.2px;
-  }
+  h1{ margin:0; font-size:22px; letter-spacing:.2px; }
   .subhead{color:var(--muted);font-size:12.5px;margin-top:6px}
 
-  /* ===== LOGIN COLLAPSIBLE (NUEVO) ===== */
+  /* =========================================================
+     AUTH DROPDOWN (FIX: no rompe márgenes al abrir)
+     - summary chico (casi oculto en visualizador)
+     - panel flotante absolute, no empuja el layout
+     ========================================================= */
   details.authDetails{
-    border:1px solid var(--line2);
-    border-radius:16px;
-    background: rgba(0,0,0,.16);
-    overflow:hidden;
+    justify-self:end;
+    width: fit-content;
+    max-width: 100%;
+    position:relative;
   }
   details.authDetails > summary{
     list-style:none;
     cursor:pointer;
-    padding:10px 12px;
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    gap:10px;
     user-select:none;
+
+    display:inline-flex;
+    align-items:center;
+    gap:10px;
+
+    padding:8px 10px;
+    border-radius:999px;
+    border:1px solid var(--line2);
+    background: rgba(0,0,0,.16);
+    color: rgba(233,236,241,.92);
+    font-weight:850;
+    font-size:12.5px;
   }
   details.authDetails > summary::-webkit-details-marker{display:none}
+
+  /* el “botoncito”/flecha SIEMPRE chico */
   .authSummary{
     display:flex;align-items:center;gap:10px;
-    font-weight:850;
-    color: rgba(233,236,241,.92);
   }
   .authSummary .dot{
-    width:10px;height:10px;border-radius:999px;
+    width:9px;height:9px;border-radius:999px;
     background: rgba(147,161,182,.35);
     border:1px solid rgba(147,161,182,.35);
+    flex:0 0 auto;
   }
-  .authSummary .txt{font-size:12.5px}
-  .authSummary svg{width:16px;height:16px;opacity:.9}
-  details.authDetails[open] .authSummary svg{transform: rotate(180deg)}
+  .authSummary .txt{opacity:.9}
+  .authCaret{
+    width:14px;height:14px; opacity:.9; flex:0 0 auto;
+    transition: transform .15s ease;
+  }
+  details.authDetails[open] .authCaret{transform: rotate(180deg)}
+
+  /* panel flotante */
+  .authPanel{
+    position:absolute;
+    right:0;
+    top: calc(100% + 10px);
+    z-index:30;
+
+    width: 340px;
+    max-width: min(92vw, 340px);
+
+    border:1px solid var(--line2);
+    border-radius:16px;
+    background: linear-gradient(180deg, rgba(18,22,34,.96), rgba(15,19,32,.94));
+    box-shadow: 0 18px 50px rgba(0,0,0,.45);
+    overflow:hidden;
+  }
+  @media (max-width: 980px){
+    details.authDetails{justify-self:start}
+    .authPanel{ left:0; right:auto; width: min(92vw, 420px); }
+  }
+
+  .authTopLine{
+    padding:10px 12px;
+    border-bottom:1px solid rgba(35,48,73,.65);
+    display:flex;
+    justify-content:flex-end;
+    color: var(--muted);
+    font-size:12px;
+  }
+
   .auth{
     display:flex;
     gap:10px;
@@ -101,8 +143,6 @@
     align-items:center;
     justify-content:flex-end;
     padding:10px 12px 12px 12px;
-    background: rgba(0,0,0,.10);
-    border-top:1px solid var(--line2);
   }
   @media (max-width: 980px){
     .auth{justify-content:flex-start}
@@ -142,7 +182,7 @@
     gap:14px;
     align-items:stretch;
     margin-top:14px;
-    margin-bottom: 14px; /* NUEVO: separa la pastilla de botones del bloque Cabecera */
+    margin-bottom: 14px;
   }
   @media (max-width: 980px){
     .heroRow{grid-template-columns:1fr}
@@ -218,26 +258,6 @@
   .btn.agreement:hover{border-color: rgba(147,197,253,.6)}
   .btn svg{width:18px;height:18px;opacity:.95}
 
-  /* NUEVO: botón mini (para borrar recibo) */
-  .btnMini{
-    border:1px solid rgba(239,68,68,.35);
-    background: rgba(239,68,68,.10);
-    color: rgba(233,236,241,.92);
-    padding:6px 10px;
-    border-radius:10px;
-    font-weight:900;
-    cursor:pointer;
-    line-height:1;
-    font-size:12px;
-    display:inline-flex;
-    align-items:center;
-    gap:8px;
-    user-select:none;
-  }
-  .btnMini:hover{ border-color: rgba(239,68,68,.55); background: rgba(239,68,68,.14); }
-  .btnMini:active{ transform: translateY(1px); }
-  .btnMini svg{ width:14px; height:14px; opacity:.95; }
-
   /* ===== SECCIONES DESPLEGABLES ===== */
   details.section{
     border:1px solid var(--line2);
@@ -287,10 +307,11 @@
   a{color:#93c5fd;text-decoration:none}
   a:hover{text-decoration:underline}
 
-  /* no vertical */
+  /* concepto: SIEMPRE horizontal (fix definitivo) */
   td.conceptCell{
     writing-mode: horizontal-tb !important;
     text-orientation: mixed !important;
+    transform: none !important;
     white-space: normal !important;
     word-break: break-word;
     overflow-wrap:anywhere;
@@ -333,11 +354,11 @@
   .small{font-size:12px;color:var(--muted)}
   .err{font-size:12px;color:#fca5a5}
 
-  /* ===== MODAL (AJUSTE: menos transparente + panel más sólido) ===== */
+  /* ===== MODAL (menos transparente + panel más sólido) ===== */
   .modal{
     position:fixed; inset:0;
     display:none;
-    background: var(--modalBackdrop); /* antes era muy transparente */
+    background: var(--modalBackdrop);
     padding:14px;
     overflow:auto;
     -webkit-overflow-scrolling: touch;
@@ -348,7 +369,7 @@
   .modal.show{display:flex}
   .modal .card{
     max-width:920px;width:100%;margin:auto;
-    background: linear-gradient(180deg, rgba(18,22,34,.98), rgba(15,19,32,.96)); /* más sólido */
+    background: linear-gradient(180deg, rgba(18,22,34,.98), rgba(15,19,32,.96));
     border-color: rgba(147,197,253,.18);
   }
 
@@ -372,6 +393,22 @@
 
   /* util */
   .hide{display:none !important}
+
+  /* botón chiquito de eliminar */
+  .miniDanger{
+    padding:7px 10px;
+    border-radius:10px;
+    font-weight:900;
+    border:1px solid rgba(153,27,27,.85);
+    background: rgba(153,27,27,.18);
+    color: rgba(255,255,255,.92);
+    cursor:pointer;
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+  }
+  .miniDanger:hover{background: rgba(153,27,27,.26)}
+  .miniDanger svg{width:16px;height:16px;opacity:.95}
 </style>
 </head>
 
@@ -384,18 +421,21 @@
       <div class="subhead">Control contable + recibos firmados + acuerdo y anexo imprimibles.</div>
     </div>
 
-    <!-- NUEVO: login colapsable -->
+    <!-- AUTH: summary chico + panel flotante (no rompe layout) -->
     <details class="authDetails" id="authDetails">
       <summary>
         <div class="authSummary">
           <span class="dot" id="authDot"></span>
           <span class="txt" id="authSummaryTxt">Acceso</span>
         </div>
-        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <svg class="authCaret" viewBox="0 0 24 24" fill="none" aria-hidden="true">
           <path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
         </svg>
       </summary>
-      <div class="auth" id="authBar"></div>
+
+      <div class="authPanel">
+        <div class="auth" id="authBar"></div>
+      </div>
     </details>
   </div>
 
@@ -544,6 +584,7 @@
           <th class="num" style="width:120px">Monto (U$S)</th>
           <th style="width:220px">Recibo</th>
           <th style="width:140px">Estado</th>
+          <th style="width:140px">Acciones</th>
         </tr>
       </thead>
       <tbody id="tbodyRec"></tbody>
@@ -665,9 +706,8 @@
 
   function show(id){ $(id).classList.add("show"); }
   function hide(id){ $(id).classList.remove("show"); }
-  function isPeriodo(x){ return /^\d{2}\/\d{4}$/.test(String(x||"").trim()); }
+  function isPeriodo(x){ return /^\d{2}\/\d{4}$/.test(String(x ||"").trim()); }
 
-  /* NUEVO: periodo actual MM/AAAA según fecha local */
   function periodoActual(){
     const d = new Date();
     const mm = String(d.getMonth()+1).padStart(2,"0");
@@ -1512,21 +1552,41 @@
     $("cardRecibos").classList.remove("hide");
   }
 
-  /* NUEVO: actualizar resumen del desplegable de auth sin cambiar tu lógica */
   function syncAuthSummary(isEditor){
     const dot = $("authDot");
     const txt = $("authSummaryTxt");
+    const topLine = $("authTopLine");
+
     if(isEditor){
       dot.style.background = "rgba(34,197,94,.55)";
       dot.style.borderColor = "rgba(34,197,94,.55)";
-      txt.textContent = "Modo editor";
-      $("authDetails").open = true; // si ya está logeado, lo muestro
+      txt.textContent = "Editor";
+      topLine.textContent = "Modo editor habilitado";
+      $("authDetails").open = true;
     } else {
       dot.style.background = "rgba(147,161,182,.35)";
       dot.style.borderColor = "rgba(147,161,182,.35)";
       txt.textContent = "Acceso";
-      $("authDetails").open = false; // en visualizador queda oculto
+      topLine.textContent = "Modo visualizador (solo lectura)";
+      $("authDetails").open = false;
     }
+  }
+
+  // ========== ELIMINAR RECIBO (solo si está pendiente) ==========
+  function deleteReciboPendiente(recId){
+    if(!canWrite) return alert("Solo en modo editor.");
+    const rec = state.recibos.find(r=>r.id===recId);
+    if(!rec) return;
+
+    if(rec.estado !== "pendiente"){
+      return alert("Este recibo ya está imputado. Para mantener consistencia contable no se elimina desde acá.");
+    }
+
+    if(!confirm(`Eliminar recibo R${rec.numero} (${rec.periodo}) por U$S ${fmt(rec.monto)}?`)) return;
+
+    state.recibos = state.recibos.filter(r=>r.id!==recId);
+    saveState();
+    render();
   }
 
   // ========== STATE ==========
@@ -1558,32 +1618,6 @@
       render();
       applyingRemote = false;
     });
-  }
-
-  // ========= NUEVO: borrar recibo pendiente =========
-  function deleteReciboPendienteById(recId){
-    if(!canWrite) return alert("Solo disponible en modo editor.");
-    const rec = state.recibos.find(r=>r.id===recId);
-    if(!rec) return;
-
-    if(rec.estado !== "pendiente"){
-      return alert("Solo se puede eliminar un recibo PENDIENTE (no imputado).");
-    }
-
-    const ok = confirm(
-      `Eliminar recibo pendiente:\nR${rec.numero} · ${rec.periodo} · U$S ${fmt(rec.monto)}\n\nEsto borra el recibo emitido y no afecta movimientos (porque todavía no fue imputado).\n¿Confirmás?`
-    );
-    if(!ok) return;
-
-    state.recibos = state.recibos.filter(r=>r.id !== recId);
-
-    // Recalcular secuencia por seguridad (evita números “ocupados” raros si querés seguir correlativo)
-    const nums = state.recibos.map(r => Number(String(r.numero||"0").replace(/\D/g,"")) || 0);
-    const max = nums.length ? Math.max(...nums) : 0;
-    state.recibo_seq = max;
-
-    saveState();
-    render();
   }
 
   // ========== RENDER ==========
@@ -1625,36 +1659,32 @@
     const tbRec = $("tbodyRec");
     tbRec.innerHTML = "";
     if(state.recibos.length === 0){
-      tbRec.innerHTML = `<tr><td data-label="Info" colspan="5" class="muted">Todavía no hay recibos emitidos.</td></tr>`;
+      tbRec.innerHTML = `<tr><td data-label="Info" colspan="6" class="muted">Todavía no hay recibos emitidos.</td></tr>`;
     } else {
       state.recibos.slice().sort((a,b)=>a.numero.localeCompare(b.numero)).forEach(r=>{
         const est = (r.estado==="pendiente" ? "Pendiente" : "Imputado");
         const ver = `<a href="#" class="lnkRec" data-id="${r.id}">Ver</a>`;
 
-        // NUEVO: botón borrar (solo editor + solo pendiente)
-        const delBtn = (canWrite && r.estado==="pendiente")
-          ? `
-            <button class="btnMini delRec" data-id="${r.id}" title="Eliminar recibo pendiente">
-              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                <path d="M4 7h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                <path d="M10 11v7M14 11v7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                <path d="M6 7l1 14h10l1-14" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
-                <path d="M9 7V4h6v3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-              </svg>
-              Borrar
-            </button>
-          `
-          : "";
-
-        const reciboCell = `R${r.numero} · ${ver}${delBtn ? ` · ${delBtn}` : ""}`;
+        const acciones = (!canWrite)
+          ? "—"
+          : (r.estado==="pendiente"
+              ? `<button class="miniDanger btnDelRec" data-id="${r.id}" title="Eliminar recibo">
+                   <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                     <path d="M6 7h12M10 7V5h4v2M8 7l1 14h6l1-14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                   </svg>
+                   Eliminar
+                 </button>`
+              : `<span class="small">—</span>`
+            );
 
         const tr = document.createElement("tr");
         tr.innerHTML = `
           <td data-label="Período">${r.periodo}</td>
           <td class="conceptCell" data-label="Concepto">${r.concepto}<div class="small">${(MESES[r.periodo.split("/")[0]]||r.periodo.split("/")[0])} ${r.periodo.split("/")[1]}</div></td>
           <td class="num" data-label="Monto (U$S)">${fmt(r.monto)}</td>
-          <td data-label="Recibo">${reciboCell}</td>
+          <td data-label="Recibo">R${r.numero} · ${ver}</td>
           <td data-label="Estado">${est}</td>
+          <td data-label="Acciones">${acciones}</td>
         `;
         tbRec.appendChild(tr);
       });
@@ -1687,7 +1717,7 @@
       tbMov.appendChild(tr);
     });
 
-    // links ver recibo
+    // links
     document.querySelectorAll(".lnkRec").forEach(a=>{
       a.onclick = (e)=>{
         e.preventDefault();
@@ -1705,23 +1735,20 @@
       };
     });
 
-    // NUEVO: borrar recibo
-    document.querySelectorAll(".delRec").forEach(btn=>{
-      btn.onclick = (e)=>{
-        e.preventDefault();
-        e.stopPropagation();
-        const id = btn.getAttribute("data-id");
-        deleteReciboPendienteById(id);
-      };
-    });
-
-    // links adjunto
     document.querySelectorAll(".lnkAdj").forEach(a=>{
       a.onclick = (e)=>{
         e.preventDefault();
         const id = a.getAttribute("data-id");
         const mov = state.movs.find(m=>m.id===id);
         if(mov?.adjunto) abrirAdjunto(mov.adjunto);
+      };
+    });
+
+    document.querySelectorAll(".btnDelRec").forEach(b=>{
+      b.onclick = (e)=>{
+        e.preventDefault();
+        const id = b.getAttribute("data-id");
+        deleteReciboPendiente(id);
       };
     });
 
@@ -1742,7 +1769,6 @@
   // ========== UI EVENTS ==========
   function bindUI(){
     $("btnEmitir").onclick = ()=>{
-      /* AJUSTE: periodo auto = mes en curso (editable igual) */
       $("e_periodo").value = periodoActual();
       $("e_monto").value = "";
       $("e_concepto").value = "Pago mensual";
@@ -1903,6 +1929,14 @@
       saveState();
       render();
     };
+
+    // cerrar auth dropdown si clickeás afuera (sin romper nada)
+    document.addEventListener("click", (ev)=>{
+      const det = $("authDetails");
+      if(!det.open) return;
+      const within = det.contains(ev.target);
+      if(!within) det.open = false;
+    }, { capture:true });
   }
 
   // ========== INIT ==========
@@ -1927,7 +1961,6 @@
       setViewerUI();
       syncAuthSummary(false);
     }
-    render(); // para que aparezca/oculte el botón "Borrar" según el modo
   });
 
   render();
