@@ -21,7 +21,6 @@
     --ok:#16a34a;
     --warn:#f59e0b;
 
-    /* modal backdrop */
     --modalBackdrop: rgba(0,0,0,.72);
   }
 
@@ -56,85 +55,51 @@
     .top{grid-template-columns:1fr}
   }
 
-  h1{ margin:0; font-size:22px; letter-spacing:.2px; }
+  h1{
+    margin:0;
+    font-size:22px;
+    letter-spacing:.2px;
+  }
   .subhead{color:var(--muted);font-size:12.5px;margin-top:6px}
 
-  /* =========================================================
-     AUTH DROPDOWN (FIX: no rompe márgenes al abrir)
-     - summary chico (casi oculto en visualizador)
-     - panel flotante absolute, no empuja el layout
-     ========================================================= */
+  /* ===== LOGIN COLLAPSIBLE ===== */
   details.authDetails{
-    justify-self:end;
-    width: fit-content;
-    max-width: 100%;
-    position:relative;
+    border:1px solid var(--line2);
+    border-radius:16px;
+    background: rgba(0,0,0,.16);
+    overflow:hidden;
   }
   details.authDetails > summary{
     list-style:none;
     cursor:pointer;
-    user-select:none;
-
-    display:inline-flex;
+    padding:10px 12px;
+    display:flex;
     align-items:center;
+    justify-content:space-between;
     gap:10px;
-
-    padding:8px 10px;
-    border-radius:999px;
-    border:1px solid var(--line2);
-    background: rgba(0,0,0,.16);
-    color: rgba(233,236,241,.92);
-    font-weight:850;
-    font-size:12.5px;
+    user-select:none;
+    min-height: 44px;
   }
   details.authDetails > summary::-webkit-details-marker{display:none}
 
-  /* el “botoncito”/flecha SIEMPRE chico */
   .authSummary{
     display:flex;align-items:center;gap:10px;
+    font-weight:850;
+    color: rgba(233,236,241,.92);
   }
   .authSummary .dot{
-    width:9px;height:9px;border-radius:999px;
+    width:10px;height:10px;border-radius:999px;
     background: rgba(147,161,182,.35);
     border:1px solid rgba(147,161,182,.35);
-    flex:0 0 auto;
   }
-  .authSummary .txt{opacity:.9}
-  .authCaret{
-    width:14px;height:14px; opacity:.9; flex:0 0 auto;
-    transition: transform .15s ease;
-  }
-  details.authDetails[open] .authCaret{transform: rotate(180deg)}
+  .authSummary .txt{font-size:12.5px}
 
-  /* panel flotante */
-  .authPanel{
-    position:absolute;
-    right:0;
-    top: calc(100% + 10px);
-    z-index:30;
-
-    width: 340px;
-    max-width: min(92vw, 340px);
-
-    border:1px solid var(--line2);
-    border-radius:16px;
-    background: linear-gradient(180deg, rgba(18,22,34,.96), rgba(15,19,32,.94));
-    box-shadow: 0 18px 50px rgba(0,0,0,.45);
-    overflow:hidden;
+  /* flecha chica SIEMPRE */
+  .authChevron{
+    width:16px;height:16px;opacity:.9;flex:0 0 auto;
+    transform-origin:center;
   }
-  @media (max-width: 980px){
-    details.authDetails{justify-self:start}
-    .authPanel{ left:0; right:auto; width: min(92vw, 420px); }
-  }
-
-  .authTopLine{
-    padding:10px 12px;
-    border-bottom:1px solid rgba(35,48,73,.65);
-    display:flex;
-    justify-content:flex-end;
-    color: var(--muted);
-    font-size:12px;
-  }
+  details.authDetails[open] .authChevron{ transform: rotate(180deg); }
 
   .auth{
     display:flex;
@@ -143,6 +108,8 @@
     align-items:center;
     justify-content:flex-end;
     padding:10px 12px 12px 12px;
+    background: rgba(0,0,0,.10);
+    border-top:1px solid var(--line2);
   }
   @media (max-width: 980px){
     .auth{justify-content:flex-start}
@@ -307,11 +274,10 @@
   a{color:#93c5fd;text-decoration:none}
   a:hover{text-decoration:underline}
 
-  /* concepto: SIEMPRE horizontal (fix definitivo) */
+  /* concepto SIEMPRE horizontal */
   td.conceptCell{
     writing-mode: horizontal-tb !important;
     text-orientation: mixed !important;
-    transform: none !important;
     white-space: normal !important;
     word-break: break-word;
     overflow-wrap:anywhere;
@@ -354,7 +320,7 @@
   .small{font-size:12px;color:var(--muted)}
   .err{font-size:12px;color:#fca5a5}
 
-  /* ===== MODAL (menos transparente + panel más sólido) ===== */
+  /* ===== MODAL ===== */
   .modal{
     position:fixed; inset:0;
     display:none;
@@ -393,22 +359,6 @@
 
   /* util */
   .hide{display:none !important}
-
-  /* botón chiquito de eliminar */
-  .miniDanger{
-    padding:7px 10px;
-    border-radius:10px;
-    font-weight:900;
-    border:1px solid rgba(153,27,27,.85);
-    background: rgba(153,27,27,.18);
-    color: rgba(255,255,255,.92);
-    cursor:pointer;
-    display:inline-flex;
-    align-items:center;
-    gap:8px;
-  }
-  .miniDanger:hover{background: rgba(153,27,27,.26)}
-  .miniDanger svg{width:16px;height:16px;opacity:.95}
 </style>
 </head>
 
@@ -421,21 +371,18 @@
       <div class="subhead">Control contable + recibos firmados + acuerdo y anexo imprimibles.</div>
     </div>
 
-    <!-- AUTH: summary chico + panel flotante (no rompe layout) -->
+    <!-- login colapsable -->
     <details class="authDetails" id="authDetails">
       <summary>
         <div class="authSummary">
           <span class="dot" id="authDot"></span>
           <span class="txt" id="authSummaryTxt">Acceso</span>
         </div>
-        <svg class="authCaret" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <svg class="authChevron" viewBox="0 0 24 24" fill="none" aria-hidden="true">
           <path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
         </svg>
       </summary>
-
-      <div class="authPanel">
-        <div class="auth" id="authBar"></div>
-      </div>
+      <div class="auth" id="authBar"></div>
     </details>
   </div>
 
@@ -576,6 +523,7 @@
   <!-- Recibos (se oculta en modo visualizador) -->
   <div class="card" id="cardRecibos">
     <h2 style="margin:0 0 8px 0;color:var(--muted)">Recibos emitidos</h2>
+    <div class="muted" id="recDeleteHint" style="margin-bottom:8px"></div>
     <table>
       <thead>
         <tr>
@@ -584,7 +532,7 @@
           <th class="num" style="width:120px">Monto (U$S)</th>
           <th style="width:220px">Recibo</th>
           <th style="width:140px">Estado</th>
-          <th style="width:140px">Acciones</th>
+          <th style="width:120px">Acciones</th>
         </tr>
       </thead>
       <tbody id="tbodyRec"></tbody>
@@ -706,7 +654,7 @@
 
   function show(id){ $(id).classList.add("show"); }
   function hide(id){ $(id).classList.remove("show"); }
-  function isPeriodo(x){ return /^\d{2}\/\d{4}$/.test(String(x ||"").trim()); }
+  function isPeriodo(x){ return /^\d{2}\/\d{4}$/.test(String(x||"").trim()); }
 
   function periodoActual(){
     const d = new Date();
@@ -1542,6 +1490,7 @@
     $("btnImport").classList.add("hide");
     $("btnReset").classList.add("hide");
     $("cardRecibos").classList.add("hide");
+    $("recDeleteHint").textContent = "";
   }
   function setEditorUI(){
     $("btnEmitir").classList.remove("hide");
@@ -1555,38 +1504,17 @@
   function syncAuthSummary(isEditor){
     const dot = $("authDot");
     const txt = $("authSummaryTxt");
-    const topLine = $("authTopLine");
-
     if(isEditor){
       dot.style.background = "rgba(34,197,94,.55)";
       dot.style.borderColor = "rgba(34,197,94,.55)";
-      txt.textContent = "Editor";
-      topLine.textContent = "Modo editor habilitado";
+      txt.textContent = "Modo editor";
       $("authDetails").open = true;
     } else {
       dot.style.background = "rgba(147,161,182,.35)";
       dot.style.borderColor = "rgba(147,161,182,.35)";
       txt.textContent = "Acceso";
-      topLine.textContent = "Modo visualizador (solo lectura)";
       $("authDetails").open = false;
     }
-  }
-
-  // ========== ELIMINAR RECIBO (solo si está pendiente) ==========
-  function deleteReciboPendiente(recId){
-    if(!canWrite) return alert("Solo en modo editor.");
-    const rec = state.recibos.find(r=>r.id===recId);
-    if(!rec) return;
-
-    if(rec.estado !== "pendiente"){
-      return alert("Este recibo ya está imputado. Para mantener consistencia contable no se elimina desde acá.");
-    }
-
-    if(!confirm(`Eliminar recibo R${rec.numero} (${rec.periodo}) por U$S ${fmt(rec.monto)}?`)) return;
-
-    state.recibos = state.recibos.filter(r=>r.id!==recId);
-    saveState();
-    render();
   }
 
   // ========== STATE ==========
@@ -1620,6 +1548,58 @@
     });
   }
 
+  // ========== RECIBOS: ELIMINAR / ANULAR ==========
+  function eliminarReciboPendiente(recId){
+    if(!canWrite) return;
+    const rec = state.recibos.find(r=>r.id===recId);
+    if(!rec) return;
+
+    if(rec.estado !== "pendiente"){
+      alert("Este recibo no está pendiente. Para los imputados usá ANULAR.");
+      return;
+    }
+
+    const msg = `Eliminar recibo R${rec.numero} (${rec.periodo}) por U$S ${fmt(rec.monto)}?\n\nEsto NO afecta movimientos porque aún no está imputado.`;
+    if(!confirm(msg)) return;
+
+    state.recibos = state.recibos.filter(r=>r.id!==recId);
+    saveState();
+    render();
+  }
+
+  function anularReciboImputado(recId){
+    if(!canWrite) return;
+    const rec = state.recibos.find(r=>r.id===recId);
+    if(!rec) return;
+
+    if(rec.estado !== "imputado"){
+      alert("Solo se pueden anular recibos IMPUTADOS.");
+      return;
+    }
+
+    const msg =
+      `ANULAR recibo R${rec.numero} (${rec.periodo}) por U$S ${fmt(rec.monto)}?\n\n` +
+      `Se agregará un movimiento de DÉBITO por el mismo monto para revertir el pago, sin borrar el historial.\n` +
+      `Esto ajusta el saldo automáticamente.`;
+    if(!confirm(msg)) return;
+
+    state.movs.push({
+      id: crypto.randomUUID(),
+      periodo: rec.periodo,
+      concepto: `ANULACIÓN de pago – Recibo R${rec.numero}`,
+      debito: Number(rec.monto || 0),
+      credito: 0,
+      recibo_num: rec.numero,
+      adjunto: null,
+      obs: "Reversión contable por anulación del recibo imputado."
+    });
+
+    rec.estado = "anulado";
+
+    saveState();
+    render();
+  }
+
   // ========== RENDER ==========
   function render(){
     if(!state || !state.meta || !Array.isArray(state.movs) || !Array.isArray(state.recibos)){
@@ -1639,6 +1619,12 @@
     $("saldoGrande").textContent = "U$S " + fmt(saldo);
     $("saldoExtra").textContent = `Saldo restante: U$S ${fmt(saldoRestante)} · Fin estimado: ${fin} · Cuotas restantes: ${cuotasRestantes}`;
     $("planResumenInline").textContent = `Saldo restante: U$S ${fmt(saldoRestante)} · Fin estimado: ${fin} · Cuotas restantes: ${cuotasRestantes}`;
+
+    // hint editor
+    if(canWrite){
+      $("recDeleteHint").textContent =
+        "Tip: los recibos PENDIENTES se pueden eliminar. Los IMPUTADOS se pueden ANULAR (revierte el pago con un débito, sin borrar el historial).";
+    }
 
     // Plan
     const tbPlan = $("tbodyPlan");
@@ -1662,20 +1648,22 @@
       tbRec.innerHTML = `<tr><td data-label="Info" colspan="6" class="muted">Todavía no hay recibos emitidos.</td></tr>`;
     } else {
       state.recibos.slice().sort((a,b)=>a.numero.localeCompare(b.numero)).forEach(r=>{
-        const est = (r.estado==="pendiente" ? "Pendiente" : "Imputado");
+        const est =
+          (r.estado==="pendiente" ? "Pendiente" :
+          (r.estado==="imputado" ? "Imputado" : "Anulado"));
+
         const ver = `<a href="#" class="lnkRec" data-id="${r.id}">Ver</a>`;
 
-        const acciones = (!canWrite)
-          ? "—"
-          : (r.estado==="pendiente"
-              ? `<button class="miniDanger btnDelRec" data-id="${r.id}" title="Eliminar recibo">
-                   <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                     <path d="M6 7h12M10 7V5h4v2M8 7l1 14h6l1-14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                   </svg>
-                   Eliminar
-                 </button>`
-              : `<span class="small">—</span>`
-            );
+        let acciones = "—";
+        if(canWrite){
+          if(r.estado==="pendiente"){
+            acciones = `<a href="#" class="lnkDelRec" data-id="${r.id}" style="color:#fca5a5">Eliminar</a>`;
+          } else if(r.estado==="imputado"){
+            acciones = `<a href="#" class="lnkAnuRec" data-id="${r.id}" style="color:#fde68a">Anular</a>`;
+          } else {
+            acciones = `<span class="small">—</span>`;
+          }
+        }
 
         const tr = document.createElement("tr");
         tr.innerHTML = `
@@ -1717,7 +1705,7 @@
       tbMov.appendChild(tr);
     });
 
-    // links
+    // Ver recibo
     document.querySelectorAll(".lnkRec").forEach(a=>{
       a.onclick = (e)=>{
         e.preventDefault();
@@ -1727,14 +1715,18 @@
 
         if(rec.estado==="pendiente"){
           openReciboPrint(state, rec, "pendiente");
-        } else {
+        } else if(rec.estado==="imputado"){
           const movs2 = calcSaldos(state);
           const mov = movs2.find(mm=>mm.recibo_num===rec.numero);
           openReciboPrint(state, rec, "imputado", mov ? mov.saldo : undefined);
+        } else {
+          // anulado: dejo ver el recibo igual (se imprimirá sin "saldo luego" porque no es imputación activa)
+          openReciboPrint(state, rec, "pendiente");
         }
       };
     });
 
+    // Adjuntos
     document.querySelectorAll(".lnkAdj").forEach(a=>{
       a.onclick = (e)=>{
         e.preventDefault();
@@ -1744,15 +1736,23 @@
       };
     });
 
-    document.querySelectorAll(".btnDelRec").forEach(b=>{
-      b.onclick = (e)=>{
+    // Eliminar pendiente
+    document.querySelectorAll(".lnkDelRec").forEach(a=>{
+      a.onclick = (e)=>{
         e.preventDefault();
-        const id = b.getAttribute("data-id");
-        deleteReciboPendiente(id);
+        eliminarReciboPendiente(a.getAttribute("data-id"));
       };
     });
 
-    // imputar habilitación
+    // Anular imputado
+    document.querySelectorAll(".lnkAnuRec").forEach(a=>{
+      a.onclick = (e)=>{
+        e.preventDefault();
+        anularReciboImputado(a.getAttribute("data-id"));
+      };
+    });
+
+    // imputar habilitación (pendientes reales)
     const pendientes = state.recibos.filter(r=>r.estado==="pendiente");
     $("btnImputar").disabled = pendientes.length===0;
 
@@ -1929,14 +1929,6 @@
       saveState();
       render();
     };
-
-    // cerrar auth dropdown si clickeás afuera (sin romper nada)
-    document.addEventListener("click", (ev)=>{
-      const det = $("authDetails");
-      if(!det.open) return;
-      const within = det.contains(ev.target);
-      if(!within) det.open = false;
-    }, { capture:true });
   }
 
   // ========== INIT ==========
@@ -1961,6 +1953,7 @@
       setViewerUI();
       syncAuthSummary(false);
     }
+    render();
   });
 
   render();
