@@ -891,8 +891,10 @@
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
 <title>${docTitle}</title>
+
 <style>
-  @page{ size:A5 landscape; margin:10mm; }
+  /* Imprimir en A4 vertical, cada "sheet" ocupa la mitad de la altura útil */
+  @page{ size: A4 portrait; margin: 10mm; }
   html,body{ height:100%; }
   body{ margin:0; font-family:system-ui,Segoe UI,Arial; color:#111; background:#fff; }
   :root{ --barH:56px; }
@@ -926,14 +928,21 @@
     cursor:pointer;
   }
 
+  /* A4 portrait: altura útil = 297mm - (margen superior + inferior).
+     Como usamos margin:10mm (arriba + abajo), altura útil = 297 - 20 = 277mm.
+     La mitad = 138.5mm -> usamos esa altura para que cada recibo ocupe la mitad. */
   .sheet{
     background:#fff;
     border:1px solid #111;
     border-radius:10px;
     box-sizing:border-box;
-    width: min(1100px, calc(100vw - 24px));
-    margin: 12px auto;
+    /* ancho: ancho de área imprimible (100% - márgenes horizontales) */
+    width: calc(100% - 20mm);
+    /* altura: mitad de la altura útil de A4 */
+    height: 138.5mm;
+    margin: 10mm auto; /* posiciona respetando los márgenes de la página */
     padding: 14px;
+    overflow: hidden;
   }
 
   p{
@@ -961,6 +970,7 @@
   .line{border-top:1px solid #111;margin-top:18px}
 
   @media (max-width: 900px){
+    /* en vista móvil adaptamos para ver bien en pantalla, pero la impresión usa @page */
     .sheet{
       width:100vw;
       margin:0;
@@ -976,16 +986,17 @@
     .topbar{ display:none; }
     html,body{ height:auto; }
     .sheet{
-      width: 100%;
-      margin:0;
+      /* mantener la misma anchura/alto en impresión; no forzar salto de página entre medias
+         para permitir 2 "sheets" por A4 (una arriba, otra abajo) */
+      width: calc(100% - 20mm);
       padding:10mm;
-      border:1px solid #111;
-      border-radius:10px;
+      border-radius:6px;
       break-inside: avoid;
       page-break-inside: avoid;
     }
   }
 </style>
+
 </head>
 <body>
 
@@ -1265,7 +1276,7 @@
 
       <p><b>PRIMERA – Antecedentes.</b> Las partes manifiestan que celebraron la compraventa del inmueble sito en
         <b>${state.meta.inmueble}</b>, instrumentada mediante <b>Escritura Pública Nº ${state.meta.escritura_num}</b>, pasada ante el
-        <b>Registro Notarial Nº ${state.meta.registro}</b>, referida al mes de <b>${state.meta.ref_mes}</b>.
+        <b>Registro Notarial Nº ${state.meta.registro}</b>, referida al 22 del mes de <b>${state.meta.ref_mes}</b>.
       </p>
 
       <p><b>SEGUNDA – Entrega inicial ya efectuada.</b> Las partes dejan constancia de que el COMPRADOR entregó en concepto de entrega inicial la suma de
@@ -1718,7 +1729,7 @@
           const mov = movs2.find(mm=>mm.recibo_num===rec.numero);
           openReciboPrint(state, rec, "imputado", mov ? mov.saldo : undefined);
         } else {
-          // anulado: dejo ver el recibo igual (se imprimirá sin "saldo luego" porque no es imputación activa)
+          // anulado: dejo ver el recibo igual (se imp72imirá sin "saldo luego" porque no es imputación activa)
           openReciboPrint(state, rec, "pendiente");
         }
       };
