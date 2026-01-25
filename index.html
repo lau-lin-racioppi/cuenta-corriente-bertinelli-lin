@@ -893,107 +893,43 @@
 <title>${docTitle}</title>
 
 <style>
-  /* Imprimir en A4 vertical, cada "sheet" ocupa la mitad de la altura útil */
-  @page{ size: A4 portrait; margin: 10mm; }
-  html,body{ height:100%; }
-  body{ margin:0; font-family:system-ui,Segoe UI,Arial; color:#111; background:#fff; }
-  :root{ --barH:56px; }
+  /* A4 vertical, cada sheet ocupa la mitad útil de la página (2 por hoja) */
+  @page { size: A4 portrait; margin: 10mm; }
+  html,body { height:100%; margin:0; background:#fff; color:#111; font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial; }
+  :root { --page-padding:10mm; --sheet-height-mm: 138.5mm; } /* 297 - 20 = 277 -> mitad = 138.5 */
 
-  .topbar{
-    position: sticky;
-    top:0;
-    z-index:10;
-    height: var(--barH);
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    gap:10px;
-    padding: 10px 12px;
-    background:#fff;
-    border-bottom: 1px solid #e5e7eb;
-  }
-  .topbar .ttl{
-    font-size:14px;
-    font-weight:900;
-    white-space:nowrap;
-    overflow:hidden;
-    text-overflow:ellipsis;
-  }
-  .btn{
-    border:1px solid #111;
-    background:#f2f2f2;
-    padding:8px 12px;
-    border-radius:10px;
-    font-weight:800;
-    cursor:pointer;
-  }
+  .topbar{ display:flex; align-items:center; justify-content:space-between; padding:8px 12px; background:#fff; border-bottom:1px solid #eee; }
+  .btn{ border:1px solid #111; background:#f2f2f2; padding:6px 10px; border-radius:8px; font-weight:800; cursor:pointer; }
 
-  /* A4 portrait: altura útil = 297mm - (margen superior + inferior).
-     Como usamos margin:10mm (arriba + abajo), altura útil = 297 - 20 = 277mm.
-     La mitad = 138.5mm -> usamos esa altura para que cada recibo ocupe la mitad. */
   .sheet{
-    background:#fff;
-    border:1px solid #111;
-    border-radius:10px;
-    box-sizing:border-box;
-    /* ancho: ancho de área imprimible (100% - márgenes horizontales) */
+    box-sizing: border-box;
     width: calc(100% - 20mm);
-    /* altura: mitad de la altura útil de A4 */
-    height: 138.5mm;
-    margin: 10mm auto; /* posiciona respetando los márgenes de la página */
-    padding: 14px;
+    height: var(--sheet-height-mm);
+    margin: 0 auto 10mm auto;
+    padding: 12px;
+    border: 1px solid #111;
+    border-radius: 6px;
+    background: #fff;
     overflow: hidden;
+    page-break-inside: avoid;
+    break-inside: avoid;
   }
 
-  p{
-    text-align: justify;
-    text-justify: inter-word;
-    hyphens: auto;
-    -webkit-hyphens: auto;
-    overflow-wrap: break-word;
+  .sheet p{ margin:6px 0; hyphens:auto; }
+  .h1{font-size:18px;font-weight:900;margin:0 0 6px 0}
+  .kv{margin:8px 0;font-size:14px}
+  .line{border-top:1px solid #111;margin-top:8px}
+
+  /* Impresión: ocultar controles y mantener 2 por hoja */
+  @media print {
+    .topbar { display:none; }
+    html,body { height:auto; }
+    .sheet { padding: 10mm; width: calc(100% - 20mm); border-radius:4px; }
   }
 
-  .h1{font-size:20px;font-weight:900;margin:0 0 4px 0}
-  .sub{font-size:14px;color:#333;margin:0 0 10px 0}
-  .txt{font-size:15.5px;line-height:1.65;margin:0 0 10px 0}
-  .b{font-weight:900}
-  .upper{font-weight:900;text-transform:uppercase}
-
-  .kv{margin:8px 0;font-size:15px}
-  .k{color:#222}
-
-  .vbox{ display:flex; flex-direction:column; height: 100%; }
-  .grow{ flex:1; }
-
-  .sigGrid{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:12px}
-  .lineLabel{font-size:12.5px;color:#333;margin-top:6px}
-  .line{border-top:1px solid #111;margin-top:18px}
-
-  @media (max-width: 900px){
-    /* en vista móvil adaptamos para ver bien en pantalla, pero la impresión usa @page */
-    .sheet{
-      width:100vw;
-      margin:0;
-      border-radius:0;
-      border-left:none;
-      border-right:none;
-      padding: 16px;
-      min-height: calc(100dvh - var(--barH));
-    }
-  }
-
-  @media print{
-    .topbar{ display:none; }
-    html,body{ height:auto; }
-    .sheet{
-      /* mantener la misma anchura/alto en impresión; no forzar salto de página entre medias
-         para permitir 2 "sheets" por A4 (una arriba, otra abajo) */
-      width: calc(100% - 20mm);
-      padding:10mm;
-      border-radius:6px;
-      break-inside: avoid;
-      page-break-inside: avoid;
-    }
+  /* Adaptación en pantalla para previsualizar bien */
+  @media (max-width:900px) {
+    .sheet { width: calc(100vw - 24px); height: auto; margin-bottom: 12px; }
   }
 </style>
 
