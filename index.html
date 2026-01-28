@@ -571,10 +571,6 @@
         <div class="small">Monto (U$S)</div>
         <input id="e_monto" type="number" min="1" step="1" placeholder="500" />
       </div>
-      <div style="grid-column:1/-1">
-        <div class="small">Concepto</div>
-        <input id="e_concepto" value="Pago mensual" />
-      </div>
     </div>
     <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:12px">
       <button class="btn" id="e_cancel">Cancelar</button>
@@ -867,7 +863,7 @@
   }
 
   // ==================================================
-  // RECIBO A5 apaisado – 1 sola hoja + borde
+  // RECIBO A4 portrait – 2 copias iguales en 1 hoja (con márgenes + espacio para corte)
   // ==================================================
   function openReciboPrint(state, rec, modo, saldoLuego){
     const isImputado = (modo === "imputado");
@@ -884,6 +880,46 @@
     const docTitle = `Recibo R${rec.numero} – ${rec.periodo}`;
     const fileName = `recibo_R${rec.numero}_${String(rec.periodo).replace("/","-")}.html`;
 
+    const copyHtml = `
+      <div class="copy">
+        <div class="h1">RECIBO N° ${rec.numero}</div>
+        <div class="sub">Cuenta Corriente – Bertinelli / Lin Racioppi</div>
+
+        <p class="txt">
+          En la ciudad de Buenos Aires, en el mes de <span class="b">${mes} de ${yyyy}</span>,
+          recibí de <span class="b">${state.meta.comprador}</span> la suma de
+          <span class="upper">${montoLinea}</span>,
+          en concepto de pago a cuenta del saldo pendiente de la operación de compraventa instrumentada mediante
+          <span class="b">Escritura Pública Nº ${state.meta.escritura_num}</span> (Registro Notarial Nº ${state.meta.registro}),
+          referida al mes de <span class="b">${state.meta.ref_mes}</span>.
+        </p>
+
+        <div class="kv"><span class="k">Concepto:</span> <span class="b">${rec.concepto}</span></div>
+        <div class="kv"><span class="k">Período imputado:</span> <span class="b">${rec.periodo}</span></div>
+        ${saldoBlock}
+
+        <div class="grow"></div>
+
+        <div class="sigGrid">
+          <div>
+            <div class="line"></div>
+            <div class="lineLabel">${state.meta.comprador}</div>
+            <div class="lineLabel">DNI: ${state.meta.dni_comprador}</div>
+          </div>
+
+          <div>
+            <div class="line"></div>
+            <div class="lineLabel">${state.meta.vendedor}</div>
+            <div class="lineLabel">DNI: ${state.meta.dni_vendedor}</div>
+          </div>
+        </div>
+      </div>
+    `;
+
+    // ✅ CAMBIO CLAVE: agrego separación REAL entre copias SIN mover la línea al centro exacto
+    // - .page usa --GAP para dejar aire entre las dos cajas
+    // - cada .copy mide la mitad del alto útil MENOS la mitad del GAP
+    // - la cutGuide queda EXACTA al 50% del alto útil (sin importar el gap)
     const html = `
 <!doctype html>
 <html lang="es">
@@ -891,48 +927,137 @@
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
 <title>${docTitle}</title>
-
 <style>
-  /* A4 vertical, cada sheet ocupa la mitad útil de la página (2 por hoja) */
-  @page { size: A4 portrait; margin: 10mm; }
-  html,body { height:100%; margin:0; background:#fff; color:#111; font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial; }
-  :root { --page-padding:10mm; --sheet-height-mm: 138.5mm; } /* 297 - 20 = 277 -> mitad = 138.5 */
+  @page{ size:A4 portrait; margin:0; }
 
-  .topbar{ display:flex; align-items:center; justify-content:space-between; padding:8px 12px; background:#fff; border-bottom:1px solid #eee; }
-  .btn{ border:1px solid #111; background:#f2f2f2; padding:6px 10px; border-radius:8px; font-weight:800; cursor:pointer; }
+  html,body{ height:100%; }
+  body{ margin:0; font-family:system-ui,Segoe UI,Arial; color:#111; background:#fff; }
 
-  .sheet{
+  :root{
+    --barH:56px;
+    --PAD:12mm;
+    --GAP:10mm; /* <<< separación entre recibos (ajustable) */
+  }
+
+  .topbar{
+    position: sticky;
+    top:0;
+    z-index:10;
+    height: var(--barH);
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    padding: 10px 12px;
+    background:#fff;
+    border-bottom: 1px solid #e5e7eb;
+  }
+  .topbar .ttl{
+    font-size:14px;
+    font-weight:900;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+  }
+  .btn{
+    border:1px solid #111;
+    background:#f2f2f2;
+    padding:8px 12px;
+    border-radius:10px;
+    font-weight:800;
+    cursor:pointer;
+  }
+
+  .page{
+    width: 210mm;
+    height: 297mm;
+    padding: var(--PAD);
     box-sizing: border-box;
-    width: calc(100% - 20mm);
-    height: var(--sheet-height-mm);
-    margin: 0 auto 10mm auto;
-    padding: 12px;
-    border: 1px solid #111;
-    border-radius: 6px;
-    background: #fff;
-    overflow: hidden;
-    page-break-inside: avoid;
-    break-inside: avoid;
+    position: relative;
+
+    display:flex;
+    flex-direction:column;
+    gap: var(--GAP); /* <<< deja aire entre las dos copias */
   }
 
-  .sheet p{ margin:6px 0; hyphens:auto; }
-  .h1{font-size:18px;font-weight:900;margin:0 0 6px 0}
+  /* guía EXACTA al 50% del alto útil (sin contar padding) */
+  .cutGuide{
+    position:absolute;
+    left: var(--PAD);
+    right: var(--PAD);
+    top: calc(var(--PAD) + (297mm - (var(--PAD) * 2)) / 2);
+    border-top: 1px dashed #9ca3af;
+    pointer-events:none;
+  }
+
+  /* cada recibo ocupa media hoja útil MENOS media separación */
+  .copy{
+    height: calc(((297mm - (var(--PAD) * 2)) - var(--GAP)) / 2);
+    box-sizing:border-box;
+
+    border:1px solid #111;
+    border-radius:10px;
+    padding: 10mm;
+
+    display:flex;
+    flex-direction:column;
+
+    min-height:0;
+    overflow:hidden;
+  }
+
+  p{
+    text-align: justify;
+    text-justify: inter-word;
+    hyphens: auto;
+    -webkit-hyphens: auto;
+    overflow-wrap: break-word;
+  }
+
+  .h1{font-size:18px;font-weight:900;margin:0 0 4px 0}
+  .sub{font-size:13.5px;color:#333;margin:0 0 10px 0}
+  .txt{font-size:14.5px;line-height:1.62;margin:0 0 10px 0}
+  .b{font-weight:900}
+  .upper{font-weight:900;text-transform:uppercase}
+
   .kv{margin:8px 0;font-size:14px}
-  .line{border-top:1px solid #111;margin-top:8px}
+  .k{color:#222}
 
-  /* Impresión: ocultar controles y mantener 2 por hoja */
-  @media print {
-    .topbar { display:none; }
-    html,body { height:auto; }
-    .sheet { padding: 10mm; width: calc(100% - 20mm); border-radius:4px; }
+  .grow{ flex:1; min-height:0; }
+
+  .sigGrid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:10px}
+  .lineLabel{font-size:12.5px;color:#333;margin-top:6px}
+  .line{border-top:1px solid #111;margin-top:16px}
+
+  @media screen{
+    body{ background:#e5e7eb; }
+    .page{
+      margin: 12px auto;
+      box-shadow:0 10px 30px rgba(0,0,0,.15);
+      background:#fff;
+    }
   }
 
-  /* Adaptación en pantalla para previsualizar bien */
-  @media (max-width:900px) {
-    .sheet { width: calc(100vw - 24px); height: auto; margin-bottom: 12px; }
+  @media (max-width: 900px){
+    .page{
+      width: calc(100vw - 16px);
+      height: auto;
+      padding: 14px;
+      gap: 12px;
+    }
+    .cutGuide{ display:none; }
+    .copy{ height:auto; overflow:visible; }
+  }
+
+  @media print{
+    .topbar{ display:none; }
+    body{ background:#fff; }
+    .page{
+      margin:0;
+      box-shadow:none;
+    }
   }
 </style>
-
 </head>
 <body>
 
@@ -941,42 +1066,10 @@
   <button class="btn" id="btnCta">...</button>
 </div>
 
-<div class="sheet">
-  <div class="vbox">
-    <div>
-      <div class="h1">RECIBO N° ${rec.numero}</div>
-      <div class="sub">Cuenta Corriente – Bertinelli / Lin Racioppi</div>
-
-      <p class="txt">
-        En la ciudad de Buenos Aires, en el mes de <span class="b">${mes} de ${yyyy}</span>,
-        recibí de <span class="b">${state.meta.comprador}</span> la suma de
-        <span class="upper">${montoLinea}</span>,
-        en concepto de pago a cuenta del saldo pendiente de la operación de compraventa instrumentada mediante
-        <span class="b">Escritura Pública Nº ${state.meta.escritura_num}</span> (Registro Notarial Nº ${state.meta.registro}),
-        referida al mes de <span class="b">${state.meta.ref_mes}</span>.
-      </p>
-
-      <div class="kv"><span class="k">Concepto:</span> <span class="b">${rec.concepto}</span></div>
-      <div class="kv"><span class="k">Período imputado:</span> <span class="b">${rec.periodo}</span></div>
-      ${saldoBlock}
-    </div>
-
-    <div class="grow"></div>
-
-    <div class="sigGrid">
-      <div>
-        <div class="line"></div>
-        <div class="lineLabel">${state.meta.comprador}</div>
-       <div class="lineLabel">DNI: ${state.meta.dni_comprador}</div>
-      </div>
-
-      <div>
-        <div class="line"></div>
-        <div class="lineLabel">${state.meta.vendedor} 
-       <div class="lineLabel">DNI: ${state.meta.dni_vendedor}</div>
-      </div>
-    </div>
-  </div>
+<div class="page">
+  ${copyHtml}
+  ${copyHtml}
+  <div class="cutGuide" aria-hidden="true"></div>
 </div>
 
 <script>
@@ -1212,7 +1305,7 @@
 
       <p><b>PRIMERA – Antecedentes.</b> Las partes manifiestan que celebraron la compraventa del inmueble sito en
         <b>${state.meta.inmueble}</b>, instrumentada mediante <b>Escritura Pública Nº ${state.meta.escritura_num}</b>, pasada ante el
-        <b>Registro Notarial Nº ${state.meta.registro}</b>, referida al 22 del mes de <b>${state.meta.ref_mes}</b>.
+        <b>Registro Notarial Nº ${state.meta.registro}</b>, referida al mes de <b>${state.meta.ref_mes}</b>.
       </p>
 
       <p><b>SEGUNDA – Entrega inicial ya efectuada.</b> Las partes dejan constancia de que el COMPRADOR entregó en concepto de entrega inicial la suma de
@@ -1565,13 +1658,11 @@
     $("saldoExtra").textContent = `Saldo restante: U$S ${fmt(saldoRestante)} · Fin estimado: ${fin} · Cuotas restantes: ${cuotasRestantes}`;
     $("planResumenInline").textContent = `Saldo restante: U$S ${fmt(saldoRestante)} · Fin estimado: ${fin} · Cuotas restantes: ${cuotasRestantes}`;
 
-    // hint editor
     if(canWrite){
       $("recDeleteHint").textContent =
         "Tip: los recibos PENDIENTES se pueden eliminar. Los IMPUTADOS se pueden ANULAR (revierte el pago con un débito, sin borrar el historial).";
     }
 
-    // Plan
     const tbPlan = $("tbodyPlan");
     tbPlan.innerHTML = "";
     plan.forEach(p=>{
@@ -1586,7 +1677,6 @@
       tbPlan.appendChild(tr);
     });
 
-    // Recibos
     const tbRec = $("tbodyRec");
     tbRec.innerHTML = "";
     if(state.recibos.length === 0){
@@ -1623,7 +1713,6 @@
       });
     }
 
-    // Movimientos
     const tbMov = $("tbodyMov");
     tbMov.innerHTML = "";
     movs.forEach(m=>{
@@ -1650,7 +1739,6 @@
       tbMov.appendChild(tr);
     });
 
-    // Ver recibo
     document.querySelectorAll(".lnkRec").forEach(a=>{
       a.onclick = (e)=>{
         e.preventDefault();
@@ -1665,13 +1753,11 @@
           const mov = movs2.find(mm=>mm.recibo_num===rec.numero);
           openReciboPrint(state, rec, "imputado", mov ? mov.saldo : undefined);
         } else {
-          // anulado: dejo ver el recibo igual (se imp72imirá sin "saldo luego" porque no es imputación activa)
           openReciboPrint(state, rec, "pendiente");
         }
       };
     });
 
-    // Adjuntos
     document.querySelectorAll(".lnkAdj").forEach(a=>{
       a.onclick = (e)=>{
         e.preventDefault();
@@ -1681,7 +1767,6 @@
       };
     });
 
-    // Eliminar pendiente
     document.querySelectorAll(".lnkDelRec").forEach(a=>{
       a.onclick = (e)=>{
         e.preventDefault();
@@ -1689,7 +1774,6 @@
       };
     });
 
-    // Anular imputado
     document.querySelectorAll(".lnkAnuRec").forEach(a=>{
       a.onclick = (e)=>{
         e.preventDefault();
@@ -1697,7 +1781,6 @@
       };
     });
 
-    // imputar habilitación (pendientes reales)
     const pendientes = state.recibos.filter(r=>r.estado==="pendiente");
     $("btnImputar").disabled = pendientes.length===0;
 
@@ -1877,6 +1960,8 @@
   }
 
   // ========== INIT ==========
+  function setViewerUIStub(){}
+
   mountAuthUI();
   bindUI();
   bindRealtime();
