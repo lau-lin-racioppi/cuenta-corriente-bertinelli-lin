@@ -141,9 +141,32 @@
     .hero-btn:hover .hero-btn-arrow { transform: translateX(3px); }
 
     footer { position: relative; z-index: 1; margin-top: auto; }
-    .footer-strip { display: block; width: 100%; line-height: 0; position: relative; }
-    .footer-strip a { display: block; width: 100%; }
-    .footer-strip img { display: block; width: 100%; height: auto; cursor: pointer; }
+    .footer-strip {
+      position: relative;
+      width: 100%;
+      line-height: 0;
+      /* Background: two horizontal bands matching the image colors */
+      /* Top 80/130 = 61.5% celeste, rest white */
+      background: linear-gradient(to bottom,
+        rgb(118,170,218) 0px,
+        rgb(118,170,218) 90px,
+        rgb(247,255,255) 90px,
+        rgb(247,255,255) 130px
+      );
+    }
+    .footer-strip a {
+      display: block;
+      width: 100%;
+      position: relative;
+    }
+    .footer-strip img {
+      display: block;
+      /* Never scale up beyond natural 800px, center it */
+      width: min(800px, 100%);
+      height: auto;
+      margin: 0 auto;
+      cursor: pointer;
+    }
     .footer-strip a:hover .strip-tooltip { opacity: 1; }
     .strip-tooltip {
       position: absolute;
