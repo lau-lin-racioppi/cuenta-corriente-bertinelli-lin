@@ -153,10 +153,23 @@
     .footer-strip a { display: block; width: 100%; position: relative; }
     .footer-strip img {
       display: block;
-      width: min(800px, 100%);
+      width: 100%;
       height: auto;
       margin: 0 auto;
       cursor: pointer;
+    }
+    @media (min-width: 600px) {
+      .footer-strip {
+        background: linear-gradient(to bottom,
+          rgb(118,170,218) 0px,
+          rgb(118,170,218) 45px,
+          rgb(247,255,255) 45px,
+          rgb(247,255,255) 65px
+        );
+      }
+      .footer-strip img {
+        width: min(400px, 100%);
+      }
     }
     .footer-strip a:hover .strip-tooltip { opacity: 1; }
     .strip-tooltip {
