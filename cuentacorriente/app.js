@@ -274,9 +274,10 @@ function roughBytesFromDataUrl(dataUrl) {
 }
 
 async function buildAdjuntoForFirestore(file) {
-  // Firestore doc total máx ~1 MiB. Tu state ya ocupa algo. Necesitamos ser conservadores.
-  // Regla práctica: adjunto <= 450 KB (mejor 250-350KB).
-  const MAX_BYTES = 450 * 1024;
+  // Cada adjunto ahora vive en SU PROPIO documento (cuentas/bertinelli-lin/adjuntos/{id}),
+  // no comparte espacio con el resto del state. Por eso el margen es más generoso.
+  // Regla práctica: adjunto <= 700 KB.
+  const MAX_BYTES = 700 * 1024;
 
   if (file.type.startsWith("image/")) {
     // Intento optimizado
@@ -885,7 +886,7 @@ function render() {
     movs.forEach(m => {
       const adj =
         m.recibo_num
-          ? (m.adjunto ? `Adjunto cargado · <a href="#" class="lnkAdj" data-id="${m.id}">Ver</a>` : `Falta adjunto`)
+          ? ((m.adjunto || m.tieneAdjunto) ? `Adjunto cargado · <a href="#" class="lnkAdj" data-id="${m.id}">Ver</a>` : `Falta adjunto`)
           : "—";
 
       const tr = document.createElement("tr");
@@ -925,11 +926,31 @@ function render() {
   });
 
   document.querySelectorAll(".lnkAdj").forEach(a => {
-    a.onclick = (e) => {
+    a.onclick = async (e) => {
       e.preventDefault();
       const id = a.getAttribute("data-id");
       const mov = state.movs.find(m => m.id === id);
-      if (mov?.adjunto) abrirAdjunto(mov.adjunto);
+      if (!mov) return;
+
+      if (mov.adjunto) {
+        // recibos viejos: el adjunto sigue embebido en el state (compatibilidad)
+        abrirAdjunto(mov.adjunto);
+        return;
+      }
+
+      if (mov.tieneAdjunto) {
+        try {
+          const snap = await getDoc(doc(db, "cuentas", "bertinelli-lin", "adjuntos", id));
+          if (snap.exists()) {
+            abrirAdjunto(snap.data());
+          } else {
+            alert("No encontré el adjunto guardado.");
+          }
+        } catch (err) {
+          console.error(err);
+          alert("No pude cargar el adjunto.");
+        }
+      }
     };
   });
 
@@ -1074,28 +1095,34 @@ function bindUI() {
 
         const obs = String($("i_obs").value || "").trim();
 
-        // Construye adjunto para Firestore (optimiza imagen)
-        let adjunto;
+        const movId = crypto.randomUUID();
+
+        // Construye y guarda el adjunto en SU PROPIO documento (no en el doc principal del state)
         try {
-          adjunto = await buildAdjuntoForFirestore(file);
+          const adjuntoData = await buildAdjuntoForFirestore(file);
+          await setDoc(doc(db, "cuentas", "bertinelli-lin", "adjuntos", movId), {
+            ...adjuntoData,
+            ts: Date.now()
+          });
         } catch (e) {
           if (String(e?.message || e) === "ADJUNTO_DEMASIADO_GRANDE" || String(e) === "ADJUNTO_DEMASIADO_GRANDE") {
-            return alert("El adjunto es demasiado grande para guardarlo en Firestore. Sacá la foto más cerca / menor resolución, o mandalo como imagen recortada.");
+            return alert("El adjunto es demasiado grande. Sacá la foto más cerca / menor resolución, o mandalo como imagen recortada.");
           }
           if (String(e?.message || e) === "PDF_DEMASIADO_GRANDE" || String(e) === "PDF_DEMASIADO_GRANDE") {
-            return alert("El PDF es demasiado grande para guardarlo en Firestore. Convertí a imagen o reducilo.");
+            return alert("El PDF es demasiado grande. Convertí a imagen o reducilo.");
           }
-          return alert("No pude preparar el adjunto (tipo o tamaño inválido).");
+          console.error(e);
+          return alert("No pude guardar el adjunto (tipo o tamaño inválido).");
         }
 
         state.movs.push({
-          id: crypto.randomUUID(),
+          id: movId,
           periodo: rec.periodo,
           concepto: rec.concepto,
           debito: 0,
           credito: rec.monto,
           recibo_num: rec.numero,
-          adjunto,
+          tieneAdjunto: true,
           obs: obs || null
         });
 
