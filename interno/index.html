@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Acceso interno — Lin Racioppi</title>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Acceso interno">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <link rel="canonical" href="/interno/" />
+  <link rel="stylesheet" href="./hub.css" />
+</head>
+<body>
+  <div class="wrap">
+
+    <div class="top">
+      <div>
+        <h1>Acceso interno</h1>
+        <div class="subhead">Panel personal — herramientas privadas.</div>
+      </div>
+    </div>
+
+    <!-- LOGIN (visible solo si no hay sesión) -->
+    <div class="card" id="loginCard">
+      <div class="loginBox">
+        <div class="loginTtl">Iniciar sesión</div>
+        <input id="loginEmail" type="email" placeholder="Email" />
+        <input id="loginPass" type="password" placeholder="Contraseña" />
+        <button id="btnLogin" class="btn primary">Entrar</button>
+        <div class="err" id="loginErr"></div>
+      </div>
+    </div>
+
+    <!-- HUB (visible solo con sesión iniciada) -->
+    <div id="hub" class="hide">
+      <div class="top" style="margin-bottom:14px">
+        <span class="muted" id="whoami"></span>
+        <button id="btnLogout" class="btn">Salir</button>
+      </div>
+
+      <div class="grid" id="toolsGrid">
+        <!-- Las tarjetas se arman en app.js a partir de una lista simple -->
+      </div>
+    </div>
+
+  </div>
+
+  <script type="module" src="./hub.js"></script>
+</body>
+</html>

@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Lugares visitados — Lin Racioppi</title>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Lugares visitados">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <link rel="canonical" href="/interno/mapa/" />
+  <link rel="stylesheet" href="./mapa.css" />
+</head>
+<body>
+  <div class="wrap">
+
+    <div class="top">
+      <div>
+        <h1>Lugares visitados — Argentina</h1>
+        <div class="subhead">Departamentos y municipios recorridos.</div>
+      </div>
+
+      <div class="statusPill" id="statusPill">Comprobando sesión…</div>
+    </div>
+
+    <div class="heroRow">
+      <div class="saldoPill">
+        <div class="ttl">Progreso</div>
+        <div class="amt" id="contador">— de —</div>
+        <div class="extra" id="contadorExtra">Cargando datos…</div>
+      </div>
+
+      <div class="ctaCol">
+        <div class="btnRow" id="levelBar">
+          <button class="btn primary" id="btnDepartamentos" data-level="departamentos">Departamentos</button>
+          <button class="btn" id="btnMunicipios" data-level="municipios">Municipios</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <svg id="map" viewBox="0 0 640 720" style="width:100%; height:auto; display:block;"></svg>
+      <div id="tooltip" class="muted" style="margin-top:10px; min-height:18px;">
+        Pasá el mouse o tocá un distrito para ver su nombre. Hacé click para marcarlo como visitado (necesita estar logueado como editor).
+      </div>
+    </div>
+
+  </div>
+
+  <script type="module" src="./mapa.js"></script>
+</body>
+</html>
